@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { mdiHelpCircle, mdiWindowClose } from '@/assets/svg/iconPath';
+  import { Icon } from '@iconify/vue';
   import type { StyleValue } from 'vue';
   import { computed, nextTick, onBeforeUnmount, onMounted, ref, useSlots } from 'vue';
   import type { TooltipProps } from './types';
@@ -12,7 +12,7 @@
     bottom: false,
     hovering: false,
     btnClose: false,
-    icon: mdiHelpCircle,
+    icon: 'mdi:help-circle',
     block: false,
   });
 
@@ -152,14 +152,7 @@
   >
     <div class="icon-wrap">
       <slot :toggle="toggle" v-if="slots.default !== undefined"></slot>
-      <SvgIcon
-        type="mdi"
-        class="icon"
-        :size="props.iconSize"
-        :path="props.icon"
-        @click="toggle"
-        v-else
-      />
+      <Icon :icon="props.icon" class="icon" :size="props.iconSize" @click="toggle" v-else />
     </div>
 
     <Transition :name="tooltipTrans" @after-leave="resetStyle">
@@ -177,7 +170,7 @@
             <h5 v-if="props.title">{{ props.title }}</h5>
 
             <a href="#" @click.stop.prevent="hide" v-if="props.btnClose">
-              <SvgIcon type="mdi" class="close" size="14" :path="mdiWindowClose" />
+              <Icon icon="mdi:window-close" class="close" size="14" />
             </a>
           </div>
 

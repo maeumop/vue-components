@@ -1,10 +1,5 @@
 <script setup lang="ts">
-  import {
-    mdiChevronDoubleLeft,
-    mdiChevronDoubleRight,
-    mdiChevronLeft,
-    mdiChevronRight,
-  } from '@/assets/svg/iconPath';
+  import { Icon } from '@iconify/vue';
   import { computed, ref, watch, watchEffect } from 'vue';
   import type { PaginationEmits, PaginationItem, PaginationProps } from './types';
 
@@ -99,12 +94,12 @@
     <ul>
       <li :class="{ disable: nowPage <= 1 }">
         <a href="#" @click.prevent="updateValue(1)">
-          <SvgIcon type="mdi" size="20" :path="mdiChevronDoubleLeft" />
+          <Icon icon="mdi:chevron-double-left" size="20" />
         </a>
       </li>
       <li :class="{ disable: isDisabledPrev }">
         <a href="#" @click.prevent="updateValue(prev)">
-          <SvgIcon type="mdi" size="20" :path="mdiChevronLeft" />
+          <Icon icon="mdi:chevron-left" size="20" />
         </a>
       </li>
 
@@ -118,12 +113,12 @@
 
       <li :class="{ disable: isDisabledNext }">
         <a href="#" @click.prevent="updateValue(next)">
-          <SvgIcon type="mdi" size="20" :path="mdiChevronRight" />
+          <Icon icon="mdi:chevron-right" size="20" />
         </a>
       </li>
       <li :class="{ disable: nowPage >= maxPage }">
         <a href="#" @click.prevent="updateValue(maxPage)">
-          <SvgIcon type="mdi" size="20" :path="mdiChevronDoubleRight" />
+          <Icon icon="mdi:chevron-double-right" size="20" />
         </a>
       </li>
     </ul>

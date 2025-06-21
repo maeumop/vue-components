@@ -1,5 +1,3 @@
-import type { MdiSvgIcon } from '../types';
-
 export interface TooltipModel {
   close(): void;
 }
@@ -14,7 +12,7 @@ export interface TooltipProps {
   width?: number;
   hovering?: boolean;
   btnClose?: boolean;
-  icon?: MdiSvgIcon;
+  icon?: string;
   iconSize?: string;
   dark?: boolean;
   padding?: string;

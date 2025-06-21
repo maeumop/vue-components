@@ -18,6 +18,11 @@ const router = createRouter({
       name: 'buttons',
       component: () => import('../components/StyledButton/ex.vue'),
     },
+    {
+      path: '/components/spinner',
+      name: 'spinner',
+      component: () => import('../components/Spinner/ex.vue'),
+    },
   ],
 });
 

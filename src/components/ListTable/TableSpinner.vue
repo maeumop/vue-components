@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { mdiGoogleCirclesExtended } from '@/assets/svg/iconPath';
+  import { Icon } from '@iconify/vue';
 </script>
 <script lang="ts">
   export default { name: 'TableSpinner' };
@@ -7,7 +7,7 @@
 <template>
   <div class="spinner-wrap">
     <div class="spinner">
-      <SvgIcon type="mdi" size="3.6rem" :path="mdiGoogleCirclesExtended" />
+      <Icon icon="mdi:loading" size="3.6rem" />
     </div>
   </div>
 </template>
