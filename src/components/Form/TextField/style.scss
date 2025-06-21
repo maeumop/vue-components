@@ -1,0 +1,124 @@
+@charset "UTF-8";
+/* @/components/Form/TextField/_style.scss */
+@use "sass:meta";
+@use "sass:map";
+@use "sass:color";
+@use "../../styles" as _;
+@use "../../common";
+
+/// 초기화 버튼 스타일 정의
+/// @output
+@mixin defineBtnClear {
+  position: relative;
+
+  .btn-clear {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 4rem;
+    height: 4rem;
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    svg {
+      margin-top: 0.3rem;
+      color: _.$gray-600;
+    }
+
+    &.with-icon {
+      right: 2.4rem;
+    }
+  }
+}
+
+.input-wrap {
+  display: inline-block;
+  position: relative;
+
+  .options-wrap .counting {
+    margin-bottom: 0.4rem;
+    padding: 0 0.6rem;
+
+    font-size: 1.2rem;
+    color: _.$text-default;
+    line-height: 1.9rem;
+  }
+
+  .input-relative {
+    width: 100%;
+    @include defineBtnClear;
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    border: 0.1rem solid _.$gray-300;
+    border-radius: 0.4rem;
+    padding: 0.9rem 1.6rem;
+    margin: 0;
+    resize: vertical;
+    color: _.$text-default;
+
+    @if (meta.mixin-exists("scrollbar")) {
+      // global scrollbar가 정의 되었있을 경우
+      @include scrollbar;
+    }
+
+    &:not(:read-only, :disabled):focus {
+      outline: none;
+      border-color: _.$primary;
+    }
+
+    &.error {
+      border-color: _.$danger;
+    }
+
+    &:read-only,
+    &:disabled {
+      cursor: default;
+      background-color: _.$gray-100;
+    }
+
+    &::placeholder {
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: _.$text-placeholder;
+    }
+
+    &.left-space {
+      text-indent: 2.5rem;
+    }
+
+    &.right-space {
+      padding-right: 4rem !important;
+    }
+  }
+
+  input {
+    height: 4rem;
+  }
+
+  .with-slot {
+    display: flex;
+    align-items: center;
+    position: relative;
+
+    input + * {
+      flex: 1;
+      margin-right: 0.4rem;
+    }
+
+    svg {
+      display: block;
+      position: absolute;
+      right: 0.8rem;
+      top: 0.8rem;
+      color: _.$gray-800;
+
+      &.left {
+        left: 0.8rem !important;
+      }
+    }
+  }
+}

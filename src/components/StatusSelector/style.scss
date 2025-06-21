@@ -1,0 +1,106 @@
+@charset "UTF-8";
+/* @/components/StatusSelector/_style.scss */
+@use "sass:map";
+@use "sass:selector";
+@use "../styles" as _;
+@use "../styles/keyframes";
+
+.status-selector {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+
+  .wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 0.7rem;
+    padding: 0.4rem 0.5rem 0.4rem 0.8rem;
+
+    &.readonly {
+      padding: 0.4rem 0.8rem;
+      background-color: _.$gray-300;
+    }
+
+    svg {
+      margin-left: 0.5rem;
+      transform-origin: center;
+      transition: transform 0.2s;
+
+      &.rotate {
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  &:has(.wrap.readonly) {
+    cursor: default;
+  }
+
+  ul {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    background-color: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.5);
+    margin-top: 0.5rem;
+    width: max-content;
+    padding: 0.3rem;
+
+    li {
+      font-size: 1.2rem;
+      font-weight: bold;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      transition: background-color 0.2s;
+      cursor: pointer;
+
+      .selectorWrap {
+        display: flex;
+        align-items: center;
+      }
+
+      &:hover {
+        background-color: _.$gray-100;
+      }
+    }
+  }
+
+  .circle {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 0.3rem;
+    margin-right: 0.5rem;
+    background-color: gray;
+
+    @include _.mx-buttonColorStyle using ($color-map) {
+      background-color: map.get($color-map, default);
+
+      + span {
+        color: map.get($color-map, text);
+      }
+    }
+  }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.page-fade-enter-from {
+  opacity: 0;
+}
+.page-fade-leave-from {
+  display: none;
+}
+.page-fade-enter-active {
+  transition: opacity 0.5s;
+}

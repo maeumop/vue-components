@@ -1,0 +1,267 @@
+@charset "UTF-8";
+/* @/components/Form/SelectBox/_style.scss */
+@use "sass:map";
+@use "sass:color";
+@use "../../styles" as _;
+@use "../../common";
+
+.select-box {
+  display: inline-block;
+  position: relative;
+  outline: none;
+
+  .control-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 4rem;
+    padding: 1rem 1.5rem;
+    margin: 0;
+
+    border: 0.1rem solid _.$gray-300;
+    border-radius: 0.4rem;
+
+    // [single|multiple] 선택란
+    .text {
+      flex: 1;
+      display: flex;
+      flex-wrap: wrap;
+      color: _.$text-default;
+      font-size: 1.4rem;
+      font-weight: 400;
+
+      // placeholder 정의
+      &.ph {
+        font-size: 1.4rem;
+        color: _.$text-placeholder;
+        font-weight: 400;
+      }
+
+      // inLabel 정의
+      span.label {
+        color: _.$text-default;
+        margin-right: 0.5rem;
+      }
+
+      // isShort 정의
+      span.item {
+        display: flex;
+        align-items: center;
+        background-color: _.$gray-600;
+
+        padding: 0.1rem 0.7rem;
+        color: #fff;
+        font-size: 1.1rem;
+        font-weight: 400;
+        // border-radius: 0.4rem;
+
+        & + span.item {
+          margin-left: 0.3rem;
+        }
+
+        // X 아이콘 정의
+        svg.remove-icon {
+          cursor: pointer;
+          margin-left: 0.2rem;
+
+          &:hover {
+            color: _.$danger;
+          }
+        }
+      }
+    }
+
+    /// 초기화 버튼 정의
+    .btn-clear {
+      position: absolute;
+      right: 3.2rem;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: _.$gray-600;
+    }
+
+    /// selectbox option toggle 버튼 정의
+    .arrow {
+      position: absolute;
+      right: 1.4rem;
+      transform-origin: center;
+      transition: transform 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: _.$gray-800;
+
+      &.rotate {
+        transform: rotate(180deg);
+      }
+
+      svg {
+        cursor: pointer;
+      }
+    }
+
+    &.readonly,
+    &.disabled {
+      background-color: _.$gray-100;
+      .arrow svg {
+        cursor: default;
+      }
+    }
+
+    &.disabled {
+      .text {
+        color: _.$text-disabled;
+
+        span.label {
+          margin-right: 0.5rem;
+          color: _.$text-disabled;
+        }
+      }
+
+      .arrow {
+        color: _.$gray-300;
+      }
+    }
+
+    /// selectbox option toggle active 정의
+    &.active {
+      border-color: _.$primary;
+    }
+
+    &.error {
+      border-color: _.$danger;
+      .arrow {
+        color: _.$danger;
+      }
+    }
+
+    .option-list {
+      position: fixed;
+      z-index: 30;
+      background-color: #fff;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+      border-radius: 0.4rem;
+      box-shadow: 0.1rem 0.1rem 0.5rem 0.1rem rgba(0, 0, 0, 0.3);
+
+      /// 검색어 입력 라인
+      .search {
+        .search-wrap {
+          display: flex;
+          align-items: center;
+          border-bottom: 0.1rem solid _.$gray-300;
+
+          input {
+            padding: 0 1.3rem;
+            height: 4rem;
+            color: _.$text-default;
+            border: 0;
+            width: calc(100% - 3.4rem);
+            outline: none;
+          }
+
+          svg {
+            padding-right: 1rem;
+            width: 2.4rem;
+            box-sizing: content-box;
+            color: _.$gray-800;
+          }
+        }
+      }
+
+      @each $value in top bottom {
+        &.show-#{$value} {
+          transform-origin: $value;
+        }
+      }
+
+      /// 적용 버튼 정의
+      .btn-accept {
+        text-align: center;
+        display: block;
+        line-height: 3em;
+        background-color: white;
+        border-top: 0.1rem solid _.$gray-300;
+
+        &:hover {
+          background-color: _.$gray-100;
+        }
+      }
+
+      ul {
+        max-height: 25em;
+        overflow-y: auto;
+
+        li {
+          padding: 1.3rem;
+          transition: background-color 0.3s ease;
+          box-sizing: border-box;
+          display: flex;
+          align-items: center;
+          font-size: 1.4rem;
+          font-weight: 400;
+          color: _.$text-default;
+
+          -webkit-touch-callout: none;
+          -webkit-user-select: none;
+          -khtml-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+
+          &:hover {
+            background-color: _.$gray-100;
+          }
+
+          /// 체크박스 공통 정의
+          .checkbox {
+            margin-right: 1rem;
+          }
+
+          &.key-selected {
+            // border: 0.1rem solid _.$accent;
+
+            color: _.$primary;
+            background-color: color.change(_.$primary, $lightness: 97%);
+          }
+
+          &.selected {
+            color: _.$primary;
+          }
+
+          &.items-loading svg {
+            margin: 0 auto;
+            animation: spin 1s ease-out infinite;
+            -webkit-animation: spin 1s ease-out infinite;
+          }
+        }
+      }
+    }
+  }
+
+  .options-view-enter-from,
+  .options-view-leave-to {
+    opacity: 0;
+    transform: translateY(-1rem);
+  }
+  .options-view-enter-active,
+  .options-view-leave-active {
+    transition: all 0.2s ease;
+  }
+
+  .options-view-bottom-enter-from,
+  .options-view-bottom-leave-to {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  .options-view-bottom-enter-active,
+  .options-view-bottom-leave-active {
+    transition: all 0.2s ease;
+  }
+}

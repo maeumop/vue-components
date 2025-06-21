@@ -1,0 +1,155 @@
+@charset "utf-8";
+/* @/components/ListTable/_style.scss */
+
+@use "sass:map";
+@use "sass:meta";
+@use "../styles" as _;
+@use "../styles/keyframes";
+
+/// TableSpinner 스타일 정의
+/// @/components/ListTable/TableSpinner.vue
+@mixin useTableSpinner {
+  .spinner-wrap {
+    margin: 2rem 0;
+    text-align: center;
+    width: 100%;
+
+    .spinner {
+      display: inline-block;
+      margin: 0 auto;
+      animation: spin 1s ease-out infinite;
+      -webkit-animation: spin 1s ease-out infinite;
+    }
+  }
+}
+
+/// ListCheck 스타일 정의
+/// @/components/ListTable/listCheck.vue
+@mixin useListCheck {
+  .checkbox-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    &:has(> input:disabled) {
+      cursor: default;
+    }
+
+    input + svg {
+      color: _.$gray-400;
+    }
+
+    input:disabled + svg {
+      color: _.$gray-300;
+    }
+
+    $_button-colors: _.fn-getButtonColors();
+    @if map.has-key($_button-colors, primary) {
+      input:not(:disabled):where(:hover, :checked) + svg {
+        color: map.get($_button-colors, primary, default);
+      }
+
+      input:disabled:checked + svg {
+        color: map.get($_button-colors, disabled);
+      }
+    }
+  }
+}
+
+.list-table {
+  overflow: auto;
+  position: relative;
+
+  @if (meta.mixin-exists("scrollbar")) {
+    // global scrollbar가 정의 되었있을 경우
+    @include scrollbar;
+  }
+
+  table {
+    min-width: 100%;
+    // thead가 sticky 적용이기에 border값 유지하기 위하여 정의.
+    border-spacing: 0;
+
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+
+      &.is-scroll::after {
+        position: absolute;
+        left: 0;
+        z-index: 20;
+        height: 0.6rem;
+        width: 100%;
+        background: -webkit-gradient(linear, left top, left bottom, from(rgba(0, 0, 0, 0.1)), to(rgba(0, 0, 0, 0)));
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));
+        content: "";
+      }
+    }
+  }
+
+  // slot 으로 외부 스타일 적용시, scoped 영역 해제 되므로
+  // ::v-deep 감싸워 스타일 정의.
+  &::v-deep() {
+    @include useListCheck;
+    @include useTableSpinner;
+  }
+
+  &::v-deep(table) {
+    > :where(thead, tbody) :where(td, th):has(.checkbox-wrap) {
+      text-align: center;
+    }
+
+    > :where(thead, tbody, tfoot) :where(td, th) {
+      @each $align in center left right {
+        &.#{$align} {
+          text-align: $align;
+        }
+      }
+    }
+  }
+
+  &::v-deep(table > thead th) {
+    height: 5rem;
+
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: _.$text-default;
+    padding: 1rem 1.6rem;
+    text-align: left;
+    background-color: white;
+
+    border-width: 0.1rem 0 0.1rem 0;
+    border-style: solid;
+    border-color: _.$gray-300;
+  }
+
+  &::v-deep(table > tbody) {
+    > tr {
+      &:hover {
+        background-color: _.$gray-100;
+      }
+
+      .no-data {
+        border-bottom: 0 !important;
+        text-align: center;
+        color: _.$text-default;
+        font-size: 1.4rem;
+        font-weight: 400;
+      }
+
+      td {
+        height: 5rem;
+
+        padding: 1rem 1.6rem;
+        border-style: solid;
+        border-color: _.$gray-300;
+        border-width: 0 0 0.1rem 0;
+        font-size: 1.4rem;
+        font-weight: 400;
+        text-align: left;
+        word-break: break-all;
+      }
+    }
+  }
+}

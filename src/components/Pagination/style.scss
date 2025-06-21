@@ -1,0 +1,66 @@
+@charset "UTF-8";
+/* @/components/Pagination/_style.scss */
+@use "sass:map";
+@use "../styles" as _;
+
+@mixin defineColorStyle {
+  $_button-colors: _.fn-getButtonColors();
+  @if map.has-key($_button-colors, primary) {
+    background-color: map.get($_button-colors, primary, default);
+
+    &:hover {
+      background-color: map.get($_button-colors, primary, hover);
+    }
+  }
+}
+
+.pagination {
+  > ul {
+    display: inline-flex;
+    border-radius: 0.4rem;
+    > li {
+      border-width: 0.1rem 0.1rem 0.1rem 0;
+      border-style: solid;
+      border-color: _.$gray-300;
+
+      &:first-of-type {
+        border-left-width: 0.1rem;
+        border-top-left-radius: 0.4rem;
+        border-bottom-left-radius: 0.4rem;
+      }
+      &:last-of-type {
+        border-top-right-radius: 0.4rem;
+        border-bottom-right-radius: 0.4rem;
+      }
+
+      &.disable a {
+        cursor: default;
+        pointer-events: none;
+        color: _.$gray-300;
+      }
+    }
+
+    > li:not(.disable) {
+      &:hover {
+        background-color: _.$gray-100;
+      }
+
+      &.active {
+        font-weight: 500;
+        @include defineColorStyle;
+
+        a {
+          color: white;
+        }
+      }
+    }
+
+    > li a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 4rem;
+      height: 4rem;
+    }
+  }
+}

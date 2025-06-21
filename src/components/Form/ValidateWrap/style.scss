@@ -1,0 +1,10 @@
+@charset "UTF-8";
+/* @/components/Form/ValidateWrap/_style.scss */
+@use "../../common";
+
+.validate-wrap {
+  .input-wrap {
+    display: flex;
+    align-items: flex-start;
+  }
+}

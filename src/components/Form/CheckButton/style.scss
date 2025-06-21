@@ -1,0 +1,144 @@
+@charset "UTF-8";
+/* @/components/Form/CheckButton/_style.scss */
+@use "sass:map";
+@use "sass:color";
+@use "../../styles" as _;
+@use "../../common";
+
+.check-button {
+  .origin-check-button {
+    display: inline-block;
+
+    &:not(&.block) {
+      margin-right: 1rem;
+    }
+
+    label {
+      position: relative;
+      display: flex;
+      align-items: center;
+      font-size: 1.4rem;
+      font-weight: 400;
+
+      input {
+        position: absolute;
+        clip: rect(0, 0, 0, 0);
+      }
+
+      svg {
+        width: 1.6rem;
+        height: 1.6rem;
+        margin-right: 0.3rem;
+        color: _.$gray-400;
+      }
+
+      &:has(input:disabled) {
+        color: _.$text-disabled;
+        cursor: default;
+
+        input:disabled + svg {
+          color: _.$gray-300;
+        }
+      }
+
+      @include _.mx-buttonColorStyle using ($color-map) {
+        & input:not(:disabled):hover + svg {
+          color: map.get($color-map, hover);
+        }
+
+        & input:not(:disabled):checked + svg {
+          color: map.get($color-map, default);
+        }
+
+        input:checked:disabled + svg {
+          color: map.get($color-map, disabled);
+        }
+      }
+    }
+  }
+
+  .check-button-group {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+
+    input {
+      position: absolute;
+      clip: rect(0, 0, 0, 0);
+    }
+
+    label {
+      font-size: 0.9em;
+      display: inline-block;
+      padding: 0 1.7rem;
+      height: 3.5rem;
+      line-height: 3.5rem;
+      font-weight: 400;
+      transition: all 0.2s ease;
+
+      &.last {
+        border-right: 0 !important;
+      }
+    }
+
+    @include _.mx-buttonColorStyle using ($color-map) {
+      border-radius: 0.4rem;
+      border: 0.1rem solid _.$gray-300;
+
+      label {
+        border-right: 0.1rem solid lighten(_.$gray-300, 5);
+      }
+
+      &.disabled {
+        label {
+          color: _.$text-disabled;
+          background-color: _.$gray-100;
+          cursor: default;
+        }
+
+        input:checked + label {
+          color: #fff;
+          background-color: map.get($color-map, disabled);
+        }
+      }
+
+      &:not(&.disabled) {
+        $_color: map.get($color-map, default);
+
+        border-color: $_color;
+
+        label {
+          border-color: lighten($_color, 25);
+          color: $_color;
+
+          &:hover {
+            background-color: color.change($_color, $lightness: 95%);
+          }
+        }
+
+        input:checked + label {
+          color: #fff;
+          font-weight: 500;
+          background-color: $_color;
+        }
+      }
+    }
+  }
+
+  .line-break {
+    display: block !important;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  // transition
+  .check-scale-enter-from,
+  .check-scale-leave-to {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+  .check-scale-enter-active,
+  .check-scale-leave-active {
+    transition: all 0.1s ease;
+  }
+}

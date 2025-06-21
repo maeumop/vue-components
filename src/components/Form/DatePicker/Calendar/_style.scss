@@ -1,0 +1,154 @@
+@charset "UTF-8";
+/* @/components/Form/DatePicker/Calendar/_style.scss */
+
+@use "sass:map";
+@use "sass:color";
+@use "../../../styles" as _;
+
+.select-calendar-wrap {
+  width: 30rem;
+  height: 24rem;
+  min-height: 21rem !important;
+  padding: 0 3rem;
+
+  .select-calendar {
+    width: 21rem;
+    margin: 0 auto;
+
+    ul {
+      display: table;
+      width: 100%;
+      font-size: 1.4rem;
+      font-weight: 400;
+      margin: 0;
+      padding-left: 0;
+
+      li {
+        display: table-cell;
+        text-align: center;
+        width: 3rem;
+        height: 3rem;
+        border: 0.1rem solid transparent;
+
+        line-height: 2.7rem;
+        cursor: pointer;
+      }
+
+      &.header li {
+        // 일 - 토 라인
+        color: color.change(_.$text-default, $lightness: 45%);
+        cursor: default !important;
+      }
+
+      &:not(.header) li {
+        &:first-child {
+          // 일요일 컬러 표시
+          color: red;
+        }
+
+        &:last-child {
+          // 토요일 컬러 표시
+          color: blue;
+        }
+
+        &.beforeMonth,
+        &.afterMonth {
+          // 이전달, 다음달 닐자 표시
+          color: color.change(_.$text-default, $lightness: 62%) !important;
+          cursor: default;
+        }
+
+        // &:not(.selected, .date-range, .disabled).today
+        &.today {
+          // 금일 컬러 표시 (선택, 기간내, disabled 해당 하지 않을시,)
+          // border-radius: 0.4rem;
+          border-color: _.$accent;
+        }
+
+        &.disabled {
+          color: _.$text-disabled !important;
+          cursor: default;
+        }
+
+        $_button-colors: _.fn-getButtonColors();
+        @if map.has-key($_button-colors, primary) {
+          $_color: map.get($_button-colors, primary, default);
+
+          &.selected {
+            // 선택된 날자
+            // 기간 (시작|끝) 선택된 날자
+            background-color: $_color;
+            color: white;
+
+            &:hover {
+              background: map.get($_button-colors, primary, hover);
+            }
+          }
+
+          &.date-range {
+            // 기간 내 선택된 날자
+            background-color: color.change($_color, $lightness: 97%);
+          }
+        }
+
+        &:not(.selected, .date-range, .disabled, .beforeMonth, .afterMonth):hover {
+          color: #222 !important;
+          background: color.change(#222, $lightness: 96%);
+        }
+      }
+    }
+  }
+}
+
+// transitions
+.trans-left-enter-from {
+  opacity: 0;
+  transform: translateX(2rem);
+}
+.trans-left-leave-to {
+  opacity: 0;
+  transform: translateX(-2rem);
+}
+.trans-left-enter-active,
+.trans-left-leave-active {
+  transition: all 0.1s ease-out;
+}
+
+.trans-right-enter-from {
+  opacity: 0;
+  transform: translateX(-2rem);
+}
+.trans-right-leave-to {
+  opacity: 0;
+  transform: translateX(2rem);
+}
+.trans-right-enter-active,
+.trans-right-leave-active {
+  transition: all 0.1s ease-out;
+}
+
+.trans-down-enter-from {
+  opacity: 0;
+  transform: translateY(-2rem);
+}
+.trans-down-leave-to {
+  opacity: 0;
+  transform: translateY(2rem);
+}
+.trans-down-enter-active,
+.trans-down-leave-active {
+  transition: all 0.1s ease-out;
+}
+
+.trans-up-enter-from {
+  opacity: 0;
+  transform: translateY(2rem);
+}
+.trans-up-leave-to {
+  opacity: 0;
+  transform: translateY(-2rem);
+}
+.trans-up-enter-active,
+.trans-up-leave-active {
+  transition: all 0.1s ease-out;
+}

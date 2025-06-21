@@ -1,0 +1,32 @@
+@charset "UTF-8";
+/* @/components/Form/DatePicker/DateController/_style.scss */
+@use "../../../styles" as _;
+
+.select-month {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+
+  margin: 2rem auto 0.5rem;
+
+  width: 21rem;
+  font-size: 1.4rem;
+
+  span,
+  svg {
+    cursor: pointer;
+  }
+
+  svg {
+    color: _.$gray-800;
+  }
+
+  span {
+    font-size: 1.6rem;
+    position: relative;
+
+    & + span {
+      text-align: right;
+    }
+  }
+}

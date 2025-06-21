@@ -1,0 +1,108 @@
+@charset "UTF-8";
+/* @/components/DropMenu/_style.scss */
+@use "sass:map";
+@use "sass:meta";
+@use "../styles" as _;
+
+/// 컴포넌트 color 스타일 정의
+/// @output - .drop-menu.#{color-name} { ... }
+@mixin defineColorStyle {
+  @if meta.mixin-exists("mx-buttonColorStyle", _) {
+    @include _.mx-buttonColorStyle using ($color-map) {
+      .drop-menu-wrap {
+        border-color: map.get($color-map, border);
+        background-color: map.get($color-map, default);
+
+        li > a {
+          color: white;
+          &:hover {
+            background-color: map.get($color-map, hover);
+          }
+        }
+      }
+    }
+  }
+}
+
+$transitionList: slide, scale, fade;
+$transitionDirection: top, right, bottom, left;
+
+@each $item in $transitionList {
+  @each $direct in $transitionDirection {
+    .drop-menu-#{$item}-#{$direct}-enter-from,
+    .drop-menu-#{$item}-#{$direct}-leave-to {
+      opacity: 0;
+
+      @if $item == slide {
+        @if $direct == bottom {
+          transform: translateY(-1em);
+        } @else if $direct == right {
+          transform: translateX(-1em);
+        } @else if $direct == left {
+          transform: translateX(1em);
+        } @else {
+          transform: translateY(1em);
+        }
+      } @else if $item == scale {
+        transform: scale(0);
+      }
+    }
+    .drop-menu-#{$item}-#{$direct}-enter-active,
+    .drop-menu-#{$item}-#{$direct}-leave-active {
+      transition: all 0.2s ease;
+    }
+  }
+}
+
+.drop-menu {
+  display: inline-block;
+  position: relative;
+
+  .drop-menu-wrap {
+    width: fit-content;
+    min-width: fit-content;
+    z-index: 30;
+    position: fixed;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    box-shadow: 0.1rem 0.1rem 0.5rem 0.1rem rgba(0, 0, 0, 0.15);
+    border: 0.1rem solid transparent;
+    border-radius: 0.4rem;
+    background-color: white;
+
+    &.top {
+      transform-origin: bottom center;
+      margin-bottom: 0.1rem;
+    }
+    &.right {
+      transform-origin: top left;
+      margin-left: 0.1rem;
+    }
+    &.left {
+      transform-origin: top right;
+      margin-right: 0.1rem;
+    }
+    &.bottom {
+      transform-origin: top center;
+      margin-top: 0.1rem;
+    }
+
+    li > a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem;
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: _.$text-default;
+      transition: background-color 0.2s ease;
+
+      svg {
+        margin-left: 2.5rem;
+      }
+    }
+  }
+
+  @include defineColorStyle;
+}

@@ -1,0 +1,233 @@
+@charset "UTF-8";
+/* @/components/Form/DatePicker/_style.scss */
+
+@use "sass:map";
+@use "../../styles" as _;
+@use "../../common";
+
+/// date-picker의 a 버튼 공통 스타일
+@mixin picker-button {
+  // .search-date > a
+  // .btn-area  a
+  display: inline-block;
+  text-decoration: none;
+  border: 0.1rem solid _.$gray-300;
+  border-radius: 0.4rem;
+  font-size: 1.4rem;
+  padding: 0.8rem 1.2rem;
+  color: _.$text-default;
+}
+
+/// @access private
+$-button-colors: _.fn-getButtonColors();
+
+.date-picker {
+  position: relative;
+  display: inline-block;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  .picker-popup {
+    position: fixed;
+    box-shadow: 0.2rem 0.2rem 0.5rem 0.2rem rgba(0, 0, 0, 0.3);
+    border-radius: 0.4rem;
+    background: #fff;
+    z-index: 100;
+    line-height: 1;
+
+    .pick-name-text {
+      border-bottom: 0.1rem solid _.$gray-300;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      li {
+        line-height: 4.5rem;
+        font-size: 1.5rem;
+        font-weight: 400;
+        width: 100%;
+        text-align: center;
+
+        & + li {
+          border-left: 0.1rem solid _.$gray-300;
+        }
+      }
+    }
+
+    .picker-wrap {
+      .calendar {
+        display: inline-block;
+        box-sizing: border-box;
+        vertical-align: top;
+        height: 28.4rem;
+
+        & + .calendar {
+          border-left: 0.1rem solid _.$gray-300;
+        }
+      }
+    }
+  }
+
+  .search-date {
+    padding: 1rem;
+    border-bottom: 0.1rem solid _.$gray-300;
+    text-align: left;
+
+    a {
+      @include picker-button;
+
+      & + a {
+        margin-left: 0.3rem;
+      }
+
+      &:not(&.active):hover {
+        background-color: _.$gray-100;
+      }
+
+      &.active {
+        @if map.has-key($-button-colors, primary) {
+          color: map.get($-button-colors, primary, text);
+          border-color: map.get($-button-colors, primary, default);
+        }
+      }
+    }
+  }
+
+  .btn-area {
+    // 취소, 적용 버튼 라인
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 1rem;
+    border-top: 0.1rem solid _.$gray-300;
+
+    .select-date {
+      font-size: 0.9em;
+
+      &.selected-error {
+        color: _.$danger;
+      }
+    }
+
+    a {
+      @include picker-button;
+
+      &:hover {
+        background-color: _.$gray-100;
+      }
+
+      &.okay {
+        margin-left: 0.5rem;
+
+        @if map.has-key($-button-colors, primary) {
+          color: #fff;
+          border-color: map.get($-button-colors, primary, default);
+          background-color: map.get($-button-colors, primary, default);
+          &:hover {
+            border-color: map.get($-button-colors, primary, hover);
+            background-color: map.get($-button-colors, primary, hover);
+          }
+        }
+      }
+    }
+  }
+  /// @deprecated  .show class 확인 불가 스타일
+  // &.show .picker-popup {
+  //   display: block;
+  // }
+
+  /// @deprecated .show class 확인 불가 스타일
+  // &.show .picker-date-text:after {
+  //   transform: rotate(-180deg);
+  //   transition: all 0.5s;
+  // }
+
+  .picker-date-text {
+    width: 100%;
+    border: 0.1rem solid _.$gray-300;
+    border-radius: 0.4rem;
+    height: 4rem;
+    padding: 1rem 1.5rem;
+    margin: 0;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    input {
+      border: 0 !important;
+      flex: 1;
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      text-align: center;
+      background-color: transparent;
+      color: _.$text-default;
+
+      &:focus {
+        outline: none;
+      }
+
+      &::placeholder {
+        font-size: 1.4rem;
+        font-weight: 400;
+        color: _.$text-placeholder;
+      }
+    }
+
+    svg {
+      margin-top: 0.2rem;
+      color: _.$gray-800;
+
+      /// @deprecated 사용하는 부분 미확인
+      // & + input {
+      //   margin-left: 0.5rem;
+      // }
+    }
+
+    &.active {
+      border-color: _.$primary;
+    }
+
+    &.error {
+      border-color: _.$danger;
+
+      & * {
+        color: _.$danger;
+      }
+    }
+
+    &:not(.readonly, .disabled) {
+      // 달력 아이콘 활성화
+      svg {
+        cursor: pointer;
+      }
+    }
+
+    &.readonly,
+    &.disabled {
+      background-color: _.$gray-100;
+    }
+
+    &.disabled > :not(svg) {
+      color: _.$text-placeholder;
+    }
+  }
+}
+
+// transitions
+.picker-scale-enter-from,
+.picker-scale-leave-to {
+  opacity: 0;
+  transform: scale(0.5);
+}
+.picker-scale-enter-active,
+.picker-scale-leave-active {
+  transition: all 0.2s ease-out;
+}

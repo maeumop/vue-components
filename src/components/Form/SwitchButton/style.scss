@@ -1,0 +1,144 @@
+@charset "UTF-8";
+/* @/components/Form/SwitchButton/_style.scss */
+@use "sass:map";
+@use "../../styles" as _;
+@use "../../common";
+
+.switch-wrap {
+  display: inline-block;
+  position: relative;
+  vertical-align: middle;
+
+  @include _.mx-buttonColorStyle using ($color-map) {
+    .switch input[type="checkbox"]:checked {
+      & + span {
+        background-color: map.get($color-map, default);
+      }
+
+      &:not(&:disabled) + span:hover {
+        background-color: map.get($color-map, hover);
+      }
+
+      & + svg {
+        color: map.get($color-map, default);
+      }
+    }
+  }
+
+  .switch {
+    cursor: pointer;
+    font-size: 1.4rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.checkbox {
+      svg {
+        margin-right: 0.3rem;
+        color: _.$gray-400;
+      }
+
+      input[type="checkbox"] {
+        &:not(:disabled, :checked) + svg:hover {
+          color: darken(_.$gray-400, 15);
+        }
+
+        &:disabled + svg {
+          color: _.$gray-300;
+        }
+      }
+    }
+
+    input[type="checkbox"] {
+      position: absolute;
+      clip: rect(0, 0, 0, 0);
+
+      & + span {
+        display: inline-block;
+        width: 4.1rem;
+        height: 2rem;
+        background: _.$gray-400;
+        border-radius: 1rem;
+        margin-right: 0.5rem;
+
+        i {
+          display: inline-block;
+          margin: 0.4rem;
+          width: 1.2rem;
+          height: 1.2rem;
+          background: white;
+          border-radius: 50%;
+          transition: all 0.2s;
+        }
+      }
+
+      &:not(&:disabled) + span:hover {
+        background-color: darken(_.$gray-400, 15);
+      }
+
+      &:disabled + span {
+        background: _.$gray-300;
+      }
+
+      &:checked + span > i {
+        transform: translateX(4.1rem - 1.2rem - 0.8rem);
+      }
+    }
+
+    &.small {
+      line-height: 1.9rem;
+
+      input[type="checkbox"] {
+        & + span {
+          width: 3rem;
+          height: 1.5rem;
+          margin-right: 0.5rem;
+
+          i {
+            margin: 0.3rem;
+            width: 0.9rem;
+            height: 0.9rem;
+          }
+        }
+
+        &:checked + span > i {
+          transform: translateX(3rem - 0.9rem - 0.6rem);
+        }
+      }
+
+      svg {
+        height: 1.6rem;
+      }
+    }
+
+    &:has(input[type="checkbox"]:disabled) {
+      cursor: default;
+
+      .label-text {
+        color: _.$text-disabled;
+      }
+    }
+  }
+
+  // transition
+  .check-scale-enter-from,
+  .check-scale-leave-to {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+  .check-scale-enter-active,
+  .check-scale-leave-active {
+    transition: all 0.1s ease;
+  }
+
+  .label-fade-enter-from,
+  .label-fade-leave-to {
+    opacity: 0;
+    transform: translateX(-1rem);
+  }
+  .label-fade-enter-active,
+  .label-fade-leave-active {
+    transition: all 0.1s ease;
+  }
+}

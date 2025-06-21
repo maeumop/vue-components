@@ -1,0 +1,33 @@
+@charset "utf-8";
+/* @/components/_variables.scss */
+@use "sass:map";
+
+//================================================================================
+// Override
+//================================================================================
+@use "../../assets/scss/abstracts/variables";
+@forward "./init" with (
+  $primary: variables.$primary,
+  $secondary: variables.$secondary,
+  $accent: variables.$accent,
+  $info: variables.$info,
+
+  $success: variables.$success,
+  $warning: variables.$warning,
+  $danger: variables.$danger,
+
+  $gray-800: variables.$gray-800,
+  $gray-600: variables.$gray-600,
+  $gray-400: variables.$gray-400,
+  $gray-300: variables.$gray-300,
+  $gray-100: variables.$gray-100,
+
+  $scrollbar-color: (
+    "thumb": variables.$gray-400,
+    "track": variables.$gray-100
+  ),
+
+  $text-default: map.get(variables.$G-theme-colors, text, dark),
+  $text-placeholder: map.get(variables.$G-theme-colors, text, placeholder),
+  $text-disabled: map.get(variables.$G-theme-colors, text, disabled)
+);

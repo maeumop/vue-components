@@ -1,0 +1,63 @@
+@charset "UTF-8";
+/* @/components/Toast/_style.scss */
+@use "sass:map";
+@use "sass:meta";
+@use "../styles" as _;
+
+.toast-bg {
+  position: fixed;
+  bottom: 0;
+  z-index: 10010;
+  width: 100%;
+  background-color: transparent;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+
+  pointer-events: none;
+
+  .toast-body {
+    margin: 0.5rem 0;
+    height: 5.5rem;
+    padding: 0 2.5rem 0 1.5rem;
+    min-width: 40rem;
+    border-radius: 0.5rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: left;
+    pointer-events: initial;
+
+    @if meta.mixin-exists("mx-toastColorStyle", _) {
+      @include _.mx-toastColorStyle using ($color-map) {
+        border-left: 0.6rem solid map.get($color-map, border);
+        background-color: map.get($color-map, default);
+        color: #fff;
+      }
+    }
+
+    .icon {
+      display: block;
+      margin-right: 1rem;
+    }
+
+    .message {
+      font-size: 1.4rem;
+      font-weight: 500;
+    }
+  }
+
+  .toast-view-enter-from {
+    margin-bottom: -6rem;
+    opacity: 0;
+  }
+  .toast-view-leave-to {
+    transform: scale(0);
+    opacity: 0;
+  }
+  .toast-view-enter-active,
+  .toast-view-leave-active {
+    transition: all 0.2s ease-out;
+  }
+}

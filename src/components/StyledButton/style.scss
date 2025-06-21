@@ -1,0 +1,210 @@
+@charset "UTF-8";
+/* @/components/StyledButton/_style.scss */
+@use "sass:map";
+@use "sass:meta";
+@use "../styles" as _;
+
+// 스타일 우선 순위
+// [hight > low]
+// 1. type [icon > text > default]
+// 2. outline? []
+// 3. color [primary|secondary]
+// 4. size [large > small > xsmall]
+// 5. block [false > true]
+// 6. disabled [false > true]
+
+///
+/// @param {string} $type [icon|text|outline|button]
+@mixin defineBtnStyle($type) {
+  @if $type == null {
+    @error "$type type is string";
+  }
+
+  .btn.#{$type} {
+    @if $type != icon {
+      .loading {
+        transform-origin: center center;
+        animation: spinner 1s infinite;
+      }
+
+      // props.dropMenuToggle 정의
+      svg {
+        transition: transform 0.2s;
+
+        &.rotate {
+          transform: rotate(180deg);
+        }
+      }
+    }
+
+    @if $type != text {
+      display: inline-block;
+      border: 0;
+      padding: 0 1.6rem;
+      height: 4rem;
+      transition: background-color 0.2s ease;
+
+      &.large {
+        height: 4.2rem !important;
+      }
+
+      &.small {
+        padding: 0 1.2rem;
+        height: 3.2rem !important;
+      }
+
+      &.xsmall {
+        padding: 0 0.6rem;
+        height: 2.7rem !important;
+      }
+
+      &.block {
+        width: 100%;
+      }
+    }
+
+    @if $type == button {
+      &.right svg {
+        margin-left: 0.8rem;
+      }
+
+      &.left svg {
+        margin-right: 0.8rem;
+      }
+
+      &.small {
+        font-size: 1.4rem;
+      }
+
+      &.xsmall {
+        font-size: 1.3rem;
+      }
+    }
+
+    @content;
+  }
+}
+
+/// type이 button, icon 일 경우, 색상 지정
+@mixin dafineFillColorStyle {
+  @if meta.mixin-exists("mx-buttonColorStyle", _) {
+    @include _.mx-buttonColorStyle using ($color-map) {
+      background-color: map.get($color-map, default);
+      color: white;
+
+      &:not(&.disabled):hover {
+        background-color: map.get($color-map, hover);
+      }
+
+      &.disabled {
+        background-color: map.get($color-map, disabled);
+      }
+    }
+  }
+}
+
+/// type이 text 일 경우, 색상 지정
+@mixin dafineTextColorStyle {
+  @if meta.mixin-exists("mx-buttonColorStyle", _) {
+    @include _.mx-buttonColorStyle using ($color-map) {
+      &:not(&.disabled) {
+        color: map.get($color-map, text);
+        &:hover svg {
+          color: map.get($color-map, default);
+        }
+      }
+    }
+  }
+}
+
+// 공통 정의
+.btn {
+  font-size: 1.5rem;
+  border-radius: 0.4rem;
+
+  &.disabled {
+    cursor: default !important;
+  }
+
+  .btn-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+
+  &:not(.text):not(.outline) {
+    @include dafineFillColorStyle;
+  }
+}
+
+/// type icon 정의
+@include defineBtnStyle(icon) {
+  width: 4rem;
+
+  .only-icon {
+    line-height: 100%;
+  }
+
+  &.large {
+    width: 4.2rem;
+  }
+
+  &.small {
+    width: 3.2rem;
+  }
+
+  &.xsmall {
+    width: 2.7rem;
+  }
+}
+
+/// type text 정의
+@include defineBtnStyle(text) {
+  display: inline-block;
+  font-size: 1.4rem;
+
+  svg {
+    color: _.$gray-400;
+    margin-right: 0.7rem;
+  }
+
+  &.right svg {
+    margin-right: 0;
+    margin-left: 0.7rem;
+  }
+
+  &:not(.disabled):hover {
+    text-decoration: underline;
+
+    svg {
+      color: darken(_.$gray-400, 15);
+    }
+  }
+
+  &.disabled {
+    color: _.$text-disabled;
+  }
+
+  @include dafineTextColorStyle;
+}
+
+/// type button 정의
+@include defineBtnStyle(button) {
+}
+
+// type outline 정의
+.btn.outline {
+  color: _.$text-default;
+  background-color: white;
+
+  border: 0.1rem solid _.$gray-300;
+
+  &:not(.disabled):hover {
+    background-color: _.$gray-100;
+  }
+
+  &.disabled {
+    color: _.$text-disabled;
+  }
+}
