@@ -6,7 +6,7 @@ class helper implements DatePickerHelper {
     const bodyRect: DOMRect = document.body.getBoundingClientRect();
     const rect: DOMRect = input.getBoundingClientRect();
     const windowHeight: number = window.innerHeight;
-    const windowWidth: number =  window.innerWidth;
+    const windowWidth: number = window.innerWidth;
     const pickerHeight: number = isRange ? 454 : 280;
 
     const styles: any = {
@@ -29,7 +29,6 @@ class helper implements DatePickerHelper {
           styles.transformOrigin = 'bottom left';
           styles.left = `${rect.left}px`;
         }
-
       } else {
         styles.top = `${rect.top + rect.height + 4}px`;
 
@@ -46,7 +45,6 @@ class helper implements DatePickerHelper {
     return styles;
   }
 
-
   /**
    * 지정된 포멧에 맞춰서 날짜를 문자열로 변환하여 반환
    * days의 차이에 때라 d 기준 날짜를 가감하여 변환
@@ -60,7 +58,7 @@ class helper implements DatePickerHelper {
 
     if (days) {
       const time = date.getTime();
-      date = new Date(time + (86400 * days * 1000));
+      date = new Date(time + 86400 * days * 1000);
     }
 
     const year: string = date.getFullYear().toString();
@@ -98,8 +96,8 @@ class helper implements DatePickerHelper {
   public getDateString(year: number, month: number, day: number, s: string) {
     let date: string = `${year}${s}`;
 
-    date += (month + 1 <= 10) ? `0${(month)}${s}` : `${(month)}${s}`;
-    date += (day < 10) ? `0${day}` : `${day}`;
+    date += month + 1 <= 10 ? `0${month}${s}` : `${month}${s}`;
+    date += day < 10 ? `0${day}` : `${day}`;
 
     return date;
   }

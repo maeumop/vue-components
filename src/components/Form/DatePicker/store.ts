@@ -21,7 +21,7 @@ export const useDatePickerStore = (): DatePickerStore => {
     end: {
       year: date.getFullYear(),
       month: date.getMonth(),
-    }
+    },
   });
 
   const beforeState = reactive<DateStateType>({
@@ -32,7 +32,7 @@ export const useDatePickerStore = (): DatePickerStore => {
     end: {
       year: date.getFullYear(),
       month: date.getMonth(),
-    }
+    },
   });
 
   const selectedDate = reactive<SelectedDateType>({

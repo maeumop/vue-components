@@ -1,4 +1,4 @@
 export const messageBoxType = {
   alert: 'alert',
-  confirm: 'confirm'
+  confirm: 'confirm',
 } as const;

@@ -1,24 +1,24 @@
 export interface KeyIndex<T> {
-  [index: string]: T
+  [index: string]: T;
 }
 
 export interface RuleFunc {
-  (v: any): string | boolean
+  (v: unknown): string | boolean;
 }
 
 // validate rule type
 export interface Rules {
-  [index: string]: RuleFunc[]
+  [index: string]: RuleFunc[];
 }
 
 // selectbox, checkbox 사용 옵션
 export interface OptionItem {
-  text: string
-  value: string
+  text: string;
+  value: string;
 }
 
 export interface OptionItemGroup {
-  [index: string]: OptionItem[]
+  [index: string]: OptionItem[];
 }
 
 export type MdiSvgIcon = string;

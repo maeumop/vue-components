@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import type { SvgIconProps } from './types';
+  import type { SvgIconProps } from './types';
 
-const props =  withDefaults(defineProps<SvgIconProps>(), {
-  // color: '#fff',
-  size: '20'
-});
-
+  const props = withDefaults(defineProps<SvgIconProps>(), {
+    // color: '#fff',
+    size: '20',
+  });
 </script>
-<script lang="ts"> export default {name: 'SvgIcon'}; </script>
+<script lang="ts">
+  export default { name: 'SvgIcon' };
+</script>
 
 <template>
   <svg

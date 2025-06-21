@@ -1,5 +1,4 @@
-
 export interface TabsProps {
-  tabItems: string[]
-  inBox?: boolean,
+  tabItems: string[];
+  inBox?: boolean;
 }

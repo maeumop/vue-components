@@ -1,7 +1,7 @@
-import { globalIgnores } from 'eslint/config'
-import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
-import pluginVue from 'eslint-plugin-vue'
-import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
+import skipFormatting from '@vue/eslint-config-prettier/skip-formatting';
+import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript';
+import pluginVue from 'eslint-plugin-vue';
+import { globalIgnores } from 'eslint/config';
 
 // To allow more languages other than `ts` in `.vue` files, uncomment the following lines:
 // import { configureVueProject } from '@vue/eslint-config-typescript'
@@ -11,7 +11,7 @@ import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
 export default defineConfigWithVueTs(
   {
     name: 'app/files-to-lint',
-    files: ['**/*.{ts,mts,tsx,vue}'],
+    files: ['**/*.{ts,mts,tsx,vue}']
   },
 
   globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
@@ -31,13 +31,19 @@ export default defineConfigWithVueTs(
       'vue/component-definition-name-casing': ['error', 'PascalCase'],
       'vue/component-options-name-casing': ['error', 'PascalCase'],
       'vue/custom-event-name-casing': ['error', 'camelCase'],
-      'vue/define-macros-order': ['error', {
-        order: ['defineProps', 'defineEmits']
-      }],
+      'vue/define-macros-order': [
+        'error',
+        {
+          order: ['defineProps', 'defineEmits']
+        }
+      ],
       'vue/html-comment-content-spacing': ['error', 'always'],
-      'vue/no-unused-properties': ['error', {
-        groups: ['props', 'data', 'computed', 'methods']
-      }],
+      'vue/no-unused-properties': [
+        'error',
+        {
+          groups: ['props', 'data', 'computed', 'methods']
+        }
+      ],
 
       // TypeScript 관련 규칙
       '@typescript-eslint/no-unused-vars': 'error',
@@ -54,12 +60,16 @@ export default defineConfigWithVueTs(
       'prefer-const': 'error',
       'no-var': 'error',
       'no-unused-vars': 'off', // TypeScript 규칙으로 대체
-      'eqeqeq': ['error', 'always'],
-      'curly': ['error', 'all'],
+      eqeqeq: ['error', 'always'],
+      curly: ['error', 'all'],
       'no-eval': 'error',
       'no-implied-eval': 'error',
       'no-new-func': 'error',
-      'no-script-url': 'error'
+      'no-script-url': 'error',
+      semi: ['error', 'always'],
+      '@typescript-eslint/semi': ['error', 'always'],
+      'comma-dangle': ['error', 'always'],
+      '@typescript-eslint/comma-dangle': ['error', 'always']
     }
   }
-)
+);

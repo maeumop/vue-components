@@ -5,5 +5,5 @@ export const checkButtonColors = {
 
 export const checkButtonType = {
   checkbox: 'checkbox',
-  radio: 'radio'
+  radio: 'radio',
 } as const;

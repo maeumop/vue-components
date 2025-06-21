@@ -1,80 +1,79 @@
 <script setup lang="ts">
-import { mdiGoogleCirclesExtended } from '@/assets/svg/iconPath';
-import SvgIcon from '@/components/Icon/SvgIcon.vue';
-import { ref } from 'vue';
-import type { SpinnerProps } from './types';
+  import { mdiGoogleCirclesExtended } from '@/assets/svg/iconPath';
+  import SvgIcon from '@/components/Icon/SvgIcon.vue';
+  import { ref } from 'vue';
+  import type { SpinnerProps } from './types';
 
-
-const props = withDefaults(defineProps<SpinnerProps>(), {
-  limitTime: 10,
-});
-
-let timeout: number = 0;
-let delay = ref<number>(0.5);
-let progress = ref<number>(0);
-let isShow = ref<boolean>(false);
-let message = ref<string>('Loading...');
-
-const destroy = (): void => {
-  props.destroy();
-};
-
-const waiting = (): Promise<void> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, delay.value * 1000);
+  const props = withDefaults(defineProps<SpinnerProps>(), {
+    limitTime: 10,
   });
-};
 
-const setProgress = async (flag: string): Promise<void> => {
-  if (flag === '+') {
-    progress.value++;
-  } else {
-    progress.value--;
-  }
+  let timeout: number = 0;
+  let delay = ref<number>(0.5);
+  let progress = ref<number>(0);
+  let isShow = ref<boolean>(false);
+  let message = ref<string>('Loading...');
 
-  await waiting();
+  const destroy = (): void => {
+    props.destroy();
+  };
 
-  if (progress.value) {
-    isShow.value = true;
+  const waiting = (): Promise<void> => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve();
+      }, delay.value * 1000);
+    });
+  };
 
-    // 스피너가 닫히지 않고 limitTime 이상 유지 될 경우 강제로 콘솔 메시지를 표시한다.
-    clearTimeout(timeout);
+  const setProgress = async (flag: string): Promise<void> => {
+    if (flag === '+') {
+      progress.value++;
+    } else {
+      progress.value--;
+    }
 
-    timeout = setTimeout(() => {
+    await waiting();
+
+    if (progress.value) {
+      isShow.value = true;
+
+      // 스피너가 닫히지 않고 limitTime 이상 유지 될 경우 강제로 콘솔 메시지를 표시한다.
+      clearTimeout(timeout);
+
+      timeout = setTimeout(() => {
+        progress.value = 0;
+        isShow.value = false;
+      }, props.limitTime * 1000);
+    } else {
       progress.value = 0;
       isShow.value = false;
-    }, props.limitTime * 1000);
-  } else {
+    }
+  };
+
+  const show = (msg: string): void => {
+    if (msg !== '') {
+      message.value = msg;
+    }
+
+    setProgress('+');
+  };
+
+  const hide = (): void => {
+    setProgress('-');
+  };
+
+  const close = (): void => {
     progress.value = 0;
     isShow.value = false;
-  }
-};
+  };
 
-const show = (msg: string): void => {
-  if (msg !== '') {
-    message.value = msg;
-  }
-
-  setProgress('+');
-};
-
-const hide = (): void => {
-  setProgress('-');
-};
-
-const close = (): void => {
-  progress.value = 0;
-  isShow.value = false;
-};
-
-defineExpose({
-  show,
-  hide,
-  close,
-  delay
-});
+  defineExpose({
+    show,
+    hide,
+    close,
+    delay,
+  });
 </script>
 
 <template>
@@ -99,5 +98,5 @@ defineExpose({
 </template>
 
 <style lang="scss" scoped>
-@import './style';
+  @import './style';
 </style>

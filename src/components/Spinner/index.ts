@@ -16,7 +16,7 @@ export class spinner implements SpinnerModel {
     if (!isVNode(this.VNode)) {
       this.VNode = h(SpinnerComponent, {
         limitTime: this.limitTime,
-        destroy: this.destroy
+        destroy: this.destroy,
       });
 
       render(this.VNode, this.body);
@@ -98,5 +98,5 @@ export default {
   install: (app: App, limitTime: number = 10): void => {
     // app.config.globalProperties.$spinner = new spinner(limitTime)
     app.provide('Spinner', new spinner(limitTime));
-  }
+  },
 };

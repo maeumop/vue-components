@@ -23,8 +23,8 @@ export default {
     const setMessage = (opt: MessageBoxOptions | string, type: MessageBoxType): void => {
       const props: MessageBoxOptions = {
         message: '',
-        title: (type === messageBoxType.alert) ? '알림' : '확인',
-        type
+        title: type === messageBoxType.alert ? '알림' : '확인',
+        type,
       };
 
       if (opt instanceof Object) {
@@ -94,10 +94,10 @@ export default {
     const messageBox: MessageBoxModel = {
       alert,
       confirm,
-      destroy
+      destroy,
     };
 
     app.config.globalProperties.$messageBox = messageBox;
     app.provide('MessageBox', messageBox);
-  }
+  },
 };

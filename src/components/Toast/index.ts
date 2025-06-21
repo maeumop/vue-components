@@ -19,7 +19,7 @@ export default {
       destroy: (): void => {
         render(null, body);
         vNode = null;
-      }
+      },
     };
 
     const init = () => {
@@ -80,5 +80,5 @@ export default {
 
     // app.config.globalProperties.$toast = objectToast
     app.provide('Toast', objectToast);
-  }
+  },
 };

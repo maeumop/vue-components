@@ -7,8 +7,8 @@ export const useAddFormValidate = () => {
 
   const findValidateForm = () => {
     if (instance) {
-      let parent:typeof instance | null = instance;
-  
+      let parent: typeof instance | null = instance;
+
       while (parent) {
         if (parent.type.name === 'ValidateForm') {
           break;
@@ -21,9 +21,8 @@ export const useAddFormValidate = () => {
         (parent.exposed as ValidateFormModel).addComponant(instance.vnode);
       }
     }
-    
   };
-  
+
   onMounted(() => {
     findValidateForm();
   });

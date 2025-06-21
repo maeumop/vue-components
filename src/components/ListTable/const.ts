@@ -21,7 +21,7 @@ export const listTableCheckboxIcon: ListTableListCheckIconType = {
 /**
  * ListCheck.vue radio icon ConstEnum
  */
-export const listTableRadioIcon: ListTableListCheckIconType  = {
+export const listTableRadioIcon: ListTableListCheckIconType = {
   disabled: mdiCircle,
   checked: mdiRadioboxMarked,
   blank: mdiRadioboxBlank,

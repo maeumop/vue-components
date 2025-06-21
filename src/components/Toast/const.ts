@@ -9,12 +9,12 @@ export const toastColorCase = {
   success: 'success',
   warning: 'warning',
   info: 'info',
-  danger: 'danger'
+  danger: 'danger',
 } as const;
 
 export const toastIconCase = {
   success: mdiCheckCircleOutline,
   warning: mdiChatAlert,
   info: mdiInformationVariantCircleOutline,
-  danger: mdiCloseOctagon
+  danger: mdiCloseOctagon,
 } as const;
