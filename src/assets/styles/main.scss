@@ -1,4 +1,5 @@
-@import 'variables';
+@use 'sass:color';
+@use 'variables' as *;
 
 // 전역 스타일 리셋
 * {
@@ -28,7 +29,7 @@ a {
   transition: color $transition-fast;
 
   &:hover {
-    color: darken($primary-color, 10%);
+    color: color.adjust($primary-color, $lightness: -10%);
   }
 }
 

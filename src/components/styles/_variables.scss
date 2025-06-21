@@ -1,33 +1,32 @@
 @charset "utf-8";
 /* @/components/_variables.scss */
-@use "sass:map";
+@use 'sass:map';
 
 //================================================================================
 // Override
 //================================================================================
-@use "../../assets/scss/abstracts/variables";
-@forward "./init" with (
-  $primary: variables.$primary,
-  $secondary: variables.$secondary,
-  $accent: variables.$accent,
-  $info: variables.$info,
+@use '../../assets/styles/variables' as *;
+@forward './init' with (
+  $primary: $primary-color,
+  $secondary: $secondary-color,
+  $accent: $info-color,
+  $info: $info-color,
+  $success: $success-color,
+  $warning: $warning-color,
+  $danger: $error-color,
 
-  $success: variables.$success,
-  $warning: variables.$warning,
-  $danger: variables.$danger,
-
-  $gray-800: variables.$gray-800,
-  $gray-600: variables.$gray-600,
-  $gray-400: variables.$gray-400,
-  $gray-300: variables.$gray-300,
-  $gray-100: variables.$gray-100,
+  $gray-800: $gray-800,
+  $gray-600: $gray-600,
+  $gray-400: $gray-400,
+  $gray-300: $gray-300,
+  $gray-100: $gray-100,
 
   $scrollbar-color: (
-    "thumb": variables.$gray-400,
-    "track": variables.$gray-100
+    'thumb': $gray-400,
+    'track': $gray-100,
   ),
 
-  $text-default: map.get(variables.$G-theme-colors, text, dark),
-  $text-placeholder: map.get(variables.$G-theme-colors, text, placeholder),
-  $text-disabled: map.get(variables.$G-theme-colors, text, disabled)
+  $text-default: $gray-900,
+  $text-placeholder: $gray-500,
+  $text-disabled: $gray-400
 );

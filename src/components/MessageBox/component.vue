@@ -137,7 +137,7 @@
 </template>
 
 <style scoped lang="scss">
-  @import './style';
+  @use './style';
 </style>
 <style lang="scss">
   body.hide-scroll {

@@ -1,7 +1,6 @@
 <script setup lang="ts">
   import { Icon } from '@iconify/vue';
   import { computed } from 'vue';
-  import { createClassName, isValidColor, isValidPosition } from '../constants';
   import { BADGE_CONFIG, badgeColors, badgePosition } from './const';
   import type { BadgeProps } from './types';
 
@@ -25,14 +24,38 @@
 
   // 뱃지 스타일 클래스 생성
   const badgeStyle = computed<string[]>(() => {
-    const modifiers: Record<string, string | boolean> = {
-      icon: !!props.icon && badgeSize.value === BADGE_CONFIG.largeSize,
-      [props.color]: isValidColor(props.color),
-      [badgeSize.value]: true,
-      [props.position]: isValidPosition(props.position),
+    const classes = ['badge'];
+    // 색상 클래스 - badgeColors의 키 값들을 직접 확인
+    const validColors = Object.keys(badgeColors);
+
+    if (validColors.includes(props.color)) {
+      classes.push(props.color);
+    } else {
+      console.warn('Invalid color:', props.color, 'Valid colors:', validColors);
+    }
+
+    // 크기 클래스
+    classes.push(`size-${badgeSize.value}`);
+
+    // 위치 클래스 - 공통 상수와 SCSS 클래스명 매핑
+    const positionMapping: Record<string, string> = {
+      [badgePosition.right]: 'right',
+      [badgePosition.left]: 'left',
+      [badgePosition.bottomRight]: 'bottom-right',
+      [badgePosition.bottomLeft]: 'bottom-left',
     };
 
-    return createClassName('badge', modifiers).split(' ');
+    const positionClass = positionMapping[props.position];
+    if (positionClass) {
+      classes.push(positionClass);
+    }
+
+    // 아이콘 클래스
+    if (props.icon && badgeSize.value === BADGE_CONFIG.largeSize) {
+      classes.push('icon');
+    }
+
+    return classes;
   });
 
   // 래퍼 클래스 생성
@@ -77,7 +100,7 @@
 </template>
 
 <style scoped lang="scss">
-  @import './style';
+  @use './style';
 </style>
 <script lang="ts">
   export default { name: 'Badge' };

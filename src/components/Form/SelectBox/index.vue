@@ -802,5 +802,5 @@
   export default { name: 'SelectBox' };
 </script>
 <style scoped lang="scss">
-  @import './style';
+  @use './style';
 </style>

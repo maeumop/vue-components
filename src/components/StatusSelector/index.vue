@@ -112,7 +112,7 @@
 </template>
 
 <style scoped lang="scss">
-  @import './style';
+  @use './style';
 </style>
 <script lang="ts">
   export default { name: 'StatusSelector' };

@@ -475,5 +475,5 @@
   export default { name: 'ListTable' };
 </script>
 <style scoped lang="scss">
-  @import './_style.scss';
+  @use './_style.scss';
 </style>

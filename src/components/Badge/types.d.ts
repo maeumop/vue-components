@@ -1,8 +1,7 @@
-import { type ColorType, type PositionType } from '../constants';
-import type { BADGE_CONFIG } from './const';
+import type { BADGE_CONFIG, badgeColors, badgePosition } from './const';
 
-export type BadgeColors = ColorType;
-export type BadgePosition = PositionType;
+export type BadgeColors = keyof typeof badgeColors;
+export type BadgePosition = keyof typeof badgePosition;
 export type BadgeSize = typeof BADGE_CONFIG.defaultSize | typeof BADGE_CONFIG.largeSize;
 
 export interface BadgeProps {

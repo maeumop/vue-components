@@ -2,6 +2,7 @@
 /* @/components/common.scss */
 @use 'sass:map';
 @use 'sass:math';
+@use 'sass:color';
 @use '../assets/styles/variables' as *;
 
 //================================================================================
@@ -38,7 +39,7 @@ $component-colors: (
 /// @param {number} $darken-amount - 어둡게 할 정도 (기본값: 10%)
 @mixin hover-effect($color, $darken-amount: 10%) {
   &:hover {
-    background-color: darken($color, $darken-amount);
+    background-color: color.adjust($color, $lightness: -$darken-amount);
   }
 }
 
