@@ -26,13 +26,6 @@
       icon: 'mdi:form-select',
     },
     {
-      name: 'Icon',
-      path: '/components/icon',
-      description: '아이콘 컴포넌트',
-      color: 'success',
-      icon: 'mdi:emoticon',
-    },
-    {
       name: 'ListTable',
       path: '/components/listtable',
       description: '리스트 테이블 컴포넌트',
@@ -75,7 +68,7 @@
       icon: 'mdi:checkbox-multiple-marked',
     },
     {
-      name: 'buttons',
+      name: 'StyledButton',
       path: '/components/buttons',
       description: '스타일된 버튼 컴포넌트',
       color: 'warning',
