@@ -1,21 +1,23 @@
-import type { btnColors } from './const';
+import type { buttonColors, buttonSizes, buttonStyles } from './const';
 
-export type BtnColors = (typeof btnColors)[keyof typeof btnColors];
+export type ButtonColors = (typeof buttonColors)[keyof typeof buttonColors];
+export type ButtonSizes = (typeof buttonSizes)[keyof typeof buttonSizes];
+export type ButtonStyles = (typeof buttonStyles)[keyof typeof buttonStyles];
 
 export interface StyledButtonProps {
-  color?: BtnColors;
+  color?: ButtonColors;
   class?: string;
   href?: string;
   target?: string;
-  text?: boolean;
-  icon?: MdiSvgIcon;
+  style?: ButtonStyles;
+  icon?: string;
   iconRight?: boolean;
   onlyIcon?: boolean;
   block?: boolean;
   loading?: boolean;
   disabled?: boolean;
-  xSmall?: boolean;
   small?: boolean;
+  default?: boolean;
   large?: boolean;
   outline?: boolean;
   tag?: string;

@@ -11,7 +11,7 @@ import { globalIgnores } from 'eslint/config';
 export default defineConfigWithVueTs(
   {
     name: 'app/files-to-lint',
-    files: ['**/*.{ts,mts,tsx,vue}']
+    files: ['**/*.{ts,mts,tsx,vue}'],
   },
 
   globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
@@ -34,15 +34,15 @@ export default defineConfigWithVueTs(
       'vue/define-macros-order': [
         'error',
         {
-          order: ['defineProps', 'defineEmits']
-        }
+          order: ['defineProps', 'defineEmits'],
+        },
       ],
       'vue/html-comment-content-spacing': ['error', 'always'],
       'vue/no-unused-properties': [
         'error',
         {
-          groups: ['props', 'data', 'computed', 'methods']
-        }
+          groups: ['props', 'data', 'computed', 'methods'],
+        },
       ],
 
       // TypeScript 관련 규칙
@@ -69,7 +69,6 @@ export default defineConfigWithVueTs(
       semi: ['error', 'always'],
       '@typescript-eslint/semi': ['error', 'always'],
       'comma-dangle': ['error', 'always'],
-      '@typescript-eslint/comma-dangle': ['error', 'always']
-    }
-  }
+    },
+  },
 );

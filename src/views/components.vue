@@ -75,8 +75,8 @@
       icon: 'mdi:checkbox-multiple-marked',
     },
     {
-      name: 'StyledButton',
-      path: '/components/styledbutton',
+      name: 'buttons',
+      path: '/components/buttons',
       description: '스타일된 버튼 컴포넌트',
       color: 'warning',
       icon: 'mdi:button-cursor',

@@ -1,8 +1,22 @@
-export const btnColors = {
+export const buttonColors = {
   primary: 'primary',
   secondary: 'secondary',
-  info: 'info',
   success: 'success',
   warning: 'warning',
   danger: 'danger',
+  info: 'info',
+  light: 'light',
+  dark: 'dark',
+} as const;
+
+export const buttonSizes = {
+  small: 'small',
+  default: 'default',
+  large: 'large',
+} as const;
+
+export const buttonStyles = {
+  filled: 'filled',
+  outline: 'outline',
+  text: 'text',
 } as const;

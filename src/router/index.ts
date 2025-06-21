@@ -13,6 +13,11 @@ const router = createRouter({
       name: 'badge',
       component: () => import('../components/Badge/ex.vue'),
     },
+    {
+      path: '/components/buttons',
+      name: 'buttons',
+      component: () => import('../components/StyledButton/ex.vue'),
+    },
   ],
 });
 

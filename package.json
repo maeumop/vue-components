@@ -13,8 +13,7 @@
     "lint:check": "eslint .",
     "format": "prettier --write src/",
     "format:check": "prettier --check src/",
-    "fix": "npm run lint && npm run format",
-    "prepare": "npm run fix"
+    "fix": "npm run lint && npm run format"
   },
   "dependencies": {
     "@iconify/vue": "^5.0.0",

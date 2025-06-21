@@ -1,7 +1,7 @@
 <script setup lang="ts">
-  import { mdiGoogleCirclesExtended } from '@/assets/svg/iconPath';
   import type { VNode } from 'vue';
   import { computed, h, reactive } from 'vue';
+  import { buttonStyles } from './const';
   import type { StyledButtonProps } from './types';
 
   const emit = defineEmits<{
@@ -11,7 +11,7 @@
   const props = withDefaults(defineProps<StyledButtonProps>(), {
     href: '#',
     target: '_blank',
-    text: false,
+    style: buttonStyles.filled,
     right: false,
     block: false,
     onlyIcon: false,
@@ -19,28 +19,60 @@
     disabled: false,
     iconRight: false,
     small: false,
+    default: false,
+    large: false,
     outline: false,
     tag: 'a',
     dropMenuToggle: false,
   });
 
-  const buttonStyle = computed<any>(() => {
-    const type = (props.onlyIcon && 'icon') || (props.text && 'text') || 'button';
+  const buttonStyle = computed<string[]>(() => {
+    const classes = ['btn'];
 
-    return [
-      'btn',
-      type,
-      !props.outline && props.color,
-      !props.onlyIcon && props.icon ? (props.iconRight ? 'right' : 'left') : '',
-      {
-        large: props.large,
-        small: props.small,
-        xsmall: props.xSmall,
-        block: !props.small && !props.xSmall && props.block,
-        outline: props.outline,
-      },
-      props.class,
-    ];
+    // 버튼 타입
+    if (props.onlyIcon) {
+      classes.push('icon');
+    } else if (props.style === 'text') {
+      classes.push('text');
+    }
+
+    // 색상 클래스
+    if (props.color) {
+      classes.push(props.color);
+    }
+
+    // 크기 클래스
+    if (props.large) {
+      classes.push('large');
+    } else if (props.default) {
+      classes.push('default');
+    } else if (props.small) {
+      classes.push('small');
+    } else {
+      classes.push('default'); // 기본값은 small
+    }
+
+    // 스타일 클래스
+    if (props.style === 'outline' || props.outline) {
+      classes.push('outline');
+    }
+
+    // 블록 클래스
+    if (props.block) {
+      classes.push('block');
+    }
+
+    // 비활성화 클래스
+    if (props.disabled || props.loading) {
+      classes.push('disabled');
+    }
+
+    // 추가 클래스
+    if (props.class) {
+      classes.push(props.class);
+    }
+
+    return classes;
   });
 
   const hrefState = computed<string>(() => {
@@ -51,20 +83,16 @@
     return '';
   });
 
-  const iconSize = computed<string>(() => {
-    if (props.text) {
-      return props.text ? '18' : '22';
-    }
-
+  const iconSize = computed<number>(() => {
     if (props.large) {
-      return '24';
+      return 24;
+    } else if (props.default) {
+      return 20;
     } else if (props.small) {
-      return '18';
-    } else if (props.xSmall) {
-      return '16';
+      return 18;
+    } else {
+      return 18; // 기본값은 small
     }
-
-    return '20';
   });
 
   const options = reactive<any>({
@@ -87,44 +115,41 @@
     options.type = 'button';
   }
 
-  const WrapperTag = computed<VNode>(() => h(props.text ? 'a' : props.tag, options));
+  const WrapperTag = computed<VNode>(() => h(props.style === 'text' ? 'a' : props.tag, options));
 </script>
 
 <template>
-  <WrapperTag :class="{ disabled: props.disabled || props.loading }">
+  <WrapperTag :class="buttonStyle">
     <div class="btn-wrap">
       <template v-if="!props.onlyIcon">
         <template v-if="props.loading">
-          <SvgIcon class="loading" type="mdi" :path="mdiGoogleCirclesExtended" />
+          <Icon class="loading" icon="mdi:loading" :width="iconSize" :height="iconSize" />
         </template>
         <template v-else>
-          <template v-if="props.icon">
-            <SvgIcon
-              type="mdi"
+          <template v-if="props.icon && !props.iconRight">
+            <Icon
               :class="{ rotate: props.dropMenuToggle }"
-              :size="iconSize"
-              :path="props.icon"
-              v-if="props.icon && !props.iconRight"
-            />
-
-            <slot></slot>
-
-            <SvgIcon
-              type="mdi"
-              :class="{ rotate: props.dropMenuToggle }"
-              :size="iconSize"
-              :path="props.icon"
-              v-if="props.icon && props.iconRight"
+              :width="iconSize"
+              :height="iconSize"
+              :icon="props.icon"
             />
           </template>
-          <template v-else>
-            <slot></slot>
+
+          <slot></slot>
+
+          <template v-if="props.icon && props.iconRight">
+            <Icon
+              :class="{ rotate: props.dropMenuToggle }"
+              :width="iconSize"
+              :height="iconSize"
+              :icon="props.icon"
+            />
           </template>
         </template>
       </template>
       <template v-else>
         <div class="only-icon">
-          <SvgIcon type="mdi" :size="iconSize" :path="props.icon" />
+          <Icon :width="iconSize" :height="iconSize" :icon="props.icon" />
         </div>
       </template>
     </div>
