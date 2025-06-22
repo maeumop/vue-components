@@ -23,6 +23,11 @@ const router = createRouter({
       name: 'spinner',
       component: () => import('../components/Spinner/ex.vue'),
     },
+    {
+      path: '/components/tooltip',
+      name: 'tooltip',
+      component: () => import('../components/Tooltip/ex.vue'),
+    },
   ],
 });
 

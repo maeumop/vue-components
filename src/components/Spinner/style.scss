@@ -1,7 +1,7 @@
 @charset "UTF-8";
 /* @/components/Spinner/_style.scss */
 @use '../styles/keyframes';
-@import '../../assets/styles/variables.scss';
+@use '../../assets/styles/variables' as *;
 
 .spinner-overlay {
   position: fixed;

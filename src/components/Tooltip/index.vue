@@ -1,143 +1,192 @@
 <script setup lang="ts">
   import { Icon } from '@iconify/vue';
   import type { StyleValue } from 'vue';
-  import { computed, nextTick, onBeforeUnmount, onMounted, ref, useSlots } from 'vue';
-  import type { TooltipProps } from './types';
+  import { computed, nextTick, onBeforeUnmount, onMounted, ref, useSlots, watch } from 'vue';
+  import { tooltipColor, tooltipPosition } from './const';
+  import type { TooltipPosition, TooltipProps } from './types';
 
   const slots = useSlots();
   const props = withDefaults(defineProps<TooltipProps>(), {
-    left: false,
-    right: false,
-    top: false,
-    bottom: false,
-    hovering: false,
+    position: tooltipPosition.BOTTOM,
+    hovering: true,
     btnClose: false,
-    icon: 'mdi:help-circle',
     block: false,
+    color: tooltipColor.DEFAULT,
+    width: 140,
   });
 
-  let position = ref<string>('');
-  let isShow = ref<boolean>(false);
-  let tooltipTrans = ref<string>('tooltip');
+  // 반응형 상태
+  const isShow = ref<boolean>(false);
+  const tooltipTrans = ref<string>('tooltip');
+  const position = ref<TooltipPosition>(props.position);
 
-  const el = ref<HTMLElement>();
+  // DOM 참조
+  const container = ref<HTMLElement>();
   const tooltip = ref<HTMLDivElement>();
+
+  // 계산된 속성
   const bindingStyle = computed<StyleValue>(() => {
-    return {
-      width: props.width && `${props.width}px !important`,
+    const baseStyle: StyleValue = {
+      width: props.width && `${props.width}px`,
       padding: props.padding,
     };
+
+    return baseStyle;
   });
 
-  const tooltipPosition = (): void => {
+  // 테마 클래스 계산
+  const themeClass = computed<string>(() => {
+    return `tooltip-theme-${props.color}`;
+  });
+
+  // 툴팁 위치 계산
+  const calculatePosition = (): void => {
+    if (!tooltip.value || !container.value) {
+      return;
+    }
+
+    const containerRect = container.value.getBoundingClientRect();
+    const gap = 8;
+
+    let left = '';
+    let top = '';
+    let right = '';
+    let bottom = '';
+
+    switch (props.position) {
+      case tooltipPosition.RIGHT:
+        left = `${containerRect.width + gap}px`;
+        top = `${(containerRect.height - tooltip.value.offsetHeight) / 2}px`;
+        break;
+      case tooltipPosition.LEFT:
+        right = `${containerRect.width + gap}px`;
+        top = `${(containerRect.height - tooltip.value.offsetHeight) / 2}px`;
+        break;
+      case tooltipPosition.TOP:
+        left = `${(containerRect.width - tooltip.value.offsetWidth) / 2}px`;
+        bottom = `${containerRect.height + gap}px`;
+        break;
+      default: // BOTTOM
+        left = `${(containerRect.width - tooltip.value.offsetWidth) / 2}px`;
+        top = `${containerRect.height + gap}px`;
+        break;
+    }
+
+    // 툴팁 위치 설정
+    tooltip.value.style.left = left;
+    tooltip.value.style.top = top;
+    tooltip.value.style.right = right;
+    tooltip.value.style.bottom = bottom;
+  };
+
+  // 툴팁 표시
+  const showTooltip = (): void => {
+    if (!tooltip.value) {
+      return;
+    }
+
+    isShow.value = true;
+
+    // 다음 틱에서 위치 계산 (DOM 업데이트 후)
+    nextTick(() => {
+      calculatePosition();
+    });
+  };
+
+  // 툴팁 숨김
+  const hideTooltip = (): void => {
+    isShow.value = false;
+  };
+
+  // 마우스 이벤트 처리
+  const onMouseEnter = (): void => {
+    if (props.hovering) {
+      showTooltip();
+    }
+  };
+
+  const onMouseLeave = (): void => {
+    if (props.hovering) {
+      hideTooltip();
+    }
+  };
+
+  // 클릭 이벤트 처리
+  const onClick = (): void => {
+    if (!props.hovering) {
+      toggle();
+    }
+  };
+
+  // 외부 클릭 감지
+  const handleOutsideClick = (event: Event): void => {
+    if (!props.hovering && isShow.value) {
+      const target = event.target as HTMLElement;
+      if (container.value && !container.value.contains(target)) {
+        hideTooltip();
+      }
+    }
+  };
+
+  // 토글 함수 (클릭 모드)
+  const toggle = (): void => {
+    if (!props.hovering) {
+      if (isShow.value) {
+        hideTooltip();
+      } else {
+        showTooltip();
+      }
+    }
+  };
+
+  // 숨기기 함수
+  const hide = (): void => {
+    hideTooltip();
+  };
+
+  // 위치 설정
+  const setPosition = (): void => {
+    position.value = props.position;
     if (isShow.value) {
-      const windowHeight: number = window.innerHeight;
-      const windowWidth: number = window.innerWidth;
-      const rect: DOMRect = el.value!.getBoundingClientRect();
-
       nextTick(() => {
-        if (tooltip.value) {
-          const tipRect: DOMRect = tooltip.value.getBoundingClientRect();
-          const type = props.left || props.right ? 'height' : 'width';
-          const center = (rect[type] - tipRect[type]) / 2;
-
-          if (props.right) {
-            tooltip.value.style.left = `${rect.right}px`;
-            tooltip.value.style.top = `${rect.top + center}px`;
-          } else if (props.left) {
-            tooltip.value.style.right = `${windowWidth - rect.left}px`;
-            tooltip.value.style.top = `${rect.top + center}px`;
-          } else if (props.top) {
-            tooltip.value.style.left = `${rect.left + center}px`;
-            tooltip.value.style.bottom = `${windowHeight - rect.top}px`;
-          } else {
-            tooltip.value.style.left = `${rect.left + center}px`;
-            tooltip.value.style.top = `${rect.top + rect.height}px`;
-          }
-        }
+        calculatePosition();
       });
     }
   };
 
-  const resetStyle = (): void => {
-    if (tooltip.value) {
-      tooltip.value.style.left = '';
-      tooltip.value.style.right = '';
-      tooltip.value.style.top = '';
-      tooltip.value.style.bottom = '';
-    }
-  };
-
-  const onMouse = (show: boolean): void => {
-    if (props.hovering) {
-      isShow.value = show;
-      tooltipPosition();
-    }
-  };
-
-  const toggle = (): void => {
-    if (!props.hovering) {
-      isShow.value = !isShow.value;
-      tooltipPosition();
-    }
-  };
-
-  const hide = (): void => {
-    isShow.value = false;
-  };
-
-  if (props.top) {
-    position.value = 'top';
-  } else if (props.left) {
-    position.value = 'left';
-  } else if (props.right) {
-    position.value = 'right';
-  } else {
-    position.value = 'bottom';
-  }
-
-  let eventParentElement: HTMLElement;
-
-  const parentScrollEvent = (): void => {
+  // 윈도우 리사이즈 감지
+  const handleResize = (): void => {
     if (isShow.value) {
-      isShow.value = false;
+      nextTick(() => {
+        calculatePosition();
+      });
     }
   };
 
-  /**
-   * 컴포넌트 상위 element를 탐색(재귀)하며 scroll이 있는 Element에
-   * scroll event를 추가 하여 scorll 발생시 layer 창을 닫아 준다.
-   * @param el
-   */
-  const setScrollEvent = (el: HTMLElement): void => {
-    const parent = el.parentElement as HTMLElement;
-
-    if (parent && parent.tagName.toLowerCase() !== 'html') {
-      if (parent.scrollHeight > parent.clientHeight + 10) {
-        eventParentElement = parent;
-        eventParentElement.addEventListener('scroll', parentScrollEvent);
-        return;
-      }
-
-      setScrollEvent(parent);
-    }
-  };
-
-  const close = (): void => {
-    tooltipTrans.value = '';
-    hide();
-  };
-
+  // 라이프사이클
   onMounted(() => {
-    setScrollEvent(el.value!);
+    // window 리사이즈 이벤트 추가
+    window.addEventListener('resize', handleResize);
+
+    // 외부 클릭 감지 이벤트 추가
+    document.addEventListener('click', handleOutsideClick);
   });
 
   onBeforeUnmount(() => {
-    if (eventParentElement) {
-      eventParentElement.removeEventListener('scroll', parentScrollEvent);
-    }
+    window.removeEventListener('resize', handleResize);
+    document.removeEventListener('click', handleOutsideClick);
   });
 
+  // 위치 변경 감지
+  watch(() => [props.position], setPosition, { immediate: true });
+
+  // 닫기 함수
+  const close = (): void => {
+    tooltipTrans.value = '';
+    hideTooltip();
+  };
+
+  // 외부 노출
   defineExpose({
     close,
   });
@@ -145,21 +194,23 @@
 
 <template>
   <div
-    ref="el"
-    :class="['tooltip-wrap', props.block && 'block']"
-    @mouseenter="onMouse(true)"
-    @mouseleave="onMouse(false)"
+    ref="container"
+    :class="['tooltip-container', { block: props.block }]"
+    @mouseenter="onMouseEnter"
+    @mouseleave="onMouseLeave"
+    @click="onClick"
   >
-    <div class="icon-wrap">
-      <slot :toggle="toggle" v-if="slots.default !== undefined"></slot>
-      <Icon :icon="props.icon" class="icon" :size="props.iconSize" @click="toggle" v-else />
-    </div>
+    <!-- 감싸진 요소 (slot) -->
+    <slot :toggle="toggle" :is-show="isShow"></slot>
 
-    <Transition :name="tooltipTrans" @after-leave="resetStyle">
+    <!-- 툴팁 레이어 -->
+    <Transition :name="tooltipTrans">
       <div
         ref="tooltip"
         :style="bindingStyle"
-        :class="['message-box', position, props.dark && 'dark']"
+        :class="['tooltip-layer', position, themeClass, { dark: props.dark }]"
+        role="tooltip"
+        :aria-label="Array.isArray(message) ? message.join(', ') : message"
         v-show="isShow"
       >
         <template v-if="slots.content">
@@ -167,15 +218,19 @@
         </template>
         <template v-else-if="Array.isArray(message)">
           <div class="title" v-if="props.title">
-            <h5 v-if="props.title">{{ props.title }}</h5>
-
-            <a href="#" @click.stop.prevent="hide" v-if="props.btnClose">
+            <h5>{{ props.title }}</h5>
+            <button
+              v-if="props.btnClose"
+              @click.stop="hide"
+              class="close-btn"
+              type="button"
+              aria-label="툴팁 닫기"
+            >
               <Icon icon="mdi:window-close" class="close" size="14" />
-            </a>
+            </button>
           </div>
-
           <ul class="message-list">
-            <li :key="`tooltip-message-list-${msg}`" v-for="msg in message">
+            <li v-for="(msg, index) in message" :key="`tooltip-message-${index}`">
               {{ msg }}
             </li>
           </ul>
@@ -191,6 +246,7 @@
 <style lang="scss" scoped>
   @use './style';
 </style>
+
 <script lang="ts">
   export default { name: 'Tooltip' };
 </script>
