@@ -15,6 +15,8 @@
     width: 140,
   });
 
+  const hovering = ref<boolean>(props.hovering);
+
   // 반응형 상태
   const isShow = ref<boolean>(false);
   const tooltipTrans = ref<string>('tooltip');
@@ -100,28 +102,33 @@
 
   // 마우스 이벤트 처리
   const onMouseEnter = (): void => {
-    if (props.hovering) {
+    if (hovering.value) {
       showTooltip();
     }
   };
 
   const onMouseLeave = (): void => {
-    if (props.hovering) {
+    if (hovering.value) {
       hideTooltip();
     }
   };
 
   // 클릭 이벤트 처리
   const onClick = (): void => {
-    if (!props.hovering) {
+    if (!hovering.value) {
       toggle();
+
+      nextTick(() => {
+        calculatePosition();
+      });
     }
   };
 
   // 외부 클릭 감지
   const handleOutsideClick = (event: Event): void => {
-    if (!props.hovering && isShow.value) {
+    if (!hovering.value && isShow.value) {
       const target = event.target as HTMLElement;
+
       if (container.value && !container.value.contains(target)) {
         hideTooltip();
       }
@@ -130,12 +137,8 @@
 
   // 토글 함수 (클릭 모드)
   const toggle = (): void => {
-    if (!props.hovering) {
-      if (isShow.value) {
-        hideTooltip();
-      } else {
-        showTooltip();
-      }
+    if (!hovering.value) {
+      isShow.value = !isShow.value;
     }
   };
 
@@ -152,6 +155,10 @@
         calculatePosition();
       });
     }
+  };
+
+  const setHovering = (): void => {
+    hovering.value = props.hovering;
   };
 
   // 윈도우 리사이즈 감지
@@ -179,6 +186,7 @@
 
   // 위치 변경 감지
   watch(() => [props.position], setPosition, { immediate: true });
+  watch(() => [props.hovering], setHovering, { immediate: true });
 
   // 닫기 함수
   const close = (): void => {
@@ -201,7 +209,7 @@
     @click="onClick"
   >
     <!-- 감싸진 요소 (slot) -->
-    <slot :toggle="toggle" :is-show="isShow"></slot>
+    <slot></slot>
 
     <!-- 툴팁 레이어 -->
     <Transition :name="tooltipTrans">

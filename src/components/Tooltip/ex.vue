@@ -2,6 +2,7 @@
   import { ref } from 'vue';
   import { tooltipColor, tooltipPosition } from './const';
   import Tooltip from './index.vue';
+  import type { TooltipColor, TooltipPosition } from './types';
 
   // 예제 데이터
   const messageList = ref<string[]>([
@@ -11,28 +12,19 @@
   ]);
 
   // 상태 관리
-  const currentPosition = ref(tooltipPosition.BOTTOM);
-  const currentColor = ref(tooltipColor.DEFAULT);
+  const currentPosition = ref<TooltipPosition>(tooltipPosition.BOTTOM);
+  const currentColor = ref<TooltipColor>(tooltipColor.DEFAULT);
   const isHovering = ref(true);
   const isDark = ref(false);
 
   // 위치 변경
-  const changePosition = (position: string) => {
-    currentPosition.value = position as any;
+  const changePosition = (position: TooltipPosition) => {
+    currentPosition.value = position;
   };
 
   // 색상 변경
-  const changeColor = (color: string) => {
-    currentColor.value = color as any;
-  };
-
-  // 토글 함수들
-  const toggleHovering = () => {
-    isHovering.value = !isHovering.value;
-  };
-
-  const toggleDark = () => {
-    isDark.value = !isDark.value;
+  const changeColor = (color: TooltipColor) => {
+    currentColor.value = color;
   };
 </script>
 
@@ -258,13 +250,13 @@
               </div>
               <div class="control-group">
                 <label>
-                  <input type="checkbox" v-model="isHovering" @change="toggleHovering" />
+                  <input type="checkbox" v-model="isHovering" />
                   호버링 모드
                 </label>
               </div>
               <div class="control-group">
                 <label>
-                  <input type="checkbox" v-model="isDark" @change="toggleDark" />
+                  <input type="checkbox" v-model="isDark" />
                   다크 테마
                 </label>
               </div>
@@ -280,8 +272,8 @@
                   :hovering="isHovering"
                   :dark="isDark"
                 >
-                  <template #default="{ toggle }" v-if="!isHovering">
-                    <button @click="toggle" class="preview-btn">동적 툴팁</button>
+                  <template #default v-if="!isHovering">
+                    <button class="preview-btn">동적 툴팁</button>
                   </template>
                   <template #default v-else>
                     <button class="preview-btn">동적 툴팁</button>
