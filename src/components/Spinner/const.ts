@@ -16,7 +16,7 @@ export const spinnerDefaultOptions = {
 } as const;
 
 export const spinnerStatus = {
-  HIDDEN: 'hidden',
-  SHOWING: 'showing',
-  HIDING: 'hiding',
+  hidden: 'hidden',
+  showing: 'showing',
+  hiding: 'hiding',
 } as const;

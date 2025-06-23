@@ -8,7 +8,7 @@
 
   // 상태 관리
   const currentTheme = ref<SpinnerColor>('default');
-  const status = ref<SpinnerStatus>(spinnerStatus.HIDDEN);
+  const status = ref<SpinnerStatus>(spinnerStatus.hidden);
   const lastMessage = ref<string>('');
 
   // 기본 사용법
