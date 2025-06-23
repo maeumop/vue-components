@@ -28,6 +28,11 @@ const router = createRouter({
       name: 'tooltip',
       component: () => import('../components/Tooltip/ex.vue'),
     },
+    {
+      path: '/components/messagebox',
+      name: 'messagebox',
+      component: () => import('../components/MessageBox/ex.vue'),
+    },
   ],
 });
 

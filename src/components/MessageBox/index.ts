@@ -1,103 +1,97 @@
-import type { App, VNode } from 'vue';
-import { h, isVNode, render } from 'vue';
-import type { MessageBoxModel, MessageBoxOptions, MessageBoxType } from './types';
-
+import { createApp, type App } from 'vue';
 import MessageBoxComponent from './component.vue';
-import { messageBoxType } from './const';
+import { messageBoxTransition } from './const';
+import type { MessageBoxModel, MessageBoxOptions, MessageBoxPluginOptions } from './types';
 
-export default {
-  install(app: App) {
-    const body = document.querySelector('body') as HTMLBodyElement;
-    const msgWrapper = document.createElement('div');
-    msgWrapper.id = 'messageBox';
+let messageBoxInstance: any = null;
 
-    body.appendChild(msgWrapper);
+// 플러그인 옵션을 저장할 변수
+let pluginOptions: MessageBoxPluginOptions = {
+  noScrollStyleClass: 'hide-scroll',
+  defaultTransition: messageBoxTransition.scale,
+};
 
-    let vNode: VNode | null = null;
+const createMessageBox = (options: MessageBoxOptions): void => {
+  // 플러그인 옵션과 개별 옵션을 병합
+  const mergedOptions = {
+    ...options,
+    noScrollStyleClass: options.noScrollStyleClass || pluginOptions.noScrollStyleClass,
+    transition: options.transition || pluginOptions.defaultTransition,
+  };
 
-    const destroy = (): void => {
-      render(null, msgWrapper);
-      vNode = null;
-    };
+  // 기존 인스턴스가 있다면 제거
+  if (messageBoxInstance) {
+    messageBoxInstance.unmount();
+    messageBoxInstance = null;
+  }
 
-    const setMessage = (opt: MessageBoxOptions | string, type: MessageBoxType): void => {
-      const props: MessageBoxOptions = {
-        message: '',
-        title: type === messageBoxType.alert ? '알림' : '확인',
-        type,
-      };
-
-      if (opt instanceof Object) {
-        if ('title' in opt) {
-          props.title = opt.title;
-        }
-
-        if ('width' in opt) {
-          if (opt.width) {
-            props.width = opt.width;
-          }
-        }
-
-        if ('btnOkayText' in opt) {
-          props.btnOkayText = opt.btnOkayText;
-        }
-
-        if ('btnCancelText' in opt) {
-          props.btnCancelText = opt.btnCancelText;
-        }
-
-        if (opt.okay instanceof Function) {
-          props.okay = opt.okay;
-        }
-
-        if (opt.asyncOkay instanceof Function) {
-          props.asyncOkay = opt.asyncOkay;
-        }
-
-        if (opt.cancel instanceof Function) {
-          props.cancel = opt.cancel;
-        }
-
-        if (opt.escCancel === false) {
-          props.escCancel = false;
-        }
-
-        if (opt.enterOkay === false) {
-          props.enterOkay = false;
-        }
-
-        props.destroy = destroy;
-
-        props.message = opt.message;
-      } else {
-        props.message = opt;
+  // 새로운 인스턴스 생성
+  messageBoxInstance = createApp(MessageBoxComponent, {
+    ...mergedOptions,
+    destroy: () => {
+      if (messageBoxInstance) {
+        messageBoxInstance.unmount();
+        messageBoxInstance = null;
       }
+    },
+  });
 
-      props.destroy = destroy;
+  // DOM에 마운트
+  const container = document.createElement('div');
+  document.body.appendChild(container);
+  messageBoxInstance.mount(container);
+};
 
-      if (!isVNode(vNode)) {
-        const wrapper = document.querySelector('#messageBox') as HTMLDivElement;
+const messageBox: MessageBoxModel = {
+  alert(params: MessageBoxOptions | string): void {
+    const options = typeof params === 'string' ? { message: params } : params;
+    createMessageBox({
+      type: 'alert',
+      ...options,
+    });
+  },
 
-        vNode = h(MessageBoxComponent, props);
-        render(vNode, wrapper);
-      }
-    };
+  confirm(params: MessageBoxOptions | string): void {
+    const options = typeof params === 'string' ? { message: params } : params;
+    createMessageBox({
+      type: 'confirm',
+      ...options,
+    });
+  },
 
-    const alert = (params: MessageBoxOptions | string): void => {
-      setMessage(params, messageBoxType.alert);
-    };
-
-    const confirm = (params: MessageBoxOptions | string): void => {
-      setMessage(params, messageBoxType.confirm);
-    };
-
-    const messageBox: MessageBoxModel = {
-      alert,
-      confirm,
-      destroy,
-    };
-
-    app.config.globalProperties.$messageBox = messageBox;
-    app.provide('MessageBox', messageBox);
+  destroy(): void {
+    if (messageBoxInstance) {
+      messageBoxInstance.unmount();
+      messageBoxInstance = null;
+    }
   },
 };
+
+// 플러그인 설치 함수
+export const install = (app: App, options: MessageBoxPluginOptions = {}): void => {
+  // 플러그인 옵션 업데이트
+  pluginOptions = {
+    ...pluginOptions,
+    ...options,
+  };
+
+  // 전역 속성으로 등록
+  app.config.globalProperties.$messageBox = messageBox;
+
+  // provide/inject를 위한 provide
+  app.provide('messageBox', messageBox);
+};
+
+// 타입 선언을 위한 모듈 확장
+declare module '@vue/runtime-core' {
+  interface ComponentCustomProperties {
+    $messageBox: MessageBoxModel;
+  }
+}
+
+export default {
+  install,
+};
+
+export { messageBox, messageBoxTransition };
+export type { MessageBoxModel, MessageBoxOptions, MessageBoxPluginOptions };

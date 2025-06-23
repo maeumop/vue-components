@@ -1,8 +1,8 @@
 <script setup lang="ts">
   /* eslint-disable vue/no-v-html */
-  import { mdiGoogleCirclesExtended } from '@/assets/svg/iconPath';
-  import SvgIcon from '@/components/Icon/SvgIcon.vue';
-  import { onUnmounted, ref, shallowRef } from 'vue';
+  import { Icon } from '@iconify/vue';
+  import { computed, onUnmounted, ref, shallowRef } from 'vue';
+  import { messageBoxTransition } from './const';
   import type { MessageBoxExpose, MessageBoxOptions } from './types';
 
   const props = withDefaults(defineProps<MessageBoxOptions>(), {
@@ -11,11 +11,75 @@
     btnCancelText: '취소',
     escCancel: true,
     enterOkay: true,
+    noScrollStyleClass: 'hide-scroll',
+    transition: messageBoxTransition.scale,
   });
 
-  let isShow = ref<boolean>(true);
-  let msgBoxBg = shallowRef<HTMLDivElement>();
-  let spinnerShow = ref<boolean>(false);
+  const isShow = ref<boolean>(true);
+  const msgBoxBg = shallowRef<HTMLDivElement>();
+  const spinnerShow = ref<boolean>(false);
+
+  // 접근성을 위한 computed 속성
+  const dialogId = computed(() => `messagebox-${Date.now()}`);
+  const titleId = computed(() => `${dialogId.value}-title`);
+  const contentId = computed(() => `${dialogId.value}-content`);
+
+  // 트랜지션 이름 computed
+  const transitionName = computed(() => props.transition || messageBoxTransition.scale);
+
+  // 스크롤바 너비 계산 함수
+  const getScrollbarWidth = (): number => {
+    // 더 정확한 스크롤바 너비 계산
+    const outer = document.createElement('div');
+    outer.style.visibility = 'hidden';
+    outer.style.overflow = 'scroll';
+    document.body.appendChild(outer);
+
+    const inner = document.createElement('div');
+    outer.appendChild(inner);
+
+    const scrollbarWidth = outer.offsetWidth - inner.offsetWidth;
+    outer.parentNode?.removeChild(outer);
+
+    return scrollbarWidth;
+  };
+
+  // 스크롤바 공간 설정 함수
+  const setScrollbarSpace = (): void => {
+    const scrollbarWidth = getScrollbarWidth();
+    if (scrollbarWidth > 0) {
+      document.documentElement.style.setProperty('--scrollbar-width', `${scrollbarWidth}px`);
+    }
+  };
+
+  // 스크롤바 공간 제거 함수
+  const removeScrollbarSpace = (): void => {
+    document.documentElement.style.removeProperty('--scrollbar-width');
+  };
+
+  // 스크롤바 제거 함수
+  const disableScroll = (): void => {
+    if (props.noScrollStyleClass) {
+      // 스크롤바 공간 설정
+      setScrollbarSpace();
+      // 스크롤 제거 (클래스와 인라인 스타일 모두 적용)
+      document.body.classList.add(props.noScrollStyleClass);
+      document.body.style.overflow = 'hidden';
+      document.body.style.paddingRight = `var(--scrollbar-width, 0px)`;
+      console.log('스크롤바 제거됨'); // 디버깅용
+    }
+  };
+
+  // 스크롤바 복원 함수
+  const enableScroll = (): void => {
+    if (props.noScrollStyleClass) {
+      document.body.classList.remove(props.noScrollStyleClass);
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+      removeScrollbarSpace();
+      console.log('스크롤바 복원됨'); // 디버깅용
+    }
+  };
 
   const keyupEvent = (evt: KeyboardEvent): void => {
     // Enter 키를 눌렀을 때 okay 실행
@@ -34,10 +98,12 @@
   };
 
   const hide = (): void => {
-    let box: NodeList = document.body.querySelectorAll('.msg-box-bg');
+    const boxes: NodeList = document.body.querySelectorAll('.msg-box-bg');
+    console.log('현재 MessageBox 개수:', boxes.length); // 디버깅용
 
-    if (box.length === 1) {
-      document.body.classList.remove('hide-scroll');
+    if (boxes.length === 1 && props.noScrollStyleClass) {
+      // 마지막 MessageBox가 닫힐 때만 스크롤바 복원
+      enableScroll();
     }
 
     isShow.value = false;
@@ -47,12 +113,16 @@
    * 이벤트 주입
    */
   const setEvents = (): void => {
-    document.body.classList.add('hide-scroll');
+    console.log('setEvents 호출됨'); // 디버깅용
+    // 스크롤바 제거
+    disableScroll();
+
+    // 키보드 이벤트 추가
     document.addEventListener('keyup', keyupEvent);
     msgBoxBg.value?.focus();
   };
 
-  const close = async () => {
+  const close = async (): Promise<void> => {
     if (props.destroy instanceof Function) {
       document.removeEventListener('keyup', keyupEvent);
       await props.destroy();
@@ -60,6 +130,10 @@
   };
 
   const clickOkay = (): void => {
+    if (spinnerShow.value) {
+      return;
+    }
+
     if (props.okay instanceof Function) {
       props.okay();
     }
@@ -74,11 +148,15 @@
 
     spinnerShow.value = true;
 
-    if (props.asyncOkay instanceof Function) {
-      await props.asyncOkay();
+    try {
+      if (props.asyncOkay instanceof Function) {
+        await props.asyncOkay();
+      }
+    } catch (error) {
+      console.error('MessageBox asyncOkay error:', error);
+    } finally {
+      hide();
     }
-
-    hide();
   };
 
   const clickCancel = (): void => {
@@ -104,31 +182,45 @@
 
 <template>
   <Transition name="msg-box-fade">
-    <div ref="msgBoxBg" class="msg-box-bg" tabindex="0" v-show="isShow">
-      <Transition appear name="msg-box-scale" @after-enter="setEvents" @after-leave="close">
-        <div class="msg-box" :style="{ width: props.width }" v-show="isShow">
-          <h5 class="title">
-            {{ title }}
+    <div
+      ref="msgBoxBg"
+      class="msg-box-bg"
+      tabindex="0"
+      v-show="isShow"
+      role="dialog"
+      :aria-labelledby="titleId"
+      :aria-describedby="contentId"
+      :aria-modal="true"
+    >
+      <Transition appear :name="transitionName" @after-enter="setEvents" @after-leave="close">
+        <div class="msg-box" :style="{ width: props.width }" v-show="isShow" :id="dialogId">
+          <h5 class="title" :id="titleId" v-if="props.title">
+            {{ props.title }}
           </h5>
-          <div class="contents" v-html="message"></div>
+          <div class="contents" :id="contentId" v-html="props.message"></div>
           <div class="actions">
-            <a
-              href="#"
+            <button
+              type="button"
               class="btn-okay"
-              @click.prevent="
-                typeof props.asyncOkay === 'function' ? asyncClickOkay() : clickOkay()
-              "
+              @click="typeof props.asyncOkay === 'function' ? asyncClickOkay() : clickOkay()"
+              :disabled="spinnerShow"
             >
               <template v-if="spinnerShow">
-                <SvgIcon class="loading" type="mdi" :path="mdiGoogleCirclesExtended" />
+                <Icon icon="svg-spinners:ring-resize" class="loading" />
               </template>
               <template v-else>
-                {{ btnOkayText }}
+                {{ props.btnOkayText }}
               </template>
-            </a>
-            <a href="#" class="btn-cancel" @click.prevent="clickCancel" v-if="type === 'confirm'">
-              {{ btnCancelText }}
-            </a>
+            </button>
+            <button
+              type="button"
+              class="btn-cancel"
+              @click="clickCancel"
+              v-if="props.type === 'confirm'"
+              :disabled="spinnerShow"
+            >
+              {{ props.btnCancelText }}
+            </button>
           </div>
         </div>
       </Transition>
@@ -139,11 +231,7 @@
 <style scoped lang="scss">
   @use './style';
 </style>
-<style lang="scss">
-  body.hide-scroll {
-    overflow: hidden;
-  }
-</style>
+
 <script lang="ts">
   export default { name: 'MessageBox' };
 </script>

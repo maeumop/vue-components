@@ -19,13 +19,6 @@
       icon: 'mdi:menu-down',
     },
     {
-      name: 'Form Components',
-      path: '/components/form',
-      description: '폼 관련 컴포넌트들',
-      color: 'info',
-      icon: 'mdi:form-select',
-    },
-    {
       name: 'ListTable',
       path: '/components/listtable',
       description: '리스트 테이블 컴포넌트',
