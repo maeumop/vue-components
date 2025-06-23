@@ -1,27 +1,25 @@
-import { COLORS, POSITIONS, type ColorType, type PositionType } from '../constants';
-
 // Badge 컴포넌트에서 사용할 색상 (공통 색상 상속)
-export const badgeColors: Record<string, ColorType> = {
-  primary: COLORS.primary,
-  secondary: COLORS.secondary,
-  success: COLORS.success,
-  warning: COLORS.warning,
-  danger: COLORS.danger,
-  info: COLORS.info,
-  light: COLORS.light,
-  dark: COLORS.dark,
+export const badgeColors: Record<string, string> = {
+  primary: 'primary',
+  secondary: 'secondary',
+  success: 'success',
+  warning: 'warning',
+  danger: 'danger',
+  info: 'info',
+  light: 'light',
+  dark: 'dark',
 } as const;
 
 // Badge 컴포넌트에서 사용할 위치 (공통 위치 상속)
-export const badgePosition: Record<string, PositionType> = {
-  right: POSITIONS.right,
-  left: POSITIONS.left,
-  bottomLeft: POSITIONS.bottomLeft,
-  bottomRight: POSITIONS.bottomRight,
+export const badgePosition: Record<string, string> = {
+  right: 'right',
+  left: 'left',
+  bottomLeft: 'bottomLeft',
+  bottomRight: 'bottomRight',
 } as const;
 
 // Badge 컴포넌트 특화 상수
-export const BADGE_CONFIG = {
+export const badgeConfig = {
   defaultSize: 'default',
   largeSize: 'large',
   defaultIconSize: 16,

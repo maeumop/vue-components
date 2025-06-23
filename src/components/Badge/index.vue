@@ -1,25 +1,25 @@
 <script setup lang="ts">
   import { Icon } from '@iconify/vue';
   import { computed } from 'vue';
-  import { BADGE_CONFIG, badgeColors, badgePosition } from './const';
+  import { badgeColors, badgeConfig, badgePosition } from './const';
   import type { BadgeProps } from './types';
 
   const props = withDefaults(defineProps<BadgeProps>(), {
     color: badgeColors.primary,
     position: badgePosition.right,
-    size: BADGE_CONFIG.defaultSize,
+    size: badgeConfig.defaultSize,
   });
 
   // 크기 계산 (large prop과 size prop 호환성)
   const badgeSize = computed(() => {
-    return props.large ? BADGE_CONFIG.largeSize : props.size;
+    return props.large ? badgeConfig.largeSize : props.size;
   });
 
   // 아이콘 크기 계산
   const iconSize = computed(() => {
-    return badgeSize.value === BADGE_CONFIG.largeSize
-      ? BADGE_CONFIG.largeIconSize
-      : BADGE_CONFIG.defaultIconSize;
+    return badgeSize.value === badgeConfig.largeSize
+      ? badgeConfig.largeIconSize
+      : badgeConfig.defaultIconSize;
   });
 
   // 뱃지 스타일 클래스 생성
@@ -51,7 +51,7 @@
     }
 
     // 아이콘 클래스
-    if (props.icon && badgeSize.value === BADGE_CONFIG.largeSize) {
+    if (props.icon && badgeSize.value === badgeConfig.largeSize) {
       classes.push('icon');
     }
 
@@ -89,7 +89,7 @@
   <div :class="wrapperClass">
     <slot></slot>
     <div :class="badgeClass" :aria-label="ariaLabel" role="status">
-      <template v-if="props.icon && badgeSize === BADGE_CONFIG.largeSize">
+      <template v-if="props.icon && badgeSize === badgeConfig.largeSize">
         <Icon :icon="props.icon" :width="iconSize" :height="iconSize" />
       </template>
       <template v-else>

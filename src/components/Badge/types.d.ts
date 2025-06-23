@@ -1,8 +1,8 @@
-import type { BADGE_CONFIG, badgeColors, badgePosition } from './const';
+import type { badgeColors, badgeConfig, badgePosition } from './const';
 
 export type BadgeColors = keyof typeof badgeColors;
 export type BadgePosition = keyof typeof badgePosition;
-export type BadgeSize = typeof BADGE_CONFIG.defaultSize | typeof BADGE_CONFIG.largeSize;
+export type BadgeSize = typeof badgeConfig.defaultSize | typeof badgeConfig.largeSize;
 
 export interface BadgeProps {
   /** 뱃지에 표시할 텍스트 */
