@@ -10,6 +10,7 @@ import Badge from './components/Badge/index.vue';
 import MessageBox from './components/MessageBox';
 import SpinnerPlugin from './components/Spinner';
 import StyledButton from './components/StyledButton/index.vue';
+import Toast from './components/Toast';
 
 const app = createApp(App);
 
@@ -18,9 +19,10 @@ app.component('Badge', Badge);
 app.component('Icon', Icon);
 app.component('StyledButton', StyledButton);
 
-// Spinner 플러그인 등록 (기본 설정 사용)
+// 플러그인 등록
 app.use(SpinnerPlugin);
 app.use(MessageBox);
+app.use(Toast);
 
 app.use(createPinia()).use(router);
 

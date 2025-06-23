@@ -1,8 +1,8 @@
-import { h, render, isVNode } from 'vue';
 import type { App, VNode } from 'vue';
+import { h, isVNode, render } from 'vue';
 import ToastComponent from './component.vue';
-import type { ToastModel, ToastOptions, MessageOptions } from './types';
-import { toastIconCase, toastColorCase } from './const';
+import { toastColorCase, toastIconCase } from './const';
+import type { MessageOptions, ToastModel, ToastOptions } from './types';
 
 export default {
   install: (app: App, options?: ToastOptions) => {
@@ -17,14 +17,24 @@ export default {
       maxShowMessage: 4,
       delay: 3000,
       destroy: (): void => {
-        render(null, body);
+        if (vNode && vNode.component?.exposed) {
+          vNode.component.exposed.clear();
+        }
+        render(null, wrapper);
         vNode = null;
+        if (wrapper.parentNode) {
+          wrapper.parentNode.removeChild(wrapper);
+        }
       },
     };
 
     const init = () => {
       if (!isVNode(vNode)) {
         const toastBase = document.querySelector('#toast') as HTMLDivElement;
+        if (!toastBase) {
+          console.error('Toast wrapper not found');
+          return;
+        }
 
         vNode = h(ToastComponent, props);
         render(vNode, toastBase);
@@ -42,35 +52,35 @@ export default {
     }
 
     const setMessage = (opt: MessageOptions | string): void => {
-      init();
+      try {
+        init();
 
-      if (vNode) {
-        if (vNode.component?.exposed) {
+        if (vNode && vNode.component?.exposed) {
           const { exposed } = vNode.component;
 
-          if (opt instanceof Object) {
-            if ('message' in opt) {
-              exposed.message.value = opt.message;
-            } else {
-              console.error('toast message is not set');
+          if (typeof opt === 'string') {
+            // 문자열인 경우 기본 success로 설정
+            exposed.setMessage(opt, toastColorCase.success, toastIconCase.success);
+          } else if (opt && typeof opt === 'object') {
+            // 객체인 경우
+            if (!opt.message) {
+              console.error('Toast message is required');
               return;
             }
 
-            if (opt.color) {
-              exposed.icon.value = toastIconCase[opt.color];
-              exposed.color.value = opt.color;
-            }
-          } else if (typeof opt === 'string') {
-            exposed.message.value = opt;
-            exposed.color.value = toastColorCase.success;
-            exposed.icon.value = toastIconCase.success;
+            const color = opt.color || toastColorCase.success;
+            const icon = opt.icon || toastIconCase[color];
+
+            exposed.setMessage(opt.message, color, icon);
           } else {
-            console.error('toast message is not set');
+            console.error('Invalid toast options');
             return;
           }
 
           exposed.show();
         }
+      } catch (error) {
+        console.error('Toast error:', error);
       }
     };
 
@@ -78,7 +88,10 @@ export default {
       setMessage(params);
     };
 
-    // app.config.globalProperties.$toast = objectToast
-    app.provide('Toast', objectToast);
+    // 전역 속성으로 등록
+    app.config.globalProperties.$toast = objectToast;
+
+    // provide/inject를 위한 provide
+    app.provide('toast', objectToast);
   },
 };

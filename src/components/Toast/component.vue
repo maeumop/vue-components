@@ -1,77 +1,121 @@
 <script setup lang="ts">
-  import SvgIcon from '@/components/Icon/SvgIcon.vue';
+  import { Icon } from '@iconify/vue';
   import { onUnmounted, ref, watch } from 'vue';
   import { toastColorCase, toastIconCase } from './const';
   import type { ToastColorCase, ToastIconCase, ToastListType, ToastOptions } from './types';
 
   const props = withDefaults(defineProps<ToastOptions>(), {
-    delay: 300,
+    delay: 3000,
     maxShowMessage: 4,
   });
 
-  let color = ref<ToastColorCase>(toastColorCase.success);
-  let icon = ref<ToastIconCase>(toastIconCase.success);
-  let message = ref<string>('');
+  const color = ref<ToastColorCase>(toastColorCase.success);
+  const icon = ref<ToastIconCase>(toastIconCase.success);
+  const message = ref<string>('');
 
-  let list = ref<ToastListType[]>([]);
-  let timeout: number[] = [];
-  let key: number = 0;
+  const list = ref<ToastListType[]>([]);
+  const timeoutMap = ref<Map<number, number>>(new Map());
+  const animatingKeys = ref<Set<number>>(new Set());
+  let key = 0;
 
   /**
    * Toast message 를 보여주고, 해당 내용을 delay 시간 만큼 유지 시킨후 제거 한다.
    */
   const show = (): void => {
+    const currentKey = key;
+
     list.value.push({
-      key,
+      key: currentKey,
       color: color.value,
       icon: icon.value,
       message: message.value,
     });
 
     // 표시 시간이 지나면 자동으로 메시지 삭제
-    timeout.push(
-      setTimeout((): void => {
-        hide(0);
-      }, props.delay),
-    );
+    const timeoutId = setTimeout((): void => {
+      hideByKey(currentKey);
+    }, props.delay);
 
+    timeoutMap.value.set(currentKey, timeoutId);
     key++;
 
-    const len: number = list.value.length;
-
-    if (len > props.maxShowMessage) {
-      hide(0);
+    // 최대 개수 제한
+    if (list.value.length > props.maxShowMessage) {
+      const firstItem = list.value[0];
+      if (firstItem) {
+        hideByKey(firstItem.key);
+      }
     }
   };
 
   /**
-   * Toast message 제거
+   * Toast message 제거 (인덱스 기반)
    * @param index 사용자가 클릭한 message index
    */
   const hide = (index: number = 0): void => {
-    try {
-      clearTimeout(timeout[list.value[index].key]);
+    if (index >= 0 && index < list.value.length) {
+      const item = list.value[index];
+      hideByKey(item.key);
+    }
+  };
 
-      if (list.value.length > 0) {
+  /**
+   * Toast message 제거 (키 기반)
+   * @param messageKey 메시지의 고유 키
+   */
+  const hideByKey = (messageKey: number): void => {
+    // 이미 애니메이션 중인 경우 무시
+    if (animatingKeys.value.has(messageKey)) {
+      return;
+    }
+
+    // 애니메이션 시작
+    animatingKeys.value.add(messageKey);
+
+    // timeout 정리
+    const timeoutId = timeoutMap.value.get(messageKey);
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      timeoutMap.value.delete(messageKey);
+    }
+
+    // 애니메이션 완료 후 리스트에서 제거
+    setTimeout((): void => {
+      const index = list.value.findIndex(item => item.key === messageKey);
+      if (index !== -1) {
         list.value.splice(index, 1);
       }
-    } catch (err) {
-      clear();
-      console.warn(`Toast message error: ${err}`);
-    }
+      animatingKeys.value.delete(messageKey);
+    }, 300); // CSS 애니메이션 시간과 동일
   };
 
   /**
    * 변수 초기화
    */
   const clear = (): void => {
-    list.value.forEach(item => {
-      clearTimeout(timeout[item.key]);
+    // 모든 timeout 정리
+    timeoutMap.value.forEach(timeoutId => {
+      clearTimeout(timeoutId);
     });
+    timeoutMap.value.clear();
+
     key = 0;
-    timeout = [];
     message.value = '';
     list.value = [];
+    animatingKeys.value.clear();
+  };
+
+  /**
+   * 메시지 설정 메서드
+   */
+  const setMessage = (msg: string, msgColor?: ToastColorCase, msgIcon?: ToastIconCase): void => {
+    message.value = msg;
+    if (msgColor) {
+      color.value = msgColor;
+    }
+    if (msgIcon) {
+      icon.value = msgIcon;
+    }
   };
 
   watch(list.value, items => {
@@ -81,28 +125,39 @@
   });
 
   onUnmounted(() => {
+    clear();
     props.destroy();
   });
 
   defineExpose({
     show,
-    message,
-    icon,
-    color,
+    setMessage,
+    hide,
+    clear,
   });
 </script>
 
 <template>
-  <div class="toast-bg">
+  <div class="toast-bg" role="region" aria-label="알림 메시지">
     <TransitionGroup name="toast-view">
       <div
         :key="`toast-${item.key}`"
-        :class="['toast-body', item.color ? `bg-${item.color}` : '']"
+        :class="[
+          'toast-body',
+          item.color ? `bg-${item.color}` : '',
+          animatingKeys.has(item.key) ? 'toast-leaving' : '',
+        ]"
         @click="hide(i)"
+        @keydown.enter="hide(i)"
+        @keydown.space="hide(i)"
+        :tabindex="0"
+        role="alert"
+        :aria-live="item.color === 'error' ? 'assertive' : 'polite'"
+        :aria-label="`${item.color} 알림: ${item.message}`"
         v-for="(item, i) in list"
       >
-        <SvgIcon type="mdi" class="icon" :path="item.icon" v-if="item.icon" />
-        <span class="message">{{ item.message }}</span>
+        <Icon :icon="item.icon" class="icon" v-if="item.icon" aria-hidden="true" />
+        <span class="message" v-html="item.message"></span>
       </div>
     </TransitionGroup>
   </div>

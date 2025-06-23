@@ -1,10 +1,10 @@
 @charset "UTF-8";
 /* @\components\styles\_mixins.scss */
-@use "sass:map";
-@use "sass:meta";
-@use "sass:color";
-@use "./variables" as *;
-@use "./functions" as *;
+@use 'sass:map';
+@use 'sass:meta';
+@use 'sass:color';
+@use './variables' as *;
+@use './functions' as *;
 
 /// 지정된 색상으로 스타일 정의
 /// [CheckButton|SwitchButton|StyledButton|Badge]
@@ -36,23 +36,23 @@
   $_colors: (
     info: (
       default: $info,
-      border: #008ead
+      border: #008ead,
     ),
 
     success: (
       default: $success,
-      border: #389e0d
+      border: #389e0d,
     ),
 
     warning: (
       default: $warning,
-      border: #f29e02
+      border: #f29e02,
     ),
 
-    danger: (
+    error: (
       default: $danger,
-      border: #cc2828
-    )
+      border: #cc2828,
+    ),
   );
 
   @each $key, $color in $_colors {

@@ -33,6 +33,11 @@ const router = createRouter({
       name: 'messagebox',
       component: () => import('../components/MessageBox/ex.vue'),
     },
+    {
+      path: '/components/toast',
+      name: 'toast',
+      component: () => import('../components/Toast/ex.vue'),
+    },
   ],
 });
 

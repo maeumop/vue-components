@@ -26,3 +26,17 @@ export interface ToastListType {
   icon: ToastIconCase;
   message: string;
 }
+
+export interface ToastExpose {
+  show(): void;
+  setMessage(message: string, color?: ToastColorCase, icon?: ToastIconCase): void;
+  hide(index?: number): void;
+  clear(): void;
+}
+
+// Vue 전역 속성 타입 확장
+declare module '@vue/runtime-core' {
+  interface ComponentCustomProperties {
+    $toast: ToastModel;
+  }
+}
