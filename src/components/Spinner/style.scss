@@ -13,7 +13,7 @@
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  background-color: var(--spinner-backdrop-color, rgba(0, 0, 0, 0.5));
+  background-color: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(2px);
   transition: opacity 0.3s ease-in-out;
 
@@ -34,7 +34,7 @@
   align-items: center;
   justify-content: center;
   padding: $spacing-xl;
-  background-color: var(--spinner-background-color, rgba(0, 0, 0, 0.7));
+  background-color: rgba(0, 0, 0, 0.7);
   border-radius: $border-radius-lg;
   box-shadow: $shadow-lg;
   min-width: 120px;
@@ -44,14 +44,14 @@
 
   .spinner-icon {
     font-size: 2.5rem;
-    color: var(--spinner-icon-color, $white);
+    color: $white;
     margin-bottom: $spacing-md;
     animation: spin 3s linear infinite;
     transform-origin: center;
   }
 
   .spinner-text {
-    color: var(--spinner-text-color, $white);
+    color: $white;
     font-size: $font-size-sm;
     font-weight: 500;
     margin: 0;
@@ -61,61 +61,52 @@
   }
 
   .spinner-timeout {
-    color: var(--spinner-text-color, $white);
+    color: $white;
     font-size: $font-size-xs;
     opacity: 0.7;
     margin-top: $spacing-sm;
   }
-}
 
-// 색상 테마 클래스 정의
-.spinner-theme-default {
-  --spinner-icon-color: #{$white};
-  --spinner-text-color: #{$white};
-  --spinner-background-color: rgba(0, 0, 0, 0.7);
-  --spinner-backdrop-color: rgba(0, 0, 0, 0.5);
-}
+  // 색상 테마 클래스 정의
+  &.primary,
+  &.secondary,
+  &.success,
+  &.warning,
+  &.error,
+  &.info {
+    background-color: rgba(255, 255, 255, 0.7);
+  }
 
-.spinner-theme-primary {
-  --spinner-icon-color: #{$primary-color};
-  --spinner-text-color: #{$primary-color};
-  --spinner-background-color: rgba(255, 255, 255, 0.7);
-  --spinner-backdrop-color: rgba(0, 0, 0, 0.3);
-}
-
-.spinner-theme-secondary {
-  --spinner-icon-color: #{$secondary-color};
-  --spinner-text-color: #{$secondary-color};
-  --spinner-background-color: rgba(255, 255, 255, 0.7);
-  --spinner-backdrop-color: rgba(0, 0, 0, 0.3);
-}
-
-.spinner-theme-success {
-  --spinner-icon-color: #{$success-color};
-  --spinner-text-color: #{$success-color};
-  --spinner-background-color: rgba(255, 255, 255, 0.7);
-  --spinner-backdrop-color: rgba(0, 0, 0, 0.3);
-}
-
-.spinner-theme-warning {
-  --spinner-icon-color: #{$warning-color};
-  --spinner-text-color: #{$warning-color};
-  --spinner-background-color: rgba(255, 255, 255, 0.7);
-  --spinner-backdrop-color: rgba(0, 0, 0, 0.3);
-}
-
-.spinner-theme-error {
-  --spinner-icon-color: #{$error-color};
-  --spinner-text-color: #{$error-color};
-  --spinner-background-color: rgba(255, 255, 255, 0.7);
-  --spinner-backdrop-color: rgba(0, 0, 0, 0.3);
-}
-
-.spinner-theme-info {
-  --spinner-icon-color: #{$info-color};
-  --spinner-text-color: #{$info-color};
-  --spinner-background-color: rgba(255, 255, 255, 0.7);
-  --spinner-backdrop-color: rgba(0, 0, 0, 0.3);
+  &.primary .spinner-icon,
+  &.primary .spinner-text,
+  &.primary .spinner-timeout {
+    color: $primary-color;
+  }
+  &.secondary .spinner-icon,
+  &.secondary .spinner-text,
+  &.secondary .spinner-timeout {
+    color: $secondary-color;
+  }
+  &.success .spinner-icon,
+  &.success .spinner-text,
+  &.success .spinner-timeout {
+    color: $success-color;
+  }
+  &.warning .spinner-icon,
+  &.warning .spinner-text,
+  &.warning .spinner-timeout {
+    color: $warning-color;
+  }
+  &.error .spinner-icon,
+  &.error .spinner-text,
+  &.error .spinner-timeout {
+    color: $error-color;
+  }
+  &.info .spinner-icon,
+  &.info .spinner-text,
+  &.info .spinner-timeout {
+    color: $info-color;
+  }
 }
 
 @keyframes spin {

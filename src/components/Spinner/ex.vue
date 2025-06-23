@@ -1,13 +1,14 @@
 <script setup lang="ts">
   import { ref } from 'vue';
+  import { spinnerStatus } from './const';
   import { useSpinner } from './index';
-  import type { SpinnerTheme } from './types';
+  import type { SpinnerColor, SpinnerStatus } from './types';
 
   const { show, hide } = useSpinner();
 
   // 상태 관리
-  const currentTheme = ref<SpinnerTheme>('default');
-  const spinnerStatus = ref<'hidden' | 'showing' | 'hiding'>('hidden');
+  const currentTheme = ref<SpinnerColor>('default');
+  const status = ref<SpinnerStatus>(spinnerStatus.HIDDEN);
   const lastMessage = ref<string>('');
 
   // 기본 사용법
@@ -33,8 +34,8 @@
   };
 
   // 색상 테마
-  const showThemeSpinner = (theme: SpinnerTheme) => {
-    const messages = {
+  const showThemeSpinner = (color: SpinnerColor) => {
+    const messages: Record<SpinnerColor, string> = {
       default: '기본 테마 스피너',
       primary: 'Primary 테마 스피너',
       secondary: 'Secondary 테마 스피너',
@@ -44,27 +45,27 @@
       info: 'Info 테마 스피너',
     };
 
-    show(messages[theme], { theme });
-    currentTheme.value = theme;
-    updateStatus('showing', messages[theme]);
+    show(messages[color], { color });
+    currentTheme.value = color;
+    updateStatus('showing', messages[color]);
     setTimeout(() => hide(), 3000);
   };
 
   // 고급 예제
   const showProgressiveSpinner = async () => {
-    show('작업을 시작합니다...', { theme: 'primary' });
+    show('작업을 시작합니다...', { color: 'primary' });
     updateStatus('showing', '작업을 시작합니다...');
 
     await new Promise(resolve => setTimeout(resolve, 1000));
-    show('첫 번째 단계 완료...', { theme: 'info' });
+    show('첫 번째 단계 완료...', { color: 'info' });
     updateStatus('showing', '첫 번째 단계 완료...');
 
     await new Promise(resolve => setTimeout(resolve, 1000));
-    show('마지막 단계입니다...', { theme: 'warning' });
+    show('마지막 단계입니다...', { color: 'warning' });
     updateStatus('showing', '마지막 단계입니다...');
 
     await new Promise(resolve => setTimeout(resolve, 1000));
-    show('모든 작업이 완료되었습니다!', { theme: 'success' });
+    show('모든 작업이 완료되었습니다!', { color: 'success' });
     updateStatus('showing', '모든 작업이 완료되었습니다!');
 
     setTimeout(() => {
@@ -73,30 +74,9 @@
     }, 2000);
   };
 
-  const showAnimatedSpinner = () => {
-    const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'];
-    let currentIndex = 0;
-
-    show('색상이 변하는 스피너');
-    updateStatus('showing', '색상이 변하는 스피너');
-
-    const colorInterval = setInterval(() => {
-      show('색상이 변하는 스피너', {
-        colors: { icon: colors[currentIndex] },
-      });
-      currentIndex = (currentIndex + 1) % colors.length;
-    }, 500);
-
-    setTimeout(() => {
-      clearInterval(colorInterval);
-      hide();
-      updateStatus('hiding', '');
-    }, 4000);
-  };
-
   // API 호출 시뮬레이션
   const simulateApiCall = async (type: 'success' | 'error' | 'warning') => {
-    const themes: Record<string, SpinnerTheme> = {
+    const themes: Record<string, SpinnerColor> = {
       success: 'success',
       error: 'error',
       warning: 'warning',
@@ -107,7 +87,7 @@
       warning: 'API 호출 경고!',
     };
 
-    show(`${type} API 호출 중...`, { theme: themes[type] });
+    show(`${type} API 호출 중...`, { color: themes[type] });
     updateStatus('showing', `${type} API 호출 중...`);
 
     try {
@@ -122,10 +102,10 @@
         }, 2000);
       });
 
-      show(messages[type], { theme: 'success' });
+      show(messages[type], { color: 'success' });
       updateStatus('showing', messages[type]);
     } catch (error) {
-      show('오류가 발생했습니다', { theme: 'error' });
+      show('오류가 발생했습니다', { color: 'error' });
       updateStatus('showing', '오류가 발생했습니다');
     }
 
@@ -133,15 +113,15 @@
   };
 
   const simulateLongApiCall = async () => {
-    show('긴 API 호출 중... (10초)', { theme: 'info' });
+    show('긴 API 호출 중... (10초)', { color: 'info' });
     updateStatus('showing', '긴 API 호출 중... (10초)');
 
     try {
       await new Promise(resolve => setTimeout(resolve, 10000));
-      show('긴 API 호출 완료!', { theme: 'success' });
+      show('긴 API 호출 완료!', { color: 'success' });
       updateStatus('showing', '긴 API 호출 완료!');
     } catch (error) {
-      show('타임아웃 발생', { theme: 'error' });
+      show('타임아웃 발생', { color: 'error' });
       updateStatus('showing', '타임아웃 발생');
     }
 
@@ -149,8 +129,9 @@
   };
 
   // 상태 업데이트 헬퍼
-  const updateStatus = (status: 'hidden' | 'showing' | 'hiding', message: string) => {
-    spinnerStatus.value = status;
+  const updateStatus = (s: SpinnerStatus, message: string) => {
+    status.value = s;
+
     if (message) {
       lastMessage.value = message;
     }
@@ -244,12 +225,6 @@
               </button>
               <span class="example-label">단계별 테마 변경</span>
             </div>
-            <div class="example-item">
-              <button class="demo-button advanced" @click="showAnimatedSpinner">
-                애니메이션 색상
-              </button>
-              <span class="example-label">애니메이션 색상</span>
-            </div>
           </div>
         </section>
 
@@ -258,50 +233,51 @@
           <h2>API 호출 시뮬레이션</h2>
           <div class="example-grid">
             <div class="example-item">
-              <button class="demo-button api-success" @click="simulateApiCall('success')">
-                성공 API
+              <button class="demo-button api success" @click="simulateApiCall('success')">
+                성공 API 호출
               </button>
-              <span class="example-label">성공 API</span>
+              <span class="example-label">성공 API 호출</span>
             </div>
             <div class="example-item">
-              <button class="demo-button api-error" @click="simulateApiCall('error')">
-                실패 API
+              <button class="demo-button api error" @click="simulateApiCall('error')">
+                실패 API 호출
               </button>
-              <span class="example-label">실패 API</span>
+              <span class="example-label">실패 API 호출</span>
             </div>
             <div class="example-item">
-              <button class="demo-button api-warning" @click="simulateApiCall('warning')">
-                경고 API
+              <button class="demo-button api warning" @click="simulateApiCall('warning')">
+                경고 API 호출
               </button>
-              <span class="example-label">경고 API</span>
+              <span class="example-label">경고 API 호출</span>
             </div>
             <div class="example-item">
-              <button class="demo-button api-long" @click="simulateLongApiCall">긴 API 호출</button>
-              <span class="example-label">긴 API 호출</span>
+              <button class="demo-button api long" @click="simulateLongApiCall">
+                긴 API 호출 (타임아웃)
+              </button>
+              <span class="example-label">긴 API 호출 (타임아웃)</span>
             </div>
           </div>
         </section>
 
         <!-- 상태 표시 -->
         <section class="example-section">
-          <h2>현재 상태</h2>
-          <div class="status-display">
-            <div class="status-item">
-              <strong>현재 테마:</strong>
-              <span :class="`status-${currentTheme}`">{{ currentTheme }}</span>
-            </div>
-            <div class="status-item">
-              <strong>스피너 상태:</strong>
-              <span :class="`status-${spinnerStatus}`">{{ spinnerStatus }}</span>
-            </div>
-            <div class="status-item">
-              <strong>마지막 메시지:</strong>
-              <span class="status-message">{{ lastMessage }}</span>
-            </div>
+          <h2>스피너 상태</h2>
+          <div class="status-indicator">
+            <span :class="['status-light', `status-${status}`]"></span>
+            <p>
+              현재 상태: <strong>{{ status }}</strong>
+            </p>
+            <p v-if="lastMessage">
+              마지막 메시지: <strong>{{ lastMessage }}</strong>
+            </p>
           </div>
         </section>
       </div>
     </main>
+
+    <footer class="app-footer">
+      <div class="container">&copy; 2023. All rights reserved.</div>
+    </footer>
   </div>
 </template>
 
@@ -497,90 +473,58 @@
     text-align: center;
   }
 
-  .status-display {
+  .status-indicator {
     background-color: #f8f9fa;
     padding: 1.5rem;
     border-radius: 8px;
     border: 1px solid #e9ecef;
   }
 
-  .status-item {
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+  .status-light {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 0.5rem;
 
-    &:last-child {
-      margin-bottom: 0;
+    &.status-default {
+      background-color: #e9ecef;
     }
 
-    strong {
-      color: #495057;
-      font-weight: 600;
-      min-width: 120px;
+    &.status-primary {
+      background-color: #cce7ff;
     }
 
-    span {
-      padding: 0.25rem 0.75rem;
-      border-radius: 4px;
-      font-size: 0.875rem;
-      font-weight: 500;
+    &.status-secondary {
+      background-color: #e2e3e5;
+    }
 
-      &.status-default {
-        background-color: #e9ecef;
-        color: #6c757d;
-      }
+    &.status-success {
+      background-color: #d4edda;
+    }
 
-      &.status-primary {
-        background-color: #cce7ff;
-        color: #0056b3;
-      }
+    &.status-warning {
+      background-color: #fff3cd;
+    }
 
-      &.status-secondary {
-        background-color: #e2e3e5;
-        color: #6c757d;
-      }
+    &.status-error {
+      background-color: #f8d7da;
+    }
 
-      &.status-success {
-        background-color: #d4edda;
-        color: #155724;
-      }
+    &.status-info {
+      background-color: #d1ecf1;
+    }
 
-      &.status-warning {
-        background-color: #fff3cd;
-        color: #856404;
-      }
+    &.status-hidden {
+      background-color: #e9ecef;
+    }
 
-      &.status-error {
-        background-color: #f8d7da;
-        color: #721c24;
-      }
+    &.status-showing {
+      background-color: #d4edda;
+    }
 
-      &.status-info {
-        background-color: #d1ecf1;
-        color: #0c5460;
-      }
-
-      &.status-hidden {
-        background-color: #e9ecef;
-        color: #6c757d;
-      }
-
-      &.status-showing {
-        background-color: #d4edda;
-        color: #155724;
-      }
-
-      &.status-hiding {
-        background-color: #fff3cd;
-        color: #856404;
-      }
-
-      &.status-message {
-        background-color: #f8f9fa;
-        color: #6c757d;
-        font-style: italic;
-      }
+    &.status-hiding {
+      background-color: #fff3cd;
     }
   }
 
@@ -593,14 +537,10 @@
       font-size: 2rem;
     }
 
-    .status-item {
+    .status-indicator {
       flex-direction: column;
       align-items: flex-start;
       gap: 0.25rem;
-
-      strong {
-        min-width: auto;
-      }
     }
   }
 </style>

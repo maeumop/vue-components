@@ -56,7 +56,7 @@
               <span class="example-label">제목 포함</span>
             </div>
             <div class="example-item">
-              <Tooltip :message="messageList" title="목록 툴팁">
+              <Tooltip :message="messageList" title="목록 툴팁" :width="230">
                 <div class="info-badge">목록 정보</div>
               </Tooltip>
               <span class="example-label">목록 형태</span>
@@ -165,11 +165,12 @@
               <span class="example-label">다크 테마</span>
             </div>
             <div class="example-item">
-              <Tooltip :color="tooltipColor.SECONDARY" :hovering="true">
+              <Tooltip :color="tooltipColor.SECONDARY" :hovering="true" :width="350">
                 <template #content>
                   <div class="custom-tooltip">
                     <h4>커스텀 내용</h4>
                     <p>커스텀 slot으로 만든 툴팁입니다.</p>
+                    <p>커스텀 컨텐츠는 필히 width 속성을 조절 해주세요.</p>
                   </div>
                 </template>
                 <div class="custom-element">커스텀 내용</div>
@@ -377,14 +378,14 @@
 
     h4 {
       margin: 0 0 0.5rem 0;
-      color: #c4c4c4;
+      color: #9eb3d8;
       font-size: 1rem;
       font-weight: 600;
     }
 
     p {
       margin: 0 0 1rem 0;
-      color: #dadada;
+      color: #fff;
       font-size: 0.875rem;
     }
 

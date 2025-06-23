@@ -20,7 +20,7 @@
               <span class="example-label">기본 뱃지</span>
             </div>
             <div class="example-item">
-              <Badge text="New" color="success">
+              <Badge text="N" color="success">
                 <button class="demo-button">새 메시지</button>
               </Badge>
               <span class="example-label">성공 뱃지</span>
@@ -64,42 +64,42 @@
           <h2>색상별 뱃지</h2>
           <div class="example-grid">
             <div class="example-item">
-              <Badge text="Primary" color="primary">
+              <Badge text="P" color="primary">
                 <button class="demo-button">Primary</button>
               </Badge>
             </div>
             <div class="example-item">
-              <Badge text="Secondary" color="secondary">
+              <Badge text="S" color="secondary">
                 <button class="demo-button">Secondary</button>
               </Badge>
             </div>
             <div class="example-item">
-              <Badge text="Success" color="success">
+              <Badge text="U" color="success">
                 <button class="demo-button">Success</button>
               </Badge>
             </div>
             <div class="example-item">
-              <Badge text="Warning" color="warning">
+              <Badge text="W" color="warning">
                 <button class="demo-button">Warning</button>
               </Badge>
             </div>
             <div class="example-item">
-              <Badge text="Danger" color="danger">
+              <Badge text="D" color="danger">
                 <button class="demo-button">Danger</button>
               </Badge>
             </div>
             <div class="example-item">
-              <Badge text="Info" color="info">
+              <Badge text="I" color="info">
                 <button class="demo-button">Info</button>
               </Badge>
             </div>
             <div class="example-item">
-              <Badge text="Light" color="light">
+              <Badge text="L" color="light">
                 <button class="demo-button">Light</button>
               </Badge>
             </div>
             <div class="example-item">
-              <Badge text="Dark" color="dark">
+              <Badge text="K" color="dark">
                 <button class="demo-button">Dark</button>
               </Badge>
             </div>

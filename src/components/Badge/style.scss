@@ -16,12 +16,12 @@
   }
 
   // 기본 값
-  $_x: -0.5rem;
-  $_y: -0.5rem;
+  $_x: -0.4rem;
+  $_y: -0.4rem;
 
   @if $modifier == large {
-    $_x: -0.8rem;
-    $_y: -0.8rem;
+    $_x: -0.6rem;
+    $_y: -0.6rem;
   }
 
   .badge.size-#{$modifier} {
@@ -78,12 +78,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 1.6rem;
-    height: 1.6rem;
+    width: 1.2rem;
+    height: 1.2rem;
     font-weight: 900;
     text-align: center;
     overflow: hidden;
-    border-radius: 0.8rem;
+    border-radius: 0.6rem;
     @include transition('all', 0.2s ease);
   }
 
@@ -207,9 +207,9 @@
   }
 
   @include defineSizeStyle(large) {
-    width: 2.2rem;
-    height: 2.2rem;
-    border-radius: 1.1rem;
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 0.9rem;
 
     &.icon {
       font-size: 0;

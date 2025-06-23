@@ -1,14 +1,8 @@
 import type { App, VNode } from 'vue';
 import { h, isVNode, ref, render } from 'vue';
 import SpinnerComponent from './component.vue';
-import { DEFAULT_SPINNER_OPTIONS } from './const';
-import type {
-  SpinnerColors,
-  SpinnerExpose,
-  SpinnerModel,
-  SpinnerOptions,
-  SpinnerTheme,
-} from './types';
+import { spinnerDefaultOptions } from './const';
+import type { SpinnerColor, SpinnerExpose, SpinnerModel, SpinnerOptions } from './types';
 
 // 전역 Spinner 인스턴스 관리
 let globalSpinner: Spinner | null = null;
@@ -28,12 +22,8 @@ export function useSpinner() {
   const show = (text?: string, options?: SpinnerOptions) => {
     const spinner = getSpinner();
 
-    if (options?.theme) {
-      spinner.setTheme(options.theme);
-    }
-
-    if (options?.colors) {
-      spinner.setColors(options.colors);
+    if (options?.color) {
+      spinner.setColor(options.color);
     }
 
     if (options?.limitTime) {
@@ -62,24 +52,14 @@ export class Spinner implements SpinnerModel {
   private body: HTMLBodyElement;
   private vNode: VNode | null = null;
   private limitTime: number;
-  private theme: SpinnerTheme;
-  private colors: SpinnerColors;
+  private color: SpinnerColor;
 
   constructor(options: SpinnerOptions = {}) {
-    const {
-      limitTime = DEFAULT_SPINNER_OPTIONS.limitTime,
-      theme = DEFAULT_SPINNER_OPTIONS.theme,
-      colors,
-    } = options;
+    const { limitTime = spinnerDefaultOptions.limitTime, color = spinnerDefaultOptions.color } =
+      options;
 
     this.limitTime = limitTime;
-    this.theme = theme;
-    this.colors = colors || {
-      icon: 'var(--spinner-icon-color)',
-      text: 'var(--spinner-text-color)',
-      background: 'var(--spinner-background-color)',
-      backdrop: 'var(--spinner-backdrop-color)',
-    };
+    this.color = color;
     this.body = document.querySelector('body') as HTMLBodyElement;
 
     if (!this.body) {
@@ -91,8 +71,7 @@ export class Spinner implements SpinnerModel {
     if (!isVNode(this.vNode)) {
       this.vNode = h(SpinnerComponent, {
         limitTime: this.limitTime,
-        theme: this.theme,
-        colors: this.colors,
+        color: this.color,
         destroy: this.destroy.bind(this),
       });
 
@@ -145,34 +124,17 @@ export class Spinner implements SpinnerModel {
   }
 
   /**
-   * 스피너 테마 설정
-   * @param theme 테마 이름
+   * 스피너 색상 설정
+   * @param color 색상
    * @returns 메서드 체이닝을 위한 this
    */
-  public setTheme(theme: SpinnerTheme): this {
+  public setColor(color: SpinnerColor): this {
     this.createNode();
-    this.theme = theme;
+    this.color = color;
 
     const exposed = this.getExposed();
     if (exposed) {
-      exposed.setTheme(theme);
-    }
-
-    return this;
-  }
-
-  /**
-   * 스피너 색상 커스터마이징
-   * @param colors 커스텀 색상 객체
-   * @returns 메서드 체이닝을 위한 this
-   */
-  public setColors(colors: SpinnerColors): this {
-    this.createNode();
-    this.colors = { ...this.colors, ...colors };
-
-    const exposed = this.getExposed();
-    if (exposed) {
-      exposed.setColors(colors);
+      exposed.setColor(color);
     }
 
     return this;
@@ -225,14 +187,11 @@ export class Spinner implements SpinnerModel {
 // Vue 플러그인으로 등록
 export default {
   install: (app: App, options: SpinnerOptions = {}): void => {
-    const {
-      limitTime = DEFAULT_SPINNER_OPTIONS.limitTime,
-      theme = DEFAULT_SPINNER_OPTIONS.theme,
-      colors,
-    } = options;
+    const { limitTime = spinnerDefaultOptions.limitTime, color = spinnerDefaultOptions.color } =
+      options;
 
     // 전역 Spinner 인스턴스 생성
-    globalSpinner = new Spinner({ limitTime, theme, colors });
+    globalSpinner = new Spinner({ limitTime, color });
 
     app.provide('Spinner', globalSpinner);
 
