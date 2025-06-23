@@ -38,6 +38,11 @@ const router = createRouter({
       name: 'toast',
       component: () => import('../components/Toast/ex.vue'),
     },
+    {
+      path: '/components/tabs',
+      name: 'tabs',
+      component: () => import('../components/Tabs/ex.vue'),
+    },
   ],
 });
 
