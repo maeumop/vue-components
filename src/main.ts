@@ -7,7 +7,9 @@ import router from './router';
 
 import App from './App.vue';
 import Badge from './components/Badge/index.vue';
+import ListTable from './components/ListTable/index.vue';
 import MessageBox from './components/MessageBox';
+import Pagination from './components/Pagination/index.vue';
 import SpinnerPlugin from './components/Spinner';
 import StyledButton from './components/StyledButton/index.vue';
 import Tabs from './components/Tabs/index.vue';
@@ -23,6 +25,8 @@ app.component('Badge', Badge);
 app.component('StyledButton', StyledButton);
 app.component('Tabs', Tabs);
 app.component('Tooltip', Tooltip);
+app.component('ListTable', ListTable);
+app.component('Pagination', Pagination);
 
 // 플러그인 등록
 app.use(SpinnerPlugin);

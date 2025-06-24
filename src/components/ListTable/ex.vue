@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import FloatingBackButton from '@/views/FloatingBackButton/index.vue';
 import { ref } from 'vue';
+import ListTable from './index.vue';
 import type { ListTableHeader } from './types';
 
 // 사용자 데이터 인터페이스
@@ -64,14 +66,8 @@ const headers: ListTableHeader[] = [
   { text: '역할', width: '100px', align: 'center' },
   { text: '상태', width: '100px', align: 'center' },
   { text: '등록일', width: '120px', align: 'center' },
-  { text: '액션', width: '120px', align: 'center' },
+  { text: '액션', width: '180px', align: 'center' },
 ];
-
-// 테이블 푸터 (사용하지 않으므로 주석 처리)
-// const footer: ListTableFooter[] = [
-//   { text: '총 사용자', colspan: 6, align: 'right' },
-//   { text: users.value.length + '명', align: 'center' },
-// ];
 
 // 상태별 색상
 const getStatusColor = (status: string): string => {
@@ -128,7 +124,7 @@ const handleObserve = (): void => {
 };
 
 // 비활성화 필터 (관리자는 선택 불가)
-const disableFilter = (user: User, _index: number): boolean => {
+const disableFilter = (user: User): boolean => {
   return user.role === '관리자';
 };
 
@@ -155,314 +151,312 @@ const toggleLoading = (): void => {
 </script>
 
 <template>
-  <div class="list-table-example">
-    <h1>ListTable 컴포넌트 예제</h1>
-
-    <!-- 기본 테이블 -->
-    <section class="example-section">
-      <h2>1. 기본 테이블</h2>
-      <ListTable :header="headers" :items="users">
-        <template #items="{ props }">
-          <tr>
-            <td>{{ props.id }}</td>
-            <td>{{ props.name }}</td>
-            <td>{{ props.email }}</td>
-            <td>{{ props.role }}</td>
-            <td :style="getStatusColor(props.status)">
-              {{ getStatusText(props.status) }}
-            </td>
-            <td>{{ props.createdAt }}</td>
-            <td>
-              <button @click="editUser(props)" class="btn-edit">수정</button>
-              <button @click="deleteUser(props)" class="btn-delete">삭제</button>
-            </td>
-          </tr>
-        </template>
-      </ListTable>
-    </section>
-
-    <!-- 체크박스 모드 -->
-    <section class="example-section">
-      <h2>2. 체크박스 모드</h2>
-      <div class="info">
-        <p>선택된 사용자: {{ selectedUsers.length }}명</p>
-        <button @click="toggleLoading" class="btn-toggle">로딩 토글</button>
+  <div id="app">
+    <header class="app-header">
+      <div class="container">
+        <h1>ListTable Component Examples</h1>
+        <p>Vue 3 + TypeScript로 개발된 테이블 컴포넌트</p>
       </div>
-      <ListTable
-        :header="headers"
-        :items="users"
-        check-mode="checkbox"
-        :loading="isLoading"
-        :disable-filter="disableFilter"
-        @checked="handleCheck"
-        @checked-all="handleCheckAll"
-      >
-        <template #items="{ props, disabled }">
-          <tr :class="{ disabled }">
-            <td>{{ props.id }}</td>
-            <td>{{ props.name }}</td>
-            <td>{{ props.email }}</td>
-            <td>{{ props.role }}</td>
-            <td :style="getStatusColor(props.status)">
-              {{ getStatusText(props.status) }}
-            </td>
-            <td>{{ props.createdAt }}</td>
-            <td>
-              <button @click="editUser(props)" :disabled="disabled" class="btn-edit">수정</button>
-              <button @click="deleteUser(props)" :disabled="disabled" class="btn-delete">
-                삭제
-              </button>
-            </td>
-          </tr>
-        </template>
-      </ListTable>
-    </section>
+    </header>
 
-    <!-- 라디오 모드 -->
-    <section class="example-section">
-      <h2>3. 라디오 모드</h2>
-      <div class="info">
-        <p>선택된 사용자: {{ selectedUser?.name || '없음' }}</p>
-      </div>
-      <ListTable :header="headers" :items="users" check-mode="radio" @checked="handleRadioCheck">
-        <template #items="{ props }">
-          <tr>
-            <td>{{ props.id }}</td>
-            <td>{{ props.name }}</td>
-            <td>{{ props.email }}</td>
-            <td>{{ props.role }}</td>
-            <td :style="getStatusColor(props.status)">
-              {{ getStatusText(props.status) }}
-            </td>
-            <td>{{ props.createdAt }}</td>
-            <td>
-              <button @click="editUser(props)" class="btn-edit">수정</button>
-              <button @click="deleteUser(props)" class="btn-delete">삭제</button>
-            </td>
-          </tr>
-        </template>
-      </ListTable>
-    </section>
+    <main class="main-content">
+      <div class="container">
+        <!-- 기본 테이블 -->
+        <section class="example-section">
+          <h2>기본 테이블</h2>
+          <div class="example-item">
+            <ListTable :header="headers" :items="users">
+              <template #items="{ props }">
+                <tr>
+                  <td>{{ props.id }}</td>
+                  <td>{{ props.name }}</td>
+                  <td>{{ props.email }}</td>
+                  <td>{{ props.role }}</td>
+                  <td :style="getStatusColor(props.status)">
+                    {{ getStatusText(props.status) }}
+                  </td>
+                  <td>{{ props.createdAt }}</td>
+                  <td>
+                    <button @click="editUser(props)" class="demo-button">수정</button>
+                    <button @click="deleteUser(props)" class="demo-button demo-button-danger">
+                      삭제
+                    </button>
+                  </td>
+                </tr>
+              </template>
+            </ListTable>
+          </div>
+        </section>
 
-    <!-- 무한 스크롤 -->
-    <section class="example-section">
-      <h2>4. 무한 스크롤</h2>
-      <ListTable
-        :header="headers"
-        :items="users"
-        :observer="true"
-        height="300px"
-        @observe="handleObserve"
-      >
-        <template #items="{ props }">
-          <tr>
-            <td>{{ props.id }}</td>
-            <td>{{ props.name }}</td>
-            <td>{{ props.email }}</td>
-            <td>{{ props.role }}</td>
-            <td :style="getStatusColor(props.status)">
-              {{ getStatusText(props.status) }}
-            </td>
-            <td>{{ props.createdAt }}</td>
-            <td>
-              <button @click="editUser(props)" class="btn-edit">수정</button>
-              <button @click="deleteUser(props)" class="btn-delete">삭제</button>
-            </td>
-          </tr>
-        </template>
-      </ListTable>
-    </section>
-
-    <!-- 커스텀 헤더/푸터 -->
-    <section class="example-section">
-      <h2>5. 커스텀 헤더/푸터</h2>
-      <ListTable :items="users">
-        <template #header>
-          <tr>
-            <th colspan="7" style="text-align: center; background-color: #f3f4f6">
-              사용자 관리 테이블
-            </th>
-          </tr>
-          <tr>
-            <th
-              v-for="header in headers"
-              :key="header.text"
-              :width="header.width"
-              :class="header.align"
+        <!-- 체크박스 모드 -->
+        <section class="example-section">
+          <h2>체크박스 모드</h2>
+          <div class="example-item">
+            <div class="info">
+              <p>선택된 사용자: {{ selectedUsers.length }}명</p>
+              <button @click="toggleLoading" class="demo-button">로딩 토글</button>
+            </div>
+            <ListTable
+              :header="headers"
+              :items="users"
+              check-mode="checkbox"
+              :loading="isLoading"
+              :disable-filter="disableFilter"
+              @checked="handleCheck"
+              @checked-all="handleCheckAll"
             >
-              {{ header.text }}
-            </th>
-          </tr>
-        </template>
-        <template #items="{ props }">
-          <tr>
-            <td>{{ props.id }}</td>
-            <td>{{ props.name }}</td>
-            <td>{{ props.email }}</td>
-            <td>{{ props.role }}</td>
-            <td :style="getStatusColor(props.status)">
-              {{ getStatusText(props.status) }}
-            </td>
-            <td>{{ props.createdAt }}</td>
-            <td>
-              <button @click="editUser(props)" class="btn-edit">수정</button>
-              <button @click="deleteUser(props)" class="btn-delete">삭제</button>
-            </td>
-          </tr>
-        </template>
-        <template #footer>
-          <tr>
-            <td colspan="6" style="text-align: right; font-weight: bold">총 사용자</td>
-            <td style="text-align: center; font-weight: bold">{{ users.length }}명</td>
-          </tr>
-        </template>
-      </ListTable>
-    </section>
+              <template #items="{ props, disabled }">
+                <td>{{ props.id }}</td>
+                <td>{{ props.name }}</td>
+                <td>{{ props.email }}</td>
+                <td>{{ props.role }}</td>
+                <td :style="getStatusColor(props.status)">
+                  {{ getStatusText(props.status) }}
+                </td>
+                <td>{{ props.createdAt }}</td>
+                <td>
+                  <button @click="editUser(props)" class="demo-button" :disabled="disabled">
+                    수정
+                  </button>
+                  <button
+                    @click="deleteUser(props)"
+                    class="demo-button demo-button-danger"
+                    :disabled="disabled"
+                  >
+                    삭제
+                  </button>
+                </td>
+              </template>
+            </ListTable>
+          </div>
+        </section>
 
-    <!-- 빈 데이터 상태 -->
-    <section class="example-section">
-      <h2>6. 빈 데이터 상태</h2>
-      <ListTable :header="headers" :items="[]" empty-text="사용자 데이터가 없습니다.">
-        <template #items="{ props }">
-          <tr>
-            <td>{{ props.id }}</td>
-            <td>{{ props.name }}</td>
-            <td>{{ props.email }}</td>
-            <td>{{ props.role }}</td>
-            <td>{{ props.status }}</td>
-            <td>{{ props.createdAt }}</td>
-            <td>
-              <button class="btn-edit">수정</button>
-              <button class="btn-delete">삭제</button>
-            </td>
-          </tr>
-        </template>
-      </ListTable>
-    </section>
+        <!-- 라디오 모드 -->
+        <section class="example-section">
+          <h2>라디오 모드</h2>
+          <div class="example-item">
+            <div class="info">
+              <p>선택된 사용자: {{ selectedUser ? selectedUser.name : '없음' }}</p>
+            </div>
+            <ListTable
+              :header="headers"
+              :items="users"
+              check-mode="radio"
+              :disable-filter="disableFilter"
+              @checked="handleRadioCheck"
+            >
+              <template #items="{ props, disabled }">
+                <td>{{ props.id }}</td>
+                <td>{{ props.name }}</td>
+                <td>{{ props.email }}</td>
+                <td>{{ props.role }}</td>
+                <td :style="getStatusColor(props.status)">
+                  {{ getStatusText(props.status) }}
+                </td>
+                <td>{{ props.createdAt }}</td>
+                <td>
+                  <button @click="editUser(props)" class="demo-button" :disabled="disabled">
+                    수정
+                  </button>
+                  <button
+                    @click="deleteUser(props)"
+                    class="demo-button demo-button-danger"
+                    :disabled="disabled"
+                  >
+                    삭제
+                  </button>
+                </td>
+              </template>
+            </ListTable>
+          </div>
+        </section>
+
+        <!-- 무한 스크롤 -->
+        <section class="example-section">
+          <h2>무한 스크롤</h2>
+          <div class="example-item">
+            <div class="info">
+              <p>스크롤을 내려서 더 많은 데이터를 로드합니다.</p>
+            </div>
+            <ListTable
+              :header="headers"
+              :items="users"
+              :loading="isLoading"
+              @observe="handleObserve"
+            >
+              <template #items="{ props }">
+                <tr>
+                  <td>{{ props.id }}</td>
+                  <td>{{ props.name }}</td>
+                  <td>{{ props.email }}</td>
+                  <td>{{ props.role }}</td>
+                  <td :style="getStatusColor(props.status)">
+                    {{ getStatusText(props.status) }}
+                  </td>
+                  <td>{{ props.createdAt }}</td>
+                  <td>
+                    <button @click="editUser(props)" class="demo-button">수정</button>
+                    <button @click="deleteUser(props)" class="demo-button demo-button-danger">
+                      삭제
+                    </button>
+                  </td>
+                </tr>
+              </template>
+            </ListTable>
+          </div>
+        </section>
+
+        <!-- 빈 데이터 -->
+        <section class="example-section">
+          <h2>빈 데이터</h2>
+          <div class="example-item">
+            <ListTable :header="headers" :items="[]" empty-text="사용자 데이터가 없습니다." />
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Floating Back Button -->
+    <FloatingBackButton />
   </div>
 </template>
 
-<style scoped lang="scss">
-.list-table-example {
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
+<style lang="scss" scoped>
+.app-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 3rem 0;
+  text-align: center;
 
   h1 {
-    color: #1f2937;
-    margin-bottom: 2rem;
-    font-size: 2.4rem;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
     font-weight: 600;
   }
 
-  .example-section {
-    margin-bottom: 4rem;
-    padding: 2rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    background-color: white;
+  p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0;
+  }
+}
 
-    h2 {
-      color: #374151;
-      margin-bottom: 1.5rem;
-      font-size: 1.8rem;
-      font-weight: 500;
+.main-content {
+  padding: 3rem 0;
+  background-color: #f8fafc;
+  min-height: calc(100vh - 200px);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.example-section {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+
+  h2 {
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+}
+
+.example-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.info {
+  text-align: center;
+  margin-bottom: 1rem;
+
+  p {
+    margin: 0.5rem 0;
+    color: #6b7280;
+    font-size: 0.95rem;
+  }
+}
+
+.demo-button {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.2s;
+  margin-right: 0.5rem;
+
+  &:hover {
+    background: #2563eb;
+  }
+
+  &:active {
+    background: #1d4ed8;
+  }
+
+  &:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+  }
+
+  &.demo-button-danger {
+    background: #ef4444;
+
+    &:hover {
+      background: #dc2626;
     }
 
-    .info {
-      margin-bottom: 1rem;
-      padding: 1rem;
-      background-color: #f9fafb;
-      border-radius: 0.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      p {
-        margin: 0;
-        color: #6b7280;
-        font-weight: 500;
-      }
+    &:active {
+      background: #b91c1c;
     }
 
-    .btn-toggle {
-      padding: 0.5rem 1rem;
-      background-color: #3b82f6;
-      color: white;
-      border: none;
-      border-radius: 0.25rem;
-      cursor: pointer;
-      font-size: 1.4rem;
-
-      &:hover {
-        background-color: #2563eb;
-      }
-    }
-
-    .btn-edit {
-      padding: 0.4rem 0.8rem;
-      background-color: #10b981;
-      color: white;
-      border: none;
-      border-radius: 0.25rem;
-      cursor: pointer;
-      font-size: 1.2rem;
-      margin-right: 0.5rem;
-
-      &:hover {
-        background-color: #059669;
-      }
-
-      &:disabled {
-        background-color: #9ca3af;
-        cursor: not-allowed;
-      }
-    }
-
-    .btn-delete {
-      padding: 0.4rem 0.8rem;
-      background-color: #ef4444;
-      color: white;
-      border: none;
-      border-radius: 0.25rem;
-      cursor: pointer;
-      font-size: 1.2rem;
-
-      &:hover {
-        background-color: #dc2626;
-      }
-
-      &:disabled {
-        background-color: #9ca3af;
-        cursor: not-allowed;
-      }
-    }
-
-    .disabled {
-      opacity: 0.5;
-      background-color: #f9fafb;
+    &:disabled {
+      background: #fca5a5;
     }
   }
 }
 
 // 반응형 디자인
 @media (max-width: 768px) {
-  .list-table-example {
-    padding: 1rem;
+  .app-header {
+    padding: 2rem 0;
 
-    .example-section {
-      padding: 1rem;
-
-      .info {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
-      }
+    h1 {
+      font-size: 2rem;
     }
+
+    p {
+      font-size: 1rem;
+    }
+  }
+
+  .main-content {
+    padding: 2rem 0;
+  }
+
+  .container {
+    padding: 0 1rem;
+  }
+
+  .example-section {
+    padding: 1.5rem;
+  }
+
+  .demo-button {
+    display: block;
+    width: 100%;
+    margin-bottom: 0.5rem;
+    margin-right: 0;
   }
 }
 </style>
-
-<script lang="ts">
-export default { name: 'ListTableExample' };
-</script>

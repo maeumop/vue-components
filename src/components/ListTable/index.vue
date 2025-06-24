@@ -93,6 +93,9 @@ const setHeader = (): void => {
       colspan: item.colspan ?? 0,
       align: item.align ?? 'left',
     }));
+
+    // colspan 계산: 체크박스 컬럼 + 헤더 컬럼 수
+    colspan.value = (isCheckMode.value ? 1 : 0) + props.header.length;
   }
 };
 
