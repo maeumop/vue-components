@@ -53,6 +53,11 @@ const router = createRouter({
       name: 'statusselector',
       component: () => import('../components/StatusSelector/ex.vue'),
     },
+    {
+      path: '/components/listtable',
+      name: 'listtable',
+      component: () => import('../components/ListTable/ex.vue'),
+    },
   ],
 });
 

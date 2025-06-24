@@ -1,10 +1,10 @@
 @charset "utf-8";
 /* @/components/ListTable/_style.scss */
 
-@use "sass:map";
-@use "sass:meta";
-@use "../styles" as _;
-@use "../styles/keyframes";
+@use 'sass:map';
+@use 'sass:meta';
+@use '../styles' as _;
+@use '../styles/keyframes';
 
 /// TableSpinner 스타일 정의
 /// @/components/ListTable/TableSpinner.vue
@@ -35,21 +35,21 @@
       cursor: default;
     }
 
-    input + svg {
+    input + .iconify {
       color: _.$gray-400;
     }
 
-    input:disabled + svg {
+    input:disabled + .iconify {
       color: _.$gray-300;
     }
 
     $_button-colors: _.fn-getButtonColors();
     @if map.has-key($_button-colors, primary) {
-      input:not(:disabled):where(:hover, :checked) + svg {
+      input:not(:disabled):where(:hover, :checked) + .iconify {
         color: map.get($_button-colors, primary, default);
       }
 
-      input:disabled:checked + svg {
+      input:disabled:checked + .iconify {
         color: map.get($_button-colors, disabled);
       }
     }
@@ -57,34 +57,68 @@
 }
 
 .list-table {
+  --table-header-height: 5rem;
+  --table-row-height: 5rem;
+  --table-padding: 1rem 1.6rem;
+  --table-border-color: var(--gray-300, #e5e7eb);
+  --table-font-size: 1.4rem;
+  --table-header-font-weight: 500;
+  --table-body-font-weight: 400;
+  --table-border-radius: 0.5rem;
+  --table-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+
   overflow: auto;
   position: relative;
+  border-radius: var(--table-border-radius);
+  box-shadow: var(--table-shadow);
 
-  @if (meta.mixin-exists("scrollbar")) {
+  @if (meta.mixin-exists('scrollbar')) {
     // global scrollbar가 정의 되었있을 경우
     @include scrollbar;
   }
 
+  // 반응형 디자인
+  @media (max-width: 768px) {
+    --table-header-height: 4rem;
+    --table-row-height: 4rem;
+    --table-padding: 0.8rem 1.2rem;
+    --table-font-size: 1.2rem;
+  }
+
+  @media (max-width: 480px) {
+    --table-header-height: 3.5rem;
+    --table-row-height: 3.5rem;
+    --table-padding: 0.6rem 1rem;
+    --table-font-size: 1.1rem;
+  }
+
   table {
     min-width: 100%;
-    // thead가 sticky 적용이기에 border값 유지하기 위하여 정의.
     border-spacing: 0;
+    border-collapse: collapse;
+  }
 
-    thead {
-      position: sticky;
-      top: 0;
-      z-index: 1;
+  thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: white;
 
-      &.is-scroll::after {
-        position: absolute;
-        left: 0;
-        z-index: 20;
-        height: 0.6rem;
-        width: 100%;
-        background: -webkit-gradient(linear, left top, left bottom, from(rgba(0, 0, 0, 0.1)), to(rgba(0, 0, 0, 0)));
-        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));
-        content: "";
-      }
+    &.is-scroll::after {
+      position: absolute;
+      left: 0;
+      z-index: 20;
+      height: 0.6rem;
+      width: 100%;
+      background: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        from(rgba(0, 0, 0, 0.1)),
+        to(rgba(0, 0, 0, 0))
+      );
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0));
+      content: '';
     }
   }
 
@@ -110,22 +144,27 @@
   }
 
   &::v-deep(table > thead th) {
-    height: 5rem;
-
-    font-size: 1.4rem;
-    font-weight: 500;
+    height: var(--table-header-height);
+    font-size: var(--table-font-size);
+    font-weight: var(--table-header-font-weight);
     color: _.$text-default;
-    padding: 1rem 1.6rem;
+    padding: var(--table-padding);
     text-align: left;
     background-color: white;
-
     border-width: 0.1rem 0 0.1rem 0;
     border-style: solid;
-    border-color: _.$gray-300;
+    border-color: var(--table-border-color);
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: _.$gray-50;
+    }
   }
 
   &::v-deep(table > tbody) {
     > tr {
+      transition: background-color 0.2s ease;
+
       &:hover {
         background-color: _.$gray-100;
       }
@@ -134,22 +173,58 @@
         border-bottom: 0 !important;
         text-align: center;
         color: _.$text-default;
-        font-size: 1.4rem;
-        font-weight: 400;
+        font-size: var(--table-font-size);
+        font-weight: var(--table-body-font-weight);
+        padding: 2rem;
       }
 
       td {
-        height: 5rem;
-
-        padding: 1rem 1.6rem;
+        height: var(--table-row-height);
+        padding: var(--table-padding);
         border-style: solid;
-        border-color: _.$gray-300;
+        border-color: var(--table-border-color);
         border-width: 0 0 0.1rem 0;
-        font-size: 1.4rem;
-        font-weight: 400;
+        font-size: var(--table-font-size);
+        font-weight: var(--table-body-font-weight);
         text-align: left;
         word-break: break-all;
+        vertical-align: middle;
       }
     }
+  }
+
+  // 스크롤 감지용 요소
+  .observer-target {
+    height: 1px;
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  // 접근성 개선
+  &::v-deep(table) {
+    // 포커스 표시
+    th:focus,
+    td:focus {
+      outline: 2px solid #667eea;
+      outline-offset: -2px;
+    }
+
+    // 스크린 리더 지원
+    th[scope] {
+      font-weight: var(--table-header-font-weight);
+    }
+  }
+
+  // 로딩 상태 스타일
+  &::v-deep(.spinner-wrap) {
+    .spinner {
+      color: _.$primary;
+    }
+  }
+
+  // 빈 데이터 상태 스타일
+  &::v-deep(.no-data) {
+    color: _.$gray-500;
+    font-style: italic;
   }
 }

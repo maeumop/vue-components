@@ -1,34 +1,35 @@
 <script setup lang="ts">
-  import { computed } from 'vue';
-  import { listTableCheckboxIcon, listTableRadioIcon } from './const';
-  import type { ListTableListCheckIconKeys, ListTableListCheckProps } from './types';
+import { Icon } from '@iconify/vue';
+import { computed } from 'vue';
+import { listTableCheckboxIcon, listTableRadioIcon } from './const';
+import type { ListTableListCheckIconKeys, ListTableListCheckProps } from './types';
 
-  const props = withDefaults(defineProps<ListTableListCheckProps>(), {
-    type: 'checkbox',
-  });
+const props = withDefaults(defineProps<ListTableListCheckProps>(), {
+  type: 'checkbox',
+});
 
-  const emit = defineEmits<{
-    (event: 'update:modelValue', value: boolean): void;
-  }>();
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: boolean): void;
+}>();
 
-  const svgIcon = computed<string>(() => {
-    let type: ListTableListCheckIconKeys = 'blank';
+const iconName = computed<string>(() => {
+  let type: ListTableListCheckIconKeys = 'blank';
 
-    if (props.disabled) {
-      type = 'disabled';
-    } else if (props.modelValue) {
-      type = 'checked';
-    }
+  if (props.disabled) {
+    type = 'disabled';
+  } else if (props.modelValue) {
+    type = 'checked';
+  }
 
-    return props.type === 'radio' ? listTableRadioIcon[type] : listTableCheckboxIcon[type];
-  });
+  return props.type === 'radio' ? listTableRadioIcon[type] : listTableCheckboxIcon[type];
+});
 
-  const checkEvent = (event: Event): void => {
-    if (!props.disabled) {
-      const target = event.target as HTMLInputElement;
-      emit('update:modelValue', target.checked);
-    }
-  };
+const checkEvent = (event: Event): void => {
+  if (!props.disabled) {
+    const target = event.target as HTMLInputElement;
+    emit('update:modelValue', target.checked);
+  }
+};
 </script>
 
 <template>
@@ -41,9 +42,10 @@
       @input="checkEvent"
       v-show="false"
     />
-    <SvgIcon size="2.4rem" :path="svgIcon" />
+    <Icon :icon="iconName" size="2.4rem" />
   </label>
 </template>
+
 <script lang="ts">
-  export default { name: 'ListTableCheck' };
+export default { name: 'ListTableCheck' };
 </script>
