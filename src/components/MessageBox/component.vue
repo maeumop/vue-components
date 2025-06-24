@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  /* eslint-disable vue/no-v-html */
+   
   import { Icon } from '@iconify/vue';
   import { computed, onUnmounted, ref, shallowRef } from 'vue';
   import { messageBoxTransition } from './const';

@@ -9,18 +9,6 @@
   import { useDatePickerStore } from './store';
   import type { Calendar, DatePickerEmits, DatePickerProps, ToggleButtonType } from './types';
 
-  const datePickerStore = useDatePickerStore();
-  provide('datePickerStore', datePickerStore);
-
-  const { startDate, endDate, setStartDate, setEndDate, setDateState, setSelected, init } =
-    datePickerStore;
-
-  const helper = useDatePickerHelper();
-
-  useAddFormValidate();
-
-  const emit = defineEmits<DatePickerEmits>();
-
   const props = withDefaults(defineProps<DatePickerProps>(), {
     validate: (): RuleFunc[] => [],
     range: false,
@@ -38,14 +26,24 @@
     blurValidate: true,
     defaultDate: false,
   });
+  const emit = defineEmits<DatePickerEmits>();
+  const datePickerStore = useDatePickerStore();
+  provide('datePickerStore', datePickerStore);
+
+  const { startDate, endDate, setStartDate, setEndDate, setDateState, setSelected, init } =
+    datePickerStore;
+
+  const helper = useDatePickerHelper();
+
+  useAddFormValidate();
 
   const el = ref<HTMLElement>();
   const inputArea = ref<HTMLDivElement>();
 
-  let isShow = ref<boolean>(false);
-  let picker = ref<HTMLElement>();
-  let holderText = ref<string[]>(['', '']);
-  let toggleDateButton = ref<ToggleButtonType[]>([
+  const isShow = ref<boolean>(false);
+  const picker = ref<HTMLElement>();
+  const holderText = ref<string[]>(['', '']);
+  const toggleDateButton = ref<ToggleButtonType[]>([
     { text: '오늘', checked: false },
     { text: '어제', checked: false },
     { text: '최근 7일(오늘 포함)', checked: false },
@@ -54,12 +52,12 @@
     { text: '지난 달', checked: false },
   ]);
 
-  let selectedError = ref<string>('');
-  let message = ref<string | boolean>('');
-  let onError = ref<boolean>(false);
-  let errorTransition = ref<boolean>(false);
-  let isValidate = ref<boolean>(true);
-  let _modelValue = ref<string | string[]>(props.modelValue);
+  const selectedError = ref<string>('');
+  const message = ref<string | boolean>('');
+  const onError = ref<boolean>(false);
+  const errorTransition = ref<boolean>(false);
+  const isValidate = ref<boolean>(true);
+  const _modelValue = ref<string | string[]>(props.modelValue);
 
   const startCalendar = ref<Calendar>();
   const endCalendar = ref<Calendar>();
@@ -168,8 +166,8 @@
   const setDateCalender = (): void => {
     // 해당 달력으로 변환
     const s = props.separator;
-    let start: string[] = startDate.value.split(s);
-    let end: string[] = endDate.value.split(s);
+    const start: string[] = startDate.value.split(s);
+    const end: string[] = endDate.value.split(s);
 
     // 선택되는 날짜에 대한 처리는 Calendar 컴포넌트 내부에서 실행됨
     setDateState('start', 'year', Number(start[0]));
@@ -211,7 +209,7 @@
       date = new Date(date.getFullYear(), date.getMonth(), 0);
     }
 
-    let year: string = date.getFullYear().toString();
+    const year: string = date.getFullYear().toString();
     let month: string = (date.getMonth() + 1).toString();
     let day: string = date.getDate().toString();
 
@@ -219,7 +217,7 @@
     day = day.length === 1 ? `0${day}` : day;
 
     const s = props.separator;
-    let format = `Y${s}m${s}d`;
+    const format = `Y${s}m${s}d`;
 
     switch (index) {
       case 0:

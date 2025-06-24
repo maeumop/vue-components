@@ -35,10 +35,10 @@
     },
   );
 
-  let isValidate = ref<boolean>(true);
-  let checkPass = ref<boolean>(false);
-  let message = ref<string>('');
-  let errorTransition = ref<boolean>(false);
+  const isValidate = ref<boolean>(true);
+  const checkPass = ref<boolean>(false);
+  const message = ref<string>('');
+  const errorTransition = ref<boolean>(false);
 
   const check = (silence: boolean = false): boolean => {
     if (props.disabled) {
@@ -50,7 +50,7 @@
       // validate check
       if (props.validate.length) {
         for (let i = 0; i < props.validate.length; i++) {
-          let result = props.validate[i](props.checkValue);
+          const result = props.validate[i](props.checkValue);
 
           if (typeof result === 'string') {
             if (!silence) {

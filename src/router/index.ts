@@ -48,6 +48,11 @@ const router = createRouter({
       name: 'tabs',
       component: () => import('../components/Tabs/ex.vue'),
     },
+    {
+      path: '/components/statusselector',
+      name: 'statusselector',
+      component: () => import('../components/StatusSelector/ex.vue'),
+    },
   ],
 });
 

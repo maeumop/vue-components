@@ -7,8 +7,8 @@
 
   const frm = ref<HTMLFormElement>();
 
-  let isCover = ref<boolean>(false);
-  let formValidItems = ref<VNode[]>([]);
+  const isCover = ref<boolean>(false);
+  const formValidItems = ref<VNode[]>([]);
 
   let checkState: boolean;
 

@@ -3,20 +3,19 @@
   import { computed, ref, watch, watchEffect } from 'vue';
   import type { PaginationEmits, PaginationItem, PaginationProps } from './types';
 
-  const emit = defineEmits<PaginationEmits>();
   const props = withDefaults(defineProps<PaginationProps>(), {
     size: 20,
     block: 10,
     total: 0,
   });
-
-  let pageList = ref<PaginationItem[]>([]);
-  let maxPage = ref<number>(1);
-  let pageBlock = ref<number>(10);
-  let startPage = ref<number>(1);
-  let endPage = ref<number>(1);
-  let prev = ref<number>(0);
-  let next = ref<number>(0);
+  const emit = defineEmits<PaginationEmits>();
+  const pageList = ref<PaginationItem[]>([]);
+  const maxPage = ref<number>(1);
+  const pageBlock = ref<number>(10);
+  const startPage = ref<number>(1);
+  const endPage = ref<number>(1);
+  const prev = ref<number>(0);
+  const next = ref<number>(0);
 
   const nowPage = computed<number>(() => {
     let result: number = 1;

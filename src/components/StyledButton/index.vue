@@ -4,10 +4,6 @@
   import { buttonStyles } from './const';
   import type { StyledButtonProps } from './types';
 
-  const emit = defineEmits<{
-    (event: 'click', value: MouseEvent): void;
-  }>();
-
   const props = withDefaults(defineProps<StyledButtonProps>(), {
     href: '#',
     target: '_blank',
@@ -25,6 +21,10 @@
     tag: 'a',
     dropMenuToggle: false,
   });
+
+  const emit = defineEmits<{
+    (event: 'click', value: MouseEvent): void;
+  }>();
 
   const buttonStyle = computed<string[]>(() => {
     const classes = ['btn'];

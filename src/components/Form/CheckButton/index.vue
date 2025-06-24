@@ -13,12 +13,6 @@
   import { checkButtonColors } from './const';
   import type { CheckButtonItem, CheckButtonProps } from './types';
 
-  const emit = defineEmits<{
-    (event: 'update:after'): void;
-    (event: 'update:modelValue', value: string | string[]): void;
-    (evemt: 'update:clickIndex', value: number): void;
-  }>();
-
   const props = withDefaults(defineProps<CheckButtonProps>(), {
     type: 'checkbox',
     all: false,
@@ -31,14 +25,20 @@
     lineLimit: 0,
   });
 
+  const emit = defineEmits<{
+    (event: 'update:after'): void;
+    (event: 'update:modelValue', value: string | string[]): void;
+    (evemt: 'update:clickIndex', value: number): void;
+  }>();
+
   useAddFormValidate();
 
-  let list = ref<CheckButtonItem[]>([]);
-  let val = ref<string | string[]>(props.type === 'radio' ? '' : []);
-  let isValidate = ref<boolean>(true);
-  let checkPass = ref<boolean>(false);
-  let message = ref<string>('');
-  let errorTransition = ref<boolean>(false);
+  const list = ref<CheckButtonItem[]>([]);
+  const val = ref<string | string[]>(props.type === 'radio' ? '' : []);
+  const isValidate = ref<boolean>(true);
+  const checkPass = ref<boolean>(false);
+  const message = ref<string>('');
+  const errorTransition = ref<boolean>(false);
 
   watch(
     () => props.items,
@@ -135,7 +135,7 @@
     if (!props.disabled) {
       if (!props.errorMessage && props.validate.length) {
         for (let i = 0; i < props.validate.length; i++) {
-          let result: string | boolean =
+          const result: string | boolean =
             props.type === 'checkbox'
               ? props.validate[i](Array.from(val.value))
               : props.validate[i](val.value);

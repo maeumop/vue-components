@@ -17,7 +17,7 @@ export default {
       maxShowMessage: 4,
       delay: 3000,
       destroy: (): void => {
-        if (vNode && vNode.component?.exposed) {
+        if (vNode?.component?.exposed) {
           vNode.component.exposed.clear();
         }
         render(null, wrapper);
@@ -55,7 +55,7 @@ export default {
       try {
         init();
 
-        if (vNode && vNode.component?.exposed) {
+        if (vNode?.component?.exposed) {
           const { exposed } = vNode.component;
 
           if (typeof opt === 'string') {

@@ -18,9 +18,6 @@
   import TableSpinner from './TableSpinner.vue';
   import ListTableCheck from './listCheck.vue';
 
-  const slots = useSlots();
-
-  const emit = defineEmits<ListTableEmits<T>>();
   const props = withDefaults(defineProps<ListTableProps<T>>(), {
     items: (): T[] => [],
     header: (): ListTableHeader[] => [],
@@ -30,13 +27,17 @@
     observer: false,
   });
 
-  let colspan = ref<number>(0);
-  let tableHeader = ref<ListTableHeader[]>([]);
+  const emit = defineEmits<ListTableEmits<T>>();
+
+  const slots = useSlots();
+
+  const colspan = ref<number>(0);
+  const tableHeader = ref<ListTableHeader[]>([]);
   /**
    * 컴포넌트 내에서 dataList를 조작할 일은 없고,
    * ListTableItem 통일함
    */
-  let dataList = ref<ListTableItem[]>([]);
+  const dataList = ref<ListTableItem[]>([]);
 
   const tableWidth = computed<StyleValue>(() => {
     return { width: props.width };
@@ -62,9 +63,9 @@
 
   // ==================================== STR checkMode ====================================
   // 헤더의 전체 체크 박스
-  let checkedAll = ref<boolean>(false);
+  const checkedAll = ref<boolean>(false);
   // 바디의 [체크박스|라디오] 선택한 index 값
-  let checkedIndexList = ref<number[]>([]);
+  const checkedIndexList = ref<number[]>([]);
 
   // 체크 모드 여부
   const isCheckMode = computed<boolean>(() =>
@@ -248,7 +249,7 @@
   const IObserver = new IntersectionObserver(callback, options);
   // ==================================== Scroll observer ====================================
 
-  let isScroll = ref<boolean>(false);
+  const isScroll = ref<boolean>(false);
 
   const tableScrollEvent = (event: Event): void => {
     const target = event.target as HTMLElement;
@@ -311,7 +312,7 @@
       if (slots.header && listTable.value) {
         const tHead: Element[] = Array.from(listTable.value.tHead?.children || []);
 
-        let result: number = tHead.reduce((prev, current) => {
+        const result: number = tHead.reduce((prev, current) => {
           let thCount: number = 0;
 
           if (current.tagName.toLowerCase() === 'tr') {

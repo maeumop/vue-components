@@ -5,8 +5,6 @@
   import { useAddFormValidate } from '../common';
   import type { NumberFormatEmits, NumberFormatProps } from './types';
 
-  const emit = defineEmits<NumberFormatEmits>();
-
   const props = withDefaults(defineProps<NumberFormatProps>(), {
     label: '',
     placeholder: '',
@@ -20,6 +18,8 @@
     required: false,
     hideMessage: false,
   });
+
+  const emit = defineEmits<NumberFormatEmits>();
 
   const attrs = useAttrs();
 
@@ -37,10 +37,10 @@
     return events;
   });
 
-  let isValidate = ref<boolean>(true);
-  let checkPass = ref<boolean>(false);
-  let message = ref<string>('');
-  let errorTransition = ref<boolean>(false);
+  const isValidate = ref<boolean>(true);
+  const checkPass = ref<boolean>(false);
+  const message = ref<string>('');
+  const errorTransition = ref<boolean>(false);
 
   const Input = ref<HTMLInputElement>();
 
@@ -158,7 +158,7 @@
       // validate check
       if (props.validate.length) {
         for (let i: number = 0; i < props.validate.length; i++) {
-          let result: string | boolean = props.validate[i](props.modelValue);
+          const result: string | boolean = props.validate[i](props.modelValue);
 
           if (typeof result === 'string') {
             if (!silence) {

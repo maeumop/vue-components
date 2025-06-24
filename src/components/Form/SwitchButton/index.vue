@@ -9,11 +9,6 @@
   import { switchButtonColors } from './const';
   import type { SwitchButtonProps } from './types';
 
-  const emit = defineEmits<{
-    (event: 'update:modelValue', value: string | boolean): void;
-    (event: 'update:after'): void;
-  }>();
-
   const props = withDefaults(defineProps<SwitchButtonProps>(), {
     label: (): string[] => ['미설정', '설정'],
     validate: false,
@@ -22,12 +17,17 @@
     color: switchButtonColors.primary,
   });
 
+  const emit = defineEmits<{
+    (event: 'update:modelValue', value: string | boolean): void;
+    (event: 'update:after'): void;
+  }>();
+
   useAddFormValidate();
 
-  let onError = ref<boolean>(false);
-  let errorTransition = ref<boolean>(false);
-  let message = ref<string>('');
-  let isValidate = ref<boolean>(true);
+  const onError = ref<boolean>(false);
+  const errorTransition = ref<boolean>(false);
+  const message = ref<string>('');
+  const isValidate = ref<boolean>(true);
 
   watch(
     () => props.modelValue,

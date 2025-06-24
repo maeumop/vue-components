@@ -21,8 +21,8 @@
 
   // 목록
   const el = ref<HTMLElement>();
-  let items = ref<number[]>([]);
-  let isShow = ref<boolean>(false);
+  const items = ref<number[]>([]);
+  const isShow = ref<boolean>(false);
 
   const flag: string = props.end ? 'end' : 'start';
 

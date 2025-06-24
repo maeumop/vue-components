@@ -4,10 +4,6 @@
   import { useDatePickerHelper } from '../helper';
   import type { DateCellType, DatePickerStore, DateStateValueType, TransitionCase } from '../types';
 
-  const emit = defineEmits<{
-    (event: 'update:date', value: boolean): void;
-  }>();
-
   const props = withDefaults(
     defineProps<{
       end?: boolean;
@@ -20,6 +16,10 @@
       end: false,
     },
   );
+
+  const emit = defineEmits<{
+    (event: 'update:date', value: boolean): void;
+  }>();
 
   const store = inject('datePickerStore') as DatePickerStore;
   const {
@@ -41,14 +41,14 @@
   const before: DateStateValueType = beforeState[caseStartEnd];
   const state: DateStateValueType = dateState[caseStartEnd];
 
-  let isShow = ref<boolean>(true);
+  const isShow = ref<boolean>(true);
 
   const head: string[] = ['일', '월', '화', '수', '목', '금', '토'];
   const transitionName = ref<TransitionCase>(transitionCase.down);
   const dateRender = ref<DateCellType[][]>([]);
 
   watch([startDate, endDate], v => {
-    let date = props.end ? endDate.value : startDate.value;
+    const date = props.end ? endDate.value : startDate.value;
 
     if (v) {
       setSelected(caseStartEnd, date);
@@ -129,8 +129,8 @@
     let afterDay: number = 1;
     let beforeDay: number = helper.getBeforeDay(state.year, state.month - 1, startWeek);
 
-    let startTime: number = new Date(startDate.value).getTime();
-    let endTime: number = new Date(endDate.value).getTime();
+    const startTime: number = new Date(startDate.value).getTime();
+    const endTime: number = new Date(endDate.value).getTime();
 
     // 달력 총 7일 6줄을 생성한다
     for (let i = 0; i < 6; i++) {
@@ -142,7 +142,7 @@
 
     for (let j = 0; j < 6 * 7; j++) {
       if (j >= startWeek && day <= lastDay) {
-        let formatDate = helper.getDateString(year, month, day, props.separator);
+        const formatDate = helper.getDateString(year, month, day, props.separator);
 
         if (selectedDate[caseStartEnd] === formatDate) {
           objData = { day, type: 'selected' };
@@ -155,7 +155,7 @@
         // 시작 날짜와 끝 날짜 사이에 색상 표시
         if (objData.type !== 'selected' && props.range) {
           // 랜더링 하는 날짜의 time 값
-          let time = new Date(formatDate).getTime();
+          const time = new Date(formatDate).getTime();
 
           // 선택된 날짜 사이의 색상을 변경
           if (selectedDate[caseStartEnd]) {
@@ -183,7 +183,7 @@
         objData = { day: beforeDay++, type: 'beforeMonth' };
       }
 
-      let index = Math.floor(j / 7);
+      const index = Math.floor(j / 7);
       dateRender.value[index][j % 7] = objData;
     }
   };

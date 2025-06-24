@@ -23,8 +23,6 @@
   import { useAddFormValidate } from '../common';
   import type { SelectBoxEmits, SelectBoxItem, SelectBoxProps } from './types';
 
-  const emit = defineEmits<SelectBoxEmits>();
-
   const props = withDefaults(defineProps<SelectBoxProps>(), {
     block: false,
     label: '',
@@ -47,18 +45,20 @@
     isLoading: false,
   });
 
+  const emit = defineEmits<SelectBoxEmits>();
+
   useAddFormValidate();
 
-  let isValidate = ref<boolean>(true);
-  let message = ref<string>('');
-  let errorTransition = ref<boolean>(false);
-  let isShowOption = ref<boolean>(false);
-  let showBottom = ref<boolean>(false);
+  const isValidate = ref<boolean>(true);
+  const message = ref<string>('');
+  const errorTransition = ref<boolean>(false);
+  const isShowOption = ref<boolean>(false);
+  const showBottom = ref<boolean>(false);
   // 검색어 입력중인지 체크 변수
-  let isSearchFilter = ref<boolean>(false);
+  const isSearchFilter = ref<boolean>(false);
 
-  let selectedText = ref<any>(props.multiple ? [] : '');
-  let selectedValue = ref<any>(props.multiple ? [] : '');
+  const selectedText = ref<any>(props.multiple ? [] : '');
+  const selectedValue = ref<any>(props.multiple ? [] : '');
 
   const optionList = ref<SelectBoxItem[]>([]);
 
@@ -73,7 +73,7 @@
     width: '',
   });
 
-  let selectedKeyIndex = ref<number>(0);
+  const selectedKeyIndex = ref<number>(0);
 
   watch(
     () => props.errorMessage,
@@ -134,7 +134,7 @@
     if (props.btnAccept) {
       return Array.isArray(selectedText.value) ? selectedText.value : [selectedText.value];
     }
-    let values: string[] = Array.isArray(props.modelValue) ? props.modelValue : [props.modelValue];
+    const values: string[] = Array.isArray(props.modelValue) ? props.modelValue : [props.modelValue];
     return props.options.filter(option => values.includes(option.value)).map(({ text }) => text);
   });
 
@@ -185,7 +185,7 @@
       // validate check
       if (!props.errorMessage && props.validate.length) {
         for (let i: number = 0; i < props.validate.length; i++) {
-          let result: string | boolean = props.validate[i](selectedValue.value);
+          const result: string | boolean = props.validate[i](selectedValue.value);
 
           if (typeof result === 'string') {
             if (!silence) {
@@ -333,7 +333,7 @@
     }
   };
 
-  let transitionStatus = ref<boolean>(false);
+  const transitionStatus = ref<boolean>(false);
 
   /**
    * 옵션 목록 표시

@@ -5,8 +5,6 @@
   import { modalPosition, modalTransition } from './const';
   import type { ModalProps, ModalTransition } from './types';
 
-  const slots = useSlots();
-
   const props = withDefaults(defineProps<ModalProps>(), {
     modelValue: false,
     escClose: false,
@@ -19,8 +17,10 @@
     (event: 'update:modelValue', value: boolean): void;
   }>();
 
-  let isShow = ref<boolean>(false);
-  let keyEventStyle = ref<string>('');
+  const slots = useSlots();
+
+  const isShow = ref<boolean>(false);
+  const keyEventStyle = ref<string>('');
 
   // 창이 닫히기 전에 다른 팝업 창이 있는지 검수
   let modalBg: NodeListOf<HTMLDivElement>;

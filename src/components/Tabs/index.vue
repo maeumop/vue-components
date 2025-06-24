@@ -12,10 +12,6 @@
   } from 'vue';
   import type { TabsEmits, TabsProps } from './types.d';
 
-  const slots = useSlots();
-
-  const emit = defineEmits<TabsEmits>();
-
   const props = withDefaults(defineProps<TabsProps>(), {
     inBox: false,
     activeTab: 0,
@@ -23,6 +19,10 @@
     transition: 'slide',
     disabled: () => [],
   });
+
+  const emit = defineEmits<TabsEmits>();
+
+  const slots = useSlots();
 
   const Tabs = ref<HTMLDivElement>();
   const transitionWrapper = ref<HTMLDivElement>();

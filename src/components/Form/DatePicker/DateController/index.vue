@@ -25,7 +25,7 @@
    * @param calc
    */
   const changedYear = (v: number, calc: boolean = false): void => {
-    let flag: string = props.end ? 'end' : 'start';
+    const flag: string = props.end ? 'end' : 'start';
     let year: number = v;
 
     if (calc) {
@@ -47,7 +47,7 @@
    * @param calc
    */
   const changedMonth = (v: number, calc: boolean = false): void => {
-    let flag: string = props.end ? 'end' : 'start';
+    const flag: string = props.end ? 'end' : 'start';
     let month: number = v;
 
     if (calc) {

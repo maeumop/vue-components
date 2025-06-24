@@ -3,13 +3,13 @@
   import { listTableCheckboxIcon, listTableRadioIcon } from './const';
   import type { ListTableListCheckIconKeys, ListTableListCheckProps } from './types';
 
-  const emit = defineEmits<{
-    (event: 'update:modelValue', value: boolean): void;
-  }>();
-
   const props = withDefaults(defineProps<ListTableListCheckProps>(), {
     type: 'checkbox',
   });
+
+  const emit = defineEmits<{
+    (event: 'update:modelValue', value: boolean): void;
+  }>();
 
   const svgIcon = computed<string>(() => {
     let type: ListTableListCheckIconKeys = 'blank';

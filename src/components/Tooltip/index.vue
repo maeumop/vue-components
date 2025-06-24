@@ -5,7 +5,6 @@
   import { tooltipColor, tooltipPosition } from './const';
   import type { TooltipPosition, TooltipProps } from './types';
 
-  const slots = useSlots();
   const props = withDefaults(defineProps<TooltipProps>(), {
     position: tooltipPosition.BOTTOM,
     hovering: true,
@@ -14,7 +13,7 @@
     color: tooltipColor.DEFAULT,
     width: 140,
   });
-
+  const slots = useSlots();
   const hovering = ref<boolean>(props.hovering);
 
   // 반응형 상태

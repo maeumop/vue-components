@@ -6,8 +6,6 @@
   import { useAddFormValidate } from '../common';
   import type { TextFieldEmits, TextFieldProps } from './types';
 
-  const emit = defineEmits<TextFieldEmits>();
-
   const props = withDefaults(defineProps<TextFieldProps>(), {
     rows: 5,
     type: 'text',
@@ -17,12 +15,14 @@
     maxLength: 0,
   });
 
+  const emit = defineEmits<TextFieldEmits>();
+
   useAddFormValidate();
 
-  let isValidate = ref<boolean>(true);
-  let checkPass = ref<boolean>(false);
-  let message = ref<string>('');
-  let errorTransition = ref<boolean>(false);
+  const isValidate = ref<boolean>(true);
+  const checkPass = ref<boolean>(false);
+  const message = ref<string>('');
+  const errorTransition = ref<boolean>(false);
 
   const Textarea = ref<HTMLTextAreaElement>();
   const Input = ref<HTMLInputElement>();
@@ -159,7 +159,7 @@
       // validate check
       if (props.validate.length) {
         for (let i: number = 0; i < props.validate.length; i++) {
-          let result: string | boolean = props.validate[i](checkValue);
+          const result: string | boolean = props.validate[i](checkValue);
 
           if (typeof result === 'string') {
             if (!silence) {
