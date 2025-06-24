@@ -1,66 +1,67 @@
 <script setup lang="ts">
-  import { reactive, ref } from 'vue';
-  import StyledButton from './index.vue';
+import FloatingBackButton from '@/views/FloatingBackButton/index.vue';
+import { reactive, ref } from 'vue';
+import StyledButton from './index.vue';
 
-  // 드롭다운 상태
-  const isDropdownOpen = ref(false);
-  const isMenuOpen = ref(false);
+// 드롭다운 상태
+const isDropdownOpen = ref(false);
+const isMenuOpen = ref(false);
 
-  // 폼 데이터
-  const formData = reactive({
-    email: '',
-    message: '',
-  });
+// 폼 데이터
+const formData = reactive({
+  email: '',
+  message: '',
+});
 
-  const isSubmitting = ref(false);
+const isSubmitting = ref(false);
 
-  // 이벤트 예제 데이터
-  const clickCount = ref(0);
-  const lastClickTime = ref('없음');
-  const counter = ref(0);
+// 이벤트 예제 데이터
+const clickCount = ref(0);
+const lastClickTime = ref('없음');
+const counter = ref(0);
 
-  // 드롭다운 토글
-  const toggleDropdown = () => {
-    isDropdownOpen.value = !isDropdownOpen.value;
-  };
+// 드롭다운 토글
+const toggleDropdown = () => {
+  isDropdownOpen.value = !isDropdownOpen.value;
+};
 
-  const toggleMenu = () => {
-    isMenuOpen.value = !isMenuOpen.value;
-  };
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value;
+};
 
-  // 폼 제출
-  const submitForm = async () => {
-    if (!formData.email || !formData.message) {
-      alert('모든 필드를 입력해주세요.');
-      return;
-    }
+// 폼 제출
+const submitForm = async () => {
+  if (!formData.email || !formData.message) {
+    alert('모든 필드를 입력해주세요.');
+    return;
+  }
 
-    isSubmitting.value = true;
+  isSubmitting.value = true;
 
-    // API 호출 시뮬레이션
-    await new Promise(resolve => setTimeout(resolve, 2000));
+  // API 호출 시뮬레이션
+  await new Promise(resolve => setTimeout(resolve, 2000));
 
-    console.log('폼 제출:', formData);
-    alert('폼이 성공적으로 제출되었습니다!');
+  console.log('폼 제출:', formData);
+  alert('폼이 성공적으로 제출되었습니다!');
 
-    isSubmitting.value = false;
-    resetForm();
-  };
+  isSubmitting.value = false;
+  resetForm();
+};
 
-  // 폼 리셋
-  const resetForm = () => {
-    formData.email = '';
-    formData.message = '';
-  };
+// 폼 리셋
+const resetForm = () => {
+  formData.email = '';
+  formData.message = '';
+};
 
-  // 클릭 이벤트 처리
-  const handleClick = (event: MouseEvent) => {
-    clickCount.value++;
-    lastClickTime.value = new Date().toLocaleTimeString();
-    counter.value++;
+// 클릭 이벤트 처리
+const handleClick = (event: MouseEvent) => {
+  clickCount.value++;
+  lastClickTime.value = new Date().toLocaleTimeString();
+  counter.value++;
 
-    console.log('버튼 클릭:', event);
-  };
+  console.log('버튼 클릭:', event);
+};
 </script>
 
 <template>
@@ -95,8 +96,8 @@
               <span class="example-label">Warning</span>
             </div>
             <div class="example-item">
-              <StyledButton color="danger">Danger</StyledButton>
-              <span class="example-label">Danger</span>
+              <StyledButton color="error">Error</StyledButton>
+              <span class="example-label">Error</span>
             </div>
             <div class="example-item">
               <StyledButton color="info">Info</StyledButton>
@@ -191,8 +192,8 @@
               <span class="example-label">검색</span>
             </div>
             <div class="example-item">
-              <StyledButton onlyIcon icon="mdi:heart" color="danger" />
-              <span class="example-label">좋아요</span>
+              <StyledButton onlyIcon icon="mdi:heart" color="error" />
+              <span class="example-label">하트 아이콘</span>
             </div>
             <div class="example-item">
               <StyledButton onlyIcon icon="mdi:star" color="warning" />
@@ -222,7 +223,7 @@
               <span class="example-label">Loading</span>
             </div>
             <div class="example-item">
-              <StyledButton disabled color="danger">비활성화</StyledButton>
+              <StyledButton disabled color="error">비활성화</StyledButton>
               <span class="example-label">Disabled</span>
             </div>
             <div class="example-item">
@@ -342,162 +343,165 @@
         </section>
       </div>
     </main>
+
+    <!-- Floating Back Button -->
+    <FloatingBackButton />
   </div>
 </template>
 
 <style lang="scss" scoped>
-  .app-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 2rem 0;
-    text-align: center;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+.app-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem 0;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 
-    h1 {
-      margin: 0 0 0.5rem 0;
-      font-size: 2.5rem;
-      font-weight: 700;
+  h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0;
+    font-size: 1.1rem;
+    opacity: 0.9;
+  }
+}
+
+.main-content {
+  padding: 3rem 0;
+  background-color: #f8f9fa;
+  min-height: calc(100vh - 200px);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.example-section {
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  h2 {
+    margin: 0 0 1.5rem 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 0.5rem;
+  }
+}
+
+.example-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.example-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  background-color: #f9fafb;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #d1d5db;
+    background-color: #f3f4f6;
+  }
+}
+
+.example-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  text-align: center;
+  font-weight: 500;
+}
+
+.form-example {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #374151;
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
     }
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.event-example {
+  .event-info {
+    background-color: #f3f4f6;
+    padding: 1rem;
+    border-radius: 0.375rem;
+    margin-bottom: 1rem;
 
     p {
-      margin: 0;
-      font-size: 1.1rem;
-      opacity: 0.9;
-    }
-  }
-
-  .main-content {
-    padding: 3rem 0;
-    background-color: #f8f9fa;
-    min-height: calc(100vh - 200px);
-  }
-
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-  }
-
-  .example-section {
-    margin-bottom: 3rem;
-    padding: 2rem;
-    background: white;
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-
-    h2 {
-      margin: 0 0 1.5rem 0;
-      font-size: 1.5rem;
-      font-weight: 600;
+      margin: 0.25rem 0;
+      font-family: monospace;
       color: #374151;
-      border-bottom: 2px solid #e5e7eb;
-      padding-bottom: 0.5rem;
     }
   }
+}
 
+// 반응형 디자인
+@media (max-width: 768px) {
   .example-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1rem;
-  }
-
-  .example-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.375rem;
-    background-color: #f9fafb;
-    transition: all 0.2s ease;
-
-    &:hover {
-      border-color: #d1d5db;
-      background-color: #f3f4f6;
-    }
-  }
-
-  .example-label {
-    font-size: 0.875rem;
-    color: #6b7280;
-    text-align: center;
-    font-weight: 500;
-  }
-
-  .form-example {
-    max-width: 600px;
-    margin: 0 auto;
-  }
-
-  .form-group {
-    margin-bottom: 1.5rem;
-
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-      color: #374151;
-    }
-
-    input,
-    textarea {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #d1d5db;
-      border-radius: 0.375rem;
-      font-size: 1rem;
-      transition: border-color 0.2s ease;
-
-      &:focus {
-        outline: none;
-        border-color: #4f46e5;
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-      }
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 100px;
-    }
+    grid-template-columns: 1fr;
   }
 
   .form-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-    padding-top: 1rem;
-    border-top: 1px solid #e5e7eb;
+    flex-direction: column;
   }
 
-  .event-example {
-    .event-info {
-      background-color: #f3f4f6;
-      padding: 1rem;
-      border-radius: 0.375rem;
-      margin-bottom: 1rem;
-
-      p {
-        margin: 0.25rem 0;
-        font-family: monospace;
-        color: #374151;
-      }
-    }
+  .app-header h1 {
+    font-size: 2rem;
   }
-
-  // 반응형 디자인
-  @media (max-width: 768px) {
-    .example-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .form-actions {
-      flex-direction: column;
-    }
-
-    .app-header h1 {
-      font-size: 2rem;
-    }
-  }
+}
 </style>

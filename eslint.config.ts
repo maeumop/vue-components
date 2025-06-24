@@ -45,6 +45,13 @@ export default defineConfigWithVueTs(
         },
       ],
 
+      // 들여쓰기 관련 규칙 비활성화
+      'vue/html-indent': 'off',
+      'vue/script-indent': 'off',
+      'vue/style-indent': 'off',
+      indent: 'off',
+      '@typescript-eslint/indent': 'off',
+
       // TypeScript 관련 규칙
       '@typescript-eslint/no-unused-vars': 'error',
       '@typescript-eslint/no-explicit-any': 'warn',
@@ -67,8 +74,7 @@ export default defineConfigWithVueTs(
       'no-new-func': 'error',
       'no-script-url': 'error',
       semi: ['error', 'always'],
-      '@typescript-eslint/semi': ['error', 'always'],
-      'comma-dangle': ['error', 'always'],
+      'comma-dangle': 'off',
     },
   },
 );

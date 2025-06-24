@@ -19,6 +19,11 @@ const router = createRouter({
       component: () => import('../components/StyledButton/ex.vue'),
     },
     {
+      path: '/components/dropmenu',
+      name: 'dropmenu',
+      component: () => import('../components/DropMenu/ex.vue'),
+    },
+    {
       path: '/components/spinner',
       name: 'spinner',
       component: () => import('../components/Spinner/ex.vue'),

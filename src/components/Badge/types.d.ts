@@ -1,14 +1,14 @@
-import type { badgeColors, badgeConfig, badgePosition } from './const';
+import type { badgeColor, badgeConfig, badgePosition } from './const';
 
-export type BadgeColors = keyof typeof badgeColors;
-export type BadgePosition = keyof typeof badgePosition;
+export type BadgeColor = (typeof badgeColor)[keyof typeof badgeColor];
+export type BadgePosition = (typeof badgePosition)[keyof typeof badgePosition];
 export type BadgeSize = typeof badgeConfig.defaultSize | typeof badgeConfig.largeSize;
 
 export interface BadgeProps {
   /** 뱃지에 표시할 텍스트 */
   text?: string;
   /** 뱃지 색상 */
-  color?: BadgeColors;
+  color?: BadgeColor;
   /** 뱃지 크기 */
   size?: BadgeSize;
   /** 큰 사이즈 사용 여부 (deprecated: size prop 사용 권장) */

@@ -33,7 +33,7 @@ $button-colors: (
     disabled: color.adjust($warning-color, $lightness: 20%),
     text: $warning-color,
   ),
-  danger: (
+  error: (
     default: $error-color,
     hover: color.adjust($error-color, $lightness: -10%),
     disabled: color.adjust($error-color, $lightness: 20%),

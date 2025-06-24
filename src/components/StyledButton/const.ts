@@ -3,7 +3,7 @@ export const buttonColors = {
   secondary: 'secondary',
   success: 'success',
   warning: 'warning',
-  danger: 'danger',
+  error: 'error',
   info: 'info',
   light: 'light',
   dark: 'dark',

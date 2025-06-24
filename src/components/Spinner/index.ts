@@ -13,9 +13,7 @@ export function useSpinner() {
 
   // 전역 Spinner 인스턴스 가져오기
   const getSpinner = (): Spinner => {
-    if (!globalSpinner) {
-      globalSpinner = new Spinner();
-    }
+    globalSpinner ??= new Spinner();
     return globalSpinner;
   };
 
@@ -30,7 +28,7 @@ export function useSpinner() {
       spinner.timeout(options.limitTime);
     }
 
-    spinner.show(text || '');
+    spinner.show(text ?? '');
     isLoading.value = true;
   };
 

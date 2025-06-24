@@ -1,10 +1,10 @@
 // Badge 컴포넌트에서 사용할 색상 (공통 색상 상속)
-export const badgeColors: Record<string, string> = {
+export const badgeColor: Record<string, string> = {
   primary: 'primary',
   secondary: 'secondary',
   success: 'success',
   warning: 'warning',
-  danger: 'danger',
+  error: 'error',
   info: 'info',
   light: 'light',
   dark: 'dark',
