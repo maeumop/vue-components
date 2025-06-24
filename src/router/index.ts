@@ -58,6 +58,11 @@ const router = createRouter({
       name: 'listtable',
       component: () => import('../components/ListTable/ex.vue'),
     },
+    {
+      path: '/components/pagination',
+      name: 'pagination',
+      component: () => import('../components/Pagination/ex.vue'),
+    },
   ],
 });
 
