@@ -63,6 +63,11 @@ const router = createRouter({
       name: 'pagination',
       component: () => import('../components/Pagination/ex.vue'),
     },
+    {
+      path: '/components/modal',
+      name: 'modal',
+      component: () => import('../components/Modal/ex.vue'),
+    },
   ],
 });
 

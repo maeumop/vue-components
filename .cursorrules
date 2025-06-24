@@ -78,6 +78,7 @@
 - switch case 문에서 case: {} 형태의 작성을 금지한다.
 - vue 파일은 script, template, style 순으로 한다.
 - vue 파일 컴포넌트 명은 style 테그 다음에 선언 한다.
+- vue 변수 선언시 rendering에 관여 하지 않는 변수는 반응형 변수로 선언 하지 않는다.
 
 ## AI 어시스턴트 지침
 - 위 규칙들을 엄격히 준수하여 코드 생성

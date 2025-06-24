@@ -1,142 +1,288 @@
-# Modal component
+# Modal 컴포넌트
 
-## 항목
+Vue 3 + TypeScript로 개발된 현대적이고 접근성 높은 모달 컴포넌트입니다.
 
-1. [사용방법](#1-사용방법)
-2. [Options](#2-options)
-3. [Types](#3-types)
-3. [Slots](#4-slots)
+## ✨ 주요 기능
 
-# 1. 사용방법
+- 🎯 **다양한 위치 지원**: popup, center, top, bottom, left, right
+- ⌨️ **키보드 접근성**: ESC 키로 닫기, 포커스 관리
+- 🎨 **부드러운 애니메이션**: CSS 트랜지션과 cubic-bezier 이징
+- 📱 **반응형 디자인**: 모바일 친화적 레이아웃
+- ♿ **접근성 준수**: ARIA 속성, 스크린 리더 지원
+- 🎭 **슬롯 기반**: 헤더, 바디, 액션 영역 커스터마이징
+- 🔒 **뒤로가기 방지**: 라우터 네비게이션 제어
 
-## 1.1. 전역 선언
-```javascript
-// main.js
-import Modal from '@/components/Modal/index.vue'
+## 📦 설치
 
-app.compnent('Modal', Modal)
+```bash
+npm install @iconify/vue
 ```
 
-## 1.2. 사용 예제
+## 🚀 기본 사용법
+
 ```vue
-<script setup lang="ts">
-import { ref } from 'vue'
-import Modal from '@/components/Modal/index.vue'
-
-let isShow = ref<boolean>(false)
-</script>
-
 <template>
-  <Modal
-    ref="modalPopup"
-    title="기본 형태 모달 팝업"
-    v-model="isShow">
-    <template v-slot:body>
-      무궁화 꽃이 피었습니다.
-    </template>
-    <template #action="{ close }">
-      <Button color="light" @click="close()">닫기</Button>
-      &nbsp;&nbsp;
-      <Button color="primary">확인</Button>
-    </template>
-  </Modal>
+  <div>
+    <button @click="showModal = true">모달 열기</button>
+
+    <Modal v-model="showModal" title="제목" width="500px">
+      <template #body>
+        <p>모달 내용입니다.</p>
+      </template>
+
+      <template #action="{ close }">
+        <button @click="close">닫기</button>
+      </template>
+    </Modal>
+  </div>
 </template>
-```
-> action slot의 close 함수를 실행하게 되면 modelValue를 업데이트 해준다.<br>
-하지만 document 자체에는 modal이 남아 있기 때문에 완전히 컴포넌트를 파기 하기 위해서는 v-if로 제어 해야 한다.
 
-# 2. Options
-| Name | Type | Default | Description |
-|------|------|---------|-------------|
-| modelValue | boolean | <code>false</code> | 모달을 열고 닫습니다. |
-| title | string | <code>none</code> | 모달 제목을 |
-| position? | [ModalPosition](#41-modalposition-with-enum) | <code>none</code> | 모달 제목을 |
-| escClose? | boolean | <code>false</code> | ESC 키로 모달창을 닫을지 여부 |
-| width? | string | <code>none</code> | 모달의 고정 넓이를 지정합니다, css 크기 단위 필수 |
-| screenCover? | boolean | <code>false</code> | 모달이 전체 화면을 덮을지 여부, ModalPosition.popup일때 사용 불가 |
-| hideClose? | boolean | <code>false</code> | 모달 제목 부분에 생성되는 X버튼(닫기)를 표시 하지 않는다. |
+<script setup lang="ts">
+import { ref } from 'vue';
+import Modal from '@/components/Modal';
 
-
-:arrow_up: [항목](#항목)
-
----
-
-# 3. Slots
-
-## 3.1. header
-
-* Modal의 header 부분을 직접 구현 가능 슬롯
-
-
-## 3.2. body
-
-* 주요 컨텐츠를 표시
-
-## 3.3. action
-
-* 버튼 등을 나열하여 각종 기능을 수행 할 수 있도록 나눠 놓은 섹션
-
-### 3.4. 공토 Props
-
-| Name | Type | Default | Description |
-|------|------|---------|-------------|
-| close | Function(callback): void | null | 모달을 닫기 위해 전달되는 함수, 창을 닫기전 수행해야 할 스크립트를 callback으로 전달하여 실행 가능 |
-
-
-:arrow_up: [항목](#항목)
-
----
-
-# 4. Method
-
-## 4.1. Ref.close(callback?: Function): void
-
-* 모달 창을 닫아 준다.
-
-> 해당 메서드는 Modal 창이 닫히는 <code>transition</code>이 완전히 이루어지도록 도와줍니다. (slot action 과 동일)<br>
-그외 방식으로 Modal을 닫아 주는 것은 무방하나, <code>transition</code>의 완전 수행은 보장 할 수 없습니다.<br>
-해당 메서드 수행이 완료 되면 <code>modelValue</code>를 <code>false</code>로 업데이트 합니다.
-
-:arrow_up: [항목](#항목)
-
----
-
-# 5. Types
-
-## 5.1 ModalPosition with Enum
-```js
-export const modalPosition = {
-  popup: 'popup',
-  right: 'right',
-  left: 'left',
-  bottom: 'bottom',
-} as const
-
-export type ModalPosition = typeof modalPosition[keyof typeof modalPosition]
+const showModal = ref(false);
+</script>
 ```
 
-## 5.2 ModalTransition with Enum
-```js
-export const modalTransition = {
-  popup: 'modal-scale',
-  right: 'modal-slide-in-right',
-  left: 'modal-slide-in-left',
-  bottom: 'modal-slide-in-bottom',
-} as const
+## 🎛️ Props
 
-export type ModalTransition = typeof modalTransition[keyof typeof modalTransition]
+| Prop          | 타입            | 기본값    | 설명                    |
+| ------------- | --------------- | --------- | ----------------------- |
+| `modelValue`  | `boolean`       | `false`   | 모달 표시 여부          |
+| `title`       | `string`        | `''`      | 모달 제목               |
+| `width`       | `string`        | `'320px'` | 모달 너비               |
+| `position`    | `ModalPosition` | `'popup'` | 모달 위치               |
+| `escClose`    | `boolean`       | `false`   | ESC 키로 닫기 가능 여부 |
+| `screenCover` | `boolean`       | `false`   | 화면 전체 덮기 여부     |
+| `hideClose`   | `boolean`       | `false`   | 닫기 버튼 숨김 여부     |
+| `accessBack`  | `boolean`       | `false`   | 뒤로가기 방지 여부      |
+
+### ModalPosition 타입
+
+```typescript
+type ModalPosition = 'popup' | 'center' | 'top' | 'bottom' | 'left' | 'right';
 ```
 
-:arrow_up: [항목](#항목)
+## 📡 Events
 
----
+| Event               | 타입                       | 설명                |
+| ------------------- | -------------------------- | ------------------- |
+| `update:modelValue` | `(value: boolean) => void` | 모달 표시 상태 변경 |
+| `close`             | `() => void`               | 모달 닫힘           |
 
-### UPDATE HISTORY
+## 🎭 Slots
 
-* 최초 작성 : 2023.04.25 김종윤 수석매니저
-* action slot close method 추가: 2023.05.09 김종윤 수석매니저
-* close method exposed, hide-close props 추가: 2023.05.23 김종윤 수석매니저
+### 기본 슬롯
 
----
+| Slot     | Props                   | 설명                   |
+| -------- | ----------------------- | ---------------------- |
+| `header` | `{ close: () => void }` | 헤더 영역 커스터마이징 |
+| `body`   | `{ close: () => void }` | 바디 영역 (필수)       |
+| `action` | `{ close: () => void }` | 액션 영역 (버튼 등)    |
+| `title`  | -                       | 제목 영역 추가 콘텐츠  |
 
-:arrow_left: [컴포넌트 목록으로이동](https://github.com/dream-insight/ts-vue3/components)
+## 🎨 위치별 스타일
+
+### popup (기본)
+
+- 중앙에 표시
+- 스케일 애니메이션
+- 둥근 모서리
+
+### center
+
+- 중앙에 표시
+- 페이드 애니메이션
+- 둥근 모서리
+
+### top
+
+- 상단에 표시
+- 슬라이드 다운 애니메이션
+- 둥근 모서리
+
+### bottom
+
+- 하단에서 슬라이드 업
+- 전체 너비
+- 상단만 둥근 모서리
+
+### left/right
+
+- 좌/우측에서 슬라이드
+- 전체 높이
+- 한쪽만 둥근 모서리
+
+## 🔧 고급 사용법
+
+### 커스텀 헤더
+
+```vue
+<Modal v-model="showModal" width="600px">
+  <template #header="{ close }">
+    <div class="custom-header">
+      <h2>커스텀 헤더</h2>
+      <button @click="close">×</button>
+    </div>
+  </template>
+
+  <template #body>
+    <p>커스텀 헤더가 있는 모달입니다.</p>
+  </template>
+</Modal>
+```
+
+### 화면 전체 덮기
+
+```vue
+<Modal v-model="showModal" position="center" screen-cover width="100%">
+  <template #body>
+    <div class="fullscreen-content">
+      <h1>전체 화면 모달</h1>
+      <p>화면을 완전히 덮는 모달입니다.</p>
+    </div>
+  </template>
+</Modal>
+```
+
+### 뒤로가기 방지
+
+```vue
+<Modal v-model="showModal" access-back>
+  <template #body>
+    <p>뒤로가기 버튼이 비활성화됩니다.</p>
+  </template>
+</Modal>
+```
+
+## ♿ 접근성
+
+- `role="dialog"` 속성으로 스크린 리더 인식
+- `aria-modal="true"`로 모달 상태 명시
+- `aria-labelledby`로 제목 연결
+- `aria-describedby`로 내용 연결
+- 키보드 포커스 관리
+- ESC 키 지원 (옵션)
+
+## 🎨 스타일 커스터마이징
+
+### CSS 변수
+
+```scss
+.modal-bg {
+  --modal-backdrop-color: rgba(0, 0, 0, 0.5);
+  --modal-backdrop-blur: 4px;
+  --modal-border-radius: 0.8rem;
+  --modal-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+```
+
+### 트랜지션 커스터마이징
+
+```scss
+.modal-scale-enter-active,
+.modal-scale-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+```
+
+## 🔍 예제
+
+```vue
+<template>
+  <div class="modal-examples">
+    <h2>Modal 컴포넌트 예제</h2>
+
+    <div class="button-group">
+      <button @click="openModal('popup')">팝업 모달</button>
+      <button @click="openModal('center')">중앙 모달</button>
+      <button @click="openModal('top')">상단 모달</button>
+      <button @click="openModal('bottom')">하단 모달</button>
+      <button @click="openModal('left')">좌측 모달</button>
+      <button @click="openModal('right')">우측 모달</button>
+    </div>
+
+    <Modal
+      v-model="showModal"
+      :title="modalTitle"
+      :position="modalPosition"
+      :width="modalWidth"
+      esc-close
+    >
+      <template #body>
+        <div class="modal-content">
+          <p>이것은 {{ modalPosition }} 위치의 모달입니다.</p>
+          <p>ESC 키를 눌러서 닫을 수 있습니다.</p>
+        </div>
+      </template>
+
+      <template #action="{ close }">
+        <button @click="close" class="btn-primary">확인</button>
+        <button @click="close" class="btn-secondary">취소</button>
+      </template>
+    </Modal>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import Modal from '@/components/Modal';
+import type { ModalPosition } from '@/components/Modal/types';
+
+const showModal = ref(false);
+const modalPosition = ref<ModalPosition>('popup');
+
+const modalTitle = computed(() => {
+  const titles = {
+    popup: '팝업 모달',
+    center: '중앙 모달',
+    top: '상단 모달',
+    bottom: '하단 모달',
+    left: '좌측 모달',
+    right: '우측 모달',
+  };
+  return titles[modalPosition.value];
+});
+
+const modalWidth = computed(() => {
+  return ['left', 'right', 'bottom'].includes(modalPosition.value) ? '400px' : '500px';
+});
+
+const openModal = (position: ModalPosition) => {
+  modalPosition.value = position;
+  showModal.value = true;
+};
+</script>
+```
+
+## 🐛 문제 해결
+
+### 모달이 열리지 않는 경우
+
+- `v-model` 바인딩 확인
+- `modelValue` prop이 올바르게 전달되는지 확인
+
+### ESC 키가 작동하지 않는 경우
+
+- `esc-close` prop이 `true`로 설정되어 있는지 확인
+
+### 스타일이 적용되지 않는 경우
+
+- SCSS 파일이 올바르게 import되었는지 확인
+- CSS 변수가 정의되어 있는지 확인
+
+## 📝 변경 이력
+
+### v2.0.0
+
+- Vue 3 Composition API로 마이그레이션
+- TypeScript 지원 추가
+- 접근성 개선
+- 성능 최적화
+- 현대적인 디자인 적용
+
+### v1.0.0
+
+- 초기 버전 릴리즈
+- 기본 모달 기능 구현
