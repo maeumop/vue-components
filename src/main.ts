@@ -7,6 +7,7 @@ import router from './router';
 
 import App from './App.vue';
 import Badge from './components/Badge/index.vue';
+import CheckButton from './components/Form/CheckButton/index.vue';
 import ListTable from './components/ListTable/index.vue';
 import MessageBox from './components/MessageBox';
 import Pagination from './components/Pagination/index.vue';
@@ -27,6 +28,7 @@ app.component('Tabs', Tabs);
 app.component('Tooltip', Tooltip);
 app.component('ListTable', ListTable);
 app.component('Pagination', Pagination);
+app.component('CheckButton', CheckButton);
 
 // 플러그인 등록
 app.use(SpinnerPlugin);

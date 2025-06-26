@@ -93,7 +93,7 @@ const components = [
 const formComponents = [
   {
     name: 'CheckButton',
-    path: '/components/form/checkbutton',
+    path: '/components/checkbutton',
     description: '체크 버튼 컴포넌트',
     color: 'info',
     icon: 'mdi:checkbox-marked',

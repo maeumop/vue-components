@@ -68,6 +68,11 @@ const router = createRouter({
       name: 'modal',
       component: () => import('../components/Modal/ex.vue'),
     },
+    {
+      path: '/components/checkbutton',
+      name: 'checkbutton',
+      component: () => import('../components/Form/CheckButton/ex.vue'),
+    },
   ],
 });
 
