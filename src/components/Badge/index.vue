@@ -1,25 +1,13 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
 import { computed } from 'vue';
-import { badgeColor, badgeConfig, badgePosition } from './const';
+import { badgeColor, badgePosition, badgeSize } from './const';
 import type { BadgeProps } from './types';
 
 const props = withDefaults(defineProps<BadgeProps>(), {
   color: badgeColor.primary,
   position: badgePosition.right,
-  size: badgeConfig.defaultSize,
-});
-
-// 크기 계산 (large prop과 size prop 호환성)
-const badgeSize = computed(() => {
-  return props.large ? badgeConfig.largeSize : props.size;
-});
-
-// 아이콘 크기 계산
-const iconSize = computed(() => {
-  return badgeSize.value === badgeConfig.largeSize
-    ? badgeConfig.largeIconSize
-    : badgeConfig.defaultIconSize;
+  size: badgeSize.default,
 });
 
 // 뱃지 스타일 클래스 생성
@@ -31,29 +19,15 @@ const badgeStyle = computed<string[]>(() => {
   if (validColors.includes(props.color)) {
     classes.push(props.color);
   } else {
+    classes.push(badgeColor.error);
     console.warn('Invalid color:', props.color, 'Valid colors:', validColors);
   }
 
+  // 위치 클래스
+  classes.push(props.position);
+
   // 크기 클래스
-  classes.push(`size-${badgeSize.value}`);
-
-  // 위치 클래스 - 공통 상수와 SCSS 클래스명 매핑
-  const positionMapping: Record<string, string> = {
-    [badgePosition.right]: 'right',
-    [badgePosition.left]: 'left',
-    [badgePosition.bottomRight]: 'bottom-right',
-    [badgePosition.bottomLeft]: 'bottom-left',
-  };
-
-  const positionClass = positionMapping[props.position];
-  if (positionClass) {
-    classes.push(positionClass);
-  }
-
-  // 아이콘 클래스
-  if (props.icon && badgeSize.value === badgeConfig.largeSize) {
-    classes.push('icon');
-  }
+  classes.push(props.size);
 
   return classes;
 });
@@ -64,6 +38,7 @@ const wrapperClass = computed(() => {
   if (props.wrapperClass) {
     classes.push(props.wrapperClass);
   }
+
   return classes.join(' ');
 });
 
@@ -73,6 +48,7 @@ const badgeClass = computed(() => {
   if (props.badgeClass) {
     classes.push(props.badgeClass);
   }
+
   return classes.join(' ');
 });
 
@@ -81,6 +57,7 @@ const ariaLabel = computed(() => {
   if (props.text) {
     return `${props.text}개의 알림`;
   }
+
   return '알림';
 });
 </script>
@@ -88,9 +65,9 @@ const ariaLabel = computed(() => {
 <template>
   <div :class="wrapperClass">
     <slot></slot>
-    <div :class="badgeClass" :aria-label="ariaLabel" role="status">
-      <template v-if="props.icon && badgeSize === badgeConfig.largeSize">
-        <Icon :icon="props.icon" :width="iconSize" :height="iconSize" />
+    <div :class="[badgeClass]" :aria-label="ariaLabel" role="status">
+      <template v-if="props.icon">
+        <Icon :icon="props.icon" />
       </template>
       <template v-else>
         {{ props.text }}
@@ -102,6 +79,7 @@ const ariaLabel = computed(() => {
 <style scoped lang="scss">
 @use './style';
 </style>
+
 <script lang="ts">
 export default { name: 'Badge' };
 </script>

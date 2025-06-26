@@ -14,16 +14,18 @@ export const badgeColor: Record<string, string> = {
 export const badgePosition: Record<string, string> = {
   right: 'right',
   left: 'left',
-  bottomLeft: 'bottomLeft',
-  bottomRight: 'bottomRight',
+  bottomLeft: 'bottom-left',
+  bottomRight: 'bottom-right',
+} as const;
+
+// Badge 컴포넌트 크기
+export const badgeSize: Record<string, string> = {
+  default: 'default',
+  large: 'large',
 } as const;
 
 // Badge 컴포넌트 특화 상수
 export const badgeConfig = {
-  defaultSize: 'default',
-  largeSize: 'large',
-  defaultIconSize: 16,
-  largeIconSize: 20,
   borderRadius: {
     default: '0.8rem',
     large: '1.1rem',

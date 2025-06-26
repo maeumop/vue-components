@@ -8,10 +8,10 @@
 @use '../../assets/styles/variables' as *;
 
 /// 컴포넌트 size 스타일 정의
-/// @param {string} $modifier [default] - default|large
+/// @param {string} $size [default] - default|large
 /// @output - .badge.size-#{modifier} { ... }
-@mixin defineSizeStyle($modifier: default) {
-  @if meta.type-of($modifier) != 'string' {
+@mixin defineSizeStyle($size: default) {
+  @if meta.type-of($size) != 'string' {
     @error "$modifier 는 문자열 값이 와야합니다.";
   }
 
@@ -19,12 +19,12 @@
   $_x: -0.4rem;
   $_y: -0.4rem;
 
-  @if $modifier == large {
+  @if $size == large {
     $_x: -0.6rem;
     $_y: -0.6rem;
   }
 
-  .badge.size-#{$modifier} {
+  .badge.#{$size} {
     &.right {
       right: $_x;
       top: $_y;

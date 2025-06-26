@@ -51,7 +51,7 @@ const components = [
     path: '/components/spinner',
     description: '로딩 스피너 컴포넌트',
     color: 'info',
-    icon: 'mdi:loading',
+    icon: 'svg-spinners:ring-resize',
   },
   {
     name: 'StatusSelector',
@@ -79,7 +79,7 @@ const components = [
     path: '/components/toast',
     description: '토스트 알림 컴포넌트',
     color: 'primary',
-    icon: 'mdi:toast',
+    icon: 'mdi:message',
   },
   {
     name: 'Tooltip',
@@ -138,14 +138,14 @@ const formComponents = [
     path: '/components/form/validateform',
     description: '폼 검증 컴포넌트',
     color: 'info',
-    icon: 'mdi:form-validation',
+    icon: 'mdi:shield-check',
   },
   {
     name: 'ValidateWrap',
     path: '/components/form/validatewrap',
     description: '검증 래퍼 컴포넌트',
     color: 'success',
-    icon: 'mdi:shield-check',
+    icon: 'mdi:shield-check-outline',
   },
 ];
 

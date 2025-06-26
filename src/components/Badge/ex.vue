@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import FloatingBackButton from '@/views/FloatingBackButton/index.vue';
+import { badgePosition, badgeSize } from './const';
 </script>
 
 <template>
@@ -49,13 +50,13 @@ import FloatingBackButton from '@/views/FloatingBackButton/index.vue';
               <span class="example-label">좌측 상단</span>
             </div>
             <div class="example-item">
-              <Badge text="5" position="bottom-left">
+              <Badge text="5" :position="badgePosition.bottomLeft">
                 <button class="demo-button">좌측 하단</button>
               </Badge>
               <span class="example-label">좌측 하단</span>
             </div>
             <div class="example-item">
-              <Badge text="5" position="bottom-right">
+              <Badge text="5" :position="badgePosition.bottomRight">
                 <button class="demo-button">우측 하단</button>
               </Badge>
               <span class="example-label">우측 하단</span>
@@ -115,37 +116,37 @@ import FloatingBackButton from '@/views/FloatingBackButton/index.vue';
           <h2>큰 뱃지와 아이콘</h2>
           <div class="example-grid">
             <div class="example-item">
-              <Badge large text="5">
+              <Badge size="large" text="5">
                 <button class="demo-button">큰 뱃지</button>
               </Badge>
               <span class="example-label">큰 뱃지</span>
             </div>
             <div class="example-item">
-              <Badge large icon="mdi:bell" color="warning">
+              <Badge size="large" icon="mdi:bell" color="warning">
                 <button class="demo-button">알림</button>
               </Badge>
               <span class="example-label">벨 아이콘</span>
             </div>
             <div class="example-item">
-              <Badge large icon="mdi:email" color="info">
+              <Badge size="large" icon="mdi:email" color="info">
                 <button class="demo-button">메일</button>
               </Badge>
               <span class="example-label">메일 아이콘</span>
             </div>
             <div class="example-item">
-              <Badge large icon="mdi:heart" color="error">
+              <Badge :size="badgeSize.large" icon="mdi:heart" color="error">
                 <button class="demo-button">Error</button>
               </Badge>
               <span class="example-label">Error</span>
             </div>
             <div class="example-item">
-              <Badge large icon="heroicons:user" color="success">
+              <Badge :size="badgeSize.large" icon="heroicons:user" color="success">
                 <button class="demo-button">사용자</button>
               </Badge>
               <span class="example-label">사용자 아이콘</span>
             </div>
             <div class="example-item">
-              <Badge large icon="fa:github" color="dark">
+              <Badge :size="badgeSize.large" icon="fa:github" color="dark">
                 <button class="demo-button">GitHub</button>
               </Badge>
               <span class="example-label">GitHub 아이콘</span>
@@ -158,7 +159,7 @@ import FloatingBackButton from '@/views/FloatingBackButton/index.vue';
           <h2>실제 사용 예제</h2>
           <div class="example-grid">
             <div class="example-item">
-              <Badge text="3" color="error" position="bottom-right">
+              <Badge text="3" color="error" :position="badgePosition.bottomRight">
                 <div class="notification-item">
                   <Icon icon="mdi:email" width="24" height="24" />
                   <span>메시지</span>
@@ -167,7 +168,7 @@ import FloatingBackButton from '@/views/FloatingBackButton/index.vue';
               <span class="example-label">메시지 알림</span>
             </div>
             <div class="example-item">
-              <Badge text="New" color="success" position="right">
+              <Badge text="N" color="success" :position="badgePosition.right">
                 <div class="product-item">
                   <Icon icon="mdi:package" width="24" height="24" />
                   <span>상품</span>
@@ -176,7 +177,7 @@ import FloatingBackButton from '@/views/FloatingBackButton/index.vue';
               <span class="example-label">새 상품</span>
             </div>
             <div class="example-item">
-              <Badge icon="mdi:star" large color="warning" position="bottom-left">
+              <Badge icon="mdi:star" large color="warning" :position="badgePosition.bottomLeft">
                 <div class="favorite-item">
                   <Icon icon="mdi:heart" width="24" height="24" />
                   <span>즐겨찾기</span>
