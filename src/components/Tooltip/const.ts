@@ -1,16 +1,16 @@
 export const tooltipPosition = {
-  TOP: 'top',
-  BOTTOM: 'bottom',
-  LEFT: 'left',
-  RIGHT: 'right',
+  top: 'top',
+  bottom: 'bottom',
+  left: 'left',
+  right: 'right',
 } as const;
 
 export const tooltipColor = {
-  DEFAULT: 'default',
-  PRIMARY: 'primary',
-  SECONDARY: 'secondary',
-  SUCCESS: 'success',
-  WARNING: 'warning',
-  ERROR: 'error',
-  INFO: 'info',
+  default: 'default',
+  primary: 'primary',
+  secondary: 'secondary',
+  success: 'success',
+  warning: 'warning',
+  error: 'error',
+  info: 'info',
 } as const;

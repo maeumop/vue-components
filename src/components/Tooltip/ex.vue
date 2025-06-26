@@ -13,8 +13,8 @@ const messageList = ref<string[]>([
 ]);
 
 // 상태 관리
-const currentPosition = ref<TooltipPosition>(tooltipPosition.BOTTOM);
-const currentColor = ref<TooltipColor>(tooltipColor.DEFAULT);
+const currentPosition = ref<TooltipPosition>(tooltipPosition.bottom);
+const currentColor = ref<TooltipColor>(tooltipColor.default);
 const isHovering = ref(true);
 const isDark = ref(false);
 
@@ -101,43 +101,43 @@ const changeColor = (color: TooltipColor) => {
           <h2>색상 테마</h2>
           <div class="example-grid">
             <div class="example-item">
-              <Tooltip :color="tooltipColor.DEFAULT" message="기본 테마">
+              <Tooltip :color="tooltipColor.default" message="기본 테마">
                 <div class="color-badge default">Default</div>
               </Tooltip>
               <span class="example-label">Default</span>
             </div>
             <div class="example-item">
-              <Tooltip :color="tooltipColor.PRIMARY" message="주요 액션">
+              <Tooltip :color="tooltipColor.primary" message="주요 액션">
                 <div class="color-badge primary">Primary</div>
               </Tooltip>
               <span class="example-label">Primary</span>
             </div>
             <div class="example-item">
-              <Tooltip :color="tooltipColor.SECONDARY" message="보조 액션">
+              <Tooltip :color="tooltipColor.secondary" message="보조 액션">
                 <div class="color-badge secondary">Secondary</div>
               </Tooltip>
               <span class="example-label">Secondary</span>
             </div>
             <div class="example-item">
-              <Tooltip :color="tooltipColor.SUCCESS" message="성공 메시지">
+              <Tooltip :color="tooltipColor.success" message="성공 메시지">
                 <div class="color-badge success">Success</div>
               </Tooltip>
               <span class="example-label">Success</span>
             </div>
             <div class="example-item">
-              <Tooltip :color="tooltipColor.WARNING" message="경고 메시지">
+              <Tooltip :color="tooltipColor.warning" message="경고 메시지">
                 <div class="color-badge warning">Warning</div>
               </Tooltip>
               <span class="example-label">Warning</span>
             </div>
             <div class="example-item">
-              <Tooltip :color="tooltipColor.ERROR" message="오류 메시지">
+              <Tooltip :color="tooltipColor.error" message="오류 메시지">
                 <div class="color-badge error">Error</div>
               </Tooltip>
               <span class="example-label">Error</span>
             </div>
             <div class="example-item">
-              <Tooltip :color="tooltipColor.INFO" message="정보 메시지">
+              <Tooltip :color="tooltipColor.info" message="정보 메시지">
                 <div class="color-badge info">Info</div>
               </Tooltip>
               <span class="example-label">Info</span>
@@ -153,7 +153,7 @@ const changeColor = (color: TooltipColor) => {
               <Tooltip
                 message="호버링으로 표시되는 툴팁"
                 :hovering="true"
-                :color="tooltipColor.SUCCESS"
+                :color="tooltipColor.success"
               >
                 <div class="hover-element">호버 요소</div>
               </Tooltip>
@@ -166,7 +166,7 @@ const changeColor = (color: TooltipColor) => {
               <span class="example-label">다크 테마</span>
             </div>
             <div class="example-item">
-              <Tooltip :color="tooltipColor.SECONDARY" :hovering="true" :width="350">
+              <Tooltip :color="tooltipColor.secondary" :hovering="true" :width="350">
                 <template #content>
                   <div class="custom-tooltip">
                     <h4>커스텀 내용</h4>
@@ -192,7 +192,7 @@ const changeColor = (color: TooltipColor) => {
                 <div class="comparison-example">
                   <Tooltip
                     message="마우스를 올리면 즉시 나타나고, 벗어나면 사라집니다."
-                    :color="tooltipColor.SUCCESS"
+                    :color="tooltipColor.success"
                     :width="350"
                   >
                     <div class="hover-target">
@@ -210,7 +210,7 @@ const changeColor = (color: TooltipColor) => {
                   <Tooltip
                     message="클릭하면 나타나고, 다시 클릭하거나 다른 곳을 클릭하면 사라집니다."
                     :hovering="false"
-                    :color="tooltipColor.PRIMARY"
+                    :color="tooltipColor.primary"
                   >
                     <div class="click-target">
                       <span>클릭하여 표시</span>
@@ -232,22 +232,22 @@ const changeColor = (color: TooltipColor) => {
               <div class="control-group">
                 <label>위치:</label>
                 <select v-model="currentPosition" @change="changePosition(currentPosition)">
-                  <option :value="tooltipPosition.TOP">Top</option>
-                  <option :value="tooltipPosition.BOTTOM">Bottom</option>
-                  <option :value="tooltipPosition.LEFT">Left</option>
-                  <option :value="tooltipPosition.RIGHT">Right</option>
+                  <option :value="tooltipPosition.top">Top</option>
+                  <option :value="tooltipPosition.bottom">Bottom</option>
+                  <option :value="tooltipPosition.left">Left</option>
+                  <option :value="tooltipPosition.right">Right</option>
                 </select>
               </div>
               <div class="control-group">
                 <label>색상:</label>
                 <select v-model="currentColor" @change="changeColor(currentColor)">
-                  <option :value="tooltipColor.DEFAULT">Default</option>
-                  <option :value="tooltipColor.PRIMARY">Primary</option>
-                  <option :value="tooltipColor.SECONDARY">Secondary</option>
-                  <option :value="tooltipColor.SUCCESS">Success</option>
-                  <option :value="tooltipColor.WARNING">Warning</option>
-                  <option :value="tooltipColor.ERROR">Error</option>
-                  <option :value="tooltipColor.INFO">Info</option>
+                  <option :value="tooltipColor.default">Default</option>
+                  <option :value="tooltipColor.primary">Primary</option>
+                  <option :value="tooltipColor.secondary">Secondary</option>
+                  <option :value="tooltipColor.success">Success</option>
+                  <option :value="tooltipColor.warning">Warning</option>
+                  <option :value="tooltipColor.error">Error</option>
+                  <option :value="tooltipColor.info">Info</option>
                 </select>
               </div>
               <div class="control-group">

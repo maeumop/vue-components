@@ -165,7 +165,7 @@
 }
 
 // 색상 테마
-.tooltip-theme-default {
+.tooltip-color-default {
   background-color: rgba(255, 255, 255, 0.95);
   color: #333;
   border: 1px solid rgba(0, 0, 0, 0.1);
@@ -186,7 +186,7 @@
   }
 }
 
-.tooltip-theme-primary {
+.tooltip-color-primary {
   background-color: rgba($primary-color, 0.95);
   color: white;
   border: 1px solid rgba($primary-color, 0.3);
@@ -206,7 +206,7 @@
   }
 }
 
-.tooltip-theme-secondary {
+.tooltip-color-secondary {
   background-color: rgba($secondary-color, 0.95);
   color: white;
   border: 1px solid rgba($secondary-color, 0.3);
@@ -226,7 +226,7 @@
   }
 }
 
-.tooltip-theme-success {
+.tooltip-color-success {
   background-color: rgba($success-color, 0.95);
   color: white;
   border: 1px solid rgba($success-color, 0.3);
@@ -246,7 +246,7 @@
   }
 }
 
-.tooltip-theme-warning {
+.tooltip-color-warning {
   background-color: rgba($warning-color, 0.95);
   color: white;
   border: 1px solid rgba($warning-color, 0.3);
@@ -266,7 +266,7 @@
   }
 }
 
-.tooltip-theme-error {
+.tooltip-color-error {
   background-color: rgba($error-color, 0.95);
   color: white;
   border: 1px solid rgba($error-color, 0.3);
@@ -286,7 +286,7 @@
   }
 }
 
-.tooltip-theme-info {
+.tooltip-color-info {
   background-color: rgba($info-color, 0.95);
   color: white;
   border: 1px solid rgba($info-color, 0.3);
