@@ -2,7 +2,6 @@
 import { Icon } from '@iconify/vue';
 import { computed, nextTick, onBeforeMount, onMounted, provide, ref, watch } from 'vue';
 import type { RuleFunc } from '../../types';
-import { useAddFormValidate } from '../common';
 import CalendarPart from './Calendar/index.vue';
 import DateController from './DateController/index.vue';
 import { useDatePickerHelper } from './helper';
@@ -34,8 +33,6 @@ const { startDate, endDate, setStartDate, setEndDate, setDateState, setSelected,
   datePickerStore;
 
 const helper = useDatePickerHelper();
-
-useAddFormValidate();
 
 const el = ref<HTMLElement>();
 const inputArea = ref<HTMLDivElement>();

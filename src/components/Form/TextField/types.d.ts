@@ -1,6 +1,6 @@
 import type { RuleFunc } from '../../types';
 
-type TextFieldType = 'number' | 'text' | 'tel' | 'password';
+export type TextFieldType = (typeof textFieldType)[keyof typeof textFieldType];
 
 export interface TextFieldProps {
   modelValue: string;
@@ -25,13 +25,12 @@ export interface TextFieldProps {
   iconLeft?: boolean;
   iconAction?: (event?: Event) => void;
   clearable?: boolean;
-
   // 잘 사용하지 않는 기능
   autofocus?: boolean;
   errorMessage?: string;
 }
 
-type KeyEvent = 'keydown' | 'keypress' | 'keyup';
+export type KeyEvent = (typeof textFieldEvent)[keyof typeof textFieldEvent];
 
 export interface TextFieldEmits {
   (event: 'update:modelValue', value: string): void;

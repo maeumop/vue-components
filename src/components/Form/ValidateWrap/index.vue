@@ -1,100 +1,97 @@
 <script setup lang="ts">
-  import { ref, useSlots, watch } from 'vue';
-  import type { RuleFunc } from '../../types';
-  import { useAddFormValidate } from '../common';
-  import type { ValidateWrapProps } from './types';
+import { ref, useSlots, watch } from 'vue';
+import type { RuleFunc } from '../../types';
+import type { ValidateWrapProps } from './types';
 
-  const props = withDefaults(defineProps<ValidateWrapProps>(), {
-    validate: (): RuleFunc[] => [],
-    errorMessage: '',
-  });
+const props = withDefaults(defineProps<ValidateWrapProps>(), {
+  validate: (): RuleFunc[] => [],
+  errorMessage: '',
+});
 
-  const emit = defineEmits<{
-    (event: 'update:checkValue'): void;
-  }>();
+const emit = defineEmits<{
+  (event: 'update:checkValue'): void;
+}>();
 
-  const slots = useSlots();
+const slots = useSlots();
 
-  useAddFormValidate();
-
-  watch(
-    () => [props.checkValue, props.validate, props.disabled],
-    (a, b) => {
-      if (a[0] !== b[0]) {
-        emit('update:checkValue');
-      }
-
-      resetForm();
-    },
-  );
-
-  watch(
-    () => props.errorMessage,
-    v => {
-      message.value = v;
-    },
-  );
-
-  const isValidate = ref<boolean>(true);
-  const checkPass = ref<boolean>(false);
-  const message = ref<string>('');
-  const errorTransition = ref<boolean>(false);
-
-  const check = (silence: boolean = false): boolean => {
-    if (props.disabled) {
-      return true;
+watch(
+  () => [props.checkValue, props.validate, props.disabled],
+  (a, b) => {
+    if (a[0] !== b[0]) {
+      emit('update:checkValue');
     }
 
-    // 임의로 지정된 에러가 없는 경우
-    if (props.errorMessage === '') {
-      // validate check
-      if (props.validate.length) {
-        for (let i = 0; i < props.validate.length; i++) {
-          const result = props.validate[i](props.checkValue);
+    resetForm();
+  },
+);
 
-          if (typeof result === 'string') {
-            if (!silence) {
-              errorTransition.value = true;
-              message.value = result;
-              isValidate.value = false;
-              checkPass.value = false;
-            }
+watch(
+  () => props.errorMessage,
+  v => {
+    message.value = v;
+  },
+);
 
-            return false;
-          } else {
-            message.value = '';
+const isValidate = ref<boolean>(true);
+const checkPass = ref<boolean>(false);
+const message = ref<string>('');
+const errorTransition = ref<boolean>(false);
+
+const check = (silence: boolean = false): boolean => {
+  if (props.disabled) {
+    return true;
+  }
+
+  // 임의로 지정된 에러가 없는 경우
+  if (props.errorMessage === '') {
+    // validate check
+    if (props.validate.length) {
+      for (let i = 0; i < props.validate.length; i++) {
+        const result = props.validate[i](props.checkValue);
+
+        if (typeof result === 'string') {
+          if (!silence) {
+            errorTransition.value = true;
+            message.value = result;
+            isValidate.value = false;
+            checkPass.value = false;
           }
+
+          return false;
+        } else {
+          message.value = '';
         }
       }
-
-      isValidate.value = true;
-      checkPass.value = true;
-
-      return true;
     }
 
-    return false;
-  };
-
-  const resetForm = (): void => {
     isValidate.value = true;
-    checkPass.value = false;
-    message.value = '';
-  };
+    checkPass.value = true;
 
-  const resetValidate = (): void => {
-    resetForm();
-  };
+    return true;
+  }
 
-  const childBlur = (): void => {
-    check();
-  };
+  return false;
+};
 
-  defineExpose({
-    check,
-    resetForm,
-    resetValidate,
-  });
+const resetForm = (): void => {
+  isValidate.value = true;
+  checkPass.value = false;
+  message.value = '';
+};
+
+const resetValidate = (): void => {
+  resetForm();
+};
+
+const childBlur = (): void => {
+  check();
+};
+
+defineExpose({
+  check,
+  resetForm,
+  resetValidate,
+});
 </script>
 
 <template>
@@ -124,8 +121,8 @@
 </template>
 
 <style scoped lang="scss">
-  @use './style';
+@use './style';
 </style>
 <script lang="ts">
-  export default { name: 'ValidateWrap' };
+export default { name: 'ValidateWrap' };
 </script>

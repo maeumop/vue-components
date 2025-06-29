@@ -1,220 +1,217 @@
 <script setup lang="ts">
-  import type { StyleValue } from 'vue';
-  import { computed, onMounted, ref, useAttrs, watch } from 'vue';
-  import type { RuleFunc } from '../../types';
-  import { useAddFormValidate } from '../common';
-  import type { NumberFormatEmits, NumberFormatProps } from './types';
+import type { StyleValue } from 'vue';
+import { computed, onMounted, ref, useAttrs, watch } from 'vue';
+import type { RuleFunc } from '../../types';
+import type { NumberFormatEmits, NumberFormatProps } from './types';
 
-  const props = withDefaults(defineProps<NumberFormatProps>(), {
-    label: '',
-    placeholder: '',
-    validate: (): RuleFunc[] => [],
-    errorMessage: '',
-    disabled: false,
-    block: false,
-    autofocus: false,
-    maxLength: '',
-    readonly: false,
-    required: false,
-    hideMessage: false,
+const props = withDefaults(defineProps<NumberFormatProps>(), {
+  label: '',
+  placeholder: '',
+  validate: (): RuleFunc[] => [],
+  errorMessage: '',
+  disabled: false,
+  block: false,
+  autofocus: false,
+  maxLength: '',
+  readonly: false,
+  required: false,
+  hideMessage: false,
+});
+
+const emit = defineEmits<NumberFormatEmits>();
+
+const attrs = useAttrs();
+
+const eventComputing = computed(() => {
+  const events: any = {};
+
+  Object.keys(attrs).forEach(key => {
+    if (key.startsWith('on')) {
+      events[key] = attrs[key];
+    }
   });
 
-  const emit = defineEmits<NumberFormatEmits>();
+  return events;
+});
 
-  const attrs = useAttrs();
+const isValidate = ref<boolean>(true);
+const checkPass = ref<boolean>(false);
+const message = ref<string>('');
+const errorTransition = ref<boolean>(false);
 
-  useAddFormValidate();
+const Input = ref<HTMLInputElement>();
 
-  const eventComputing = computed(() => {
-    const events: any = {};
+watch(
+  () => props.errorMessage,
+  v => {
+    // 임의로 지정된 에러가 있는 경우 에러 아이콘 표기
+    if (v !== '') {
+      message.value = v;
+      isValidate.value = false;
+      errorTransition.value = true;
+    } else {
+      resetValidate();
+    }
+  },
+);
 
-    Object.keys(attrs).forEach(key => {
-      if (key.startsWith('on')) {
-        events[key] = attrs[key];
-      }
-    });
-
-    return events;
-  });
-
-  const isValidate = ref<boolean>(true);
-  const checkPass = ref<boolean>(false);
-  const message = ref<string>('');
-  const errorTransition = ref<boolean>(false);
-
-  const Input = ref<HTMLInputElement>();
-
-  watch(
-    () => props.errorMessage,
-    v => {
-      // 임의로 지정된 에러가 있는 경우 에러 아이콘 표기
+watch(
+  () => props.modelValue,
+  v => {
+    if (!props.disabled) {
+      // 외부에서 model이 업데이트 되도 유효성 검사
       if (v !== '') {
-        message.value = v;
-        isValidate.value = false;
-        errorTransition.value = true;
-      } else {
         resetValidate();
-      }
-    },
-  );
 
-  watch(
-    () => props.modelValue,
-    v => {
-      if (!props.disabled) {
-        // 외부에서 model이 업데이트 되도 유효성 검사
-        if (v !== '') {
-          resetValidate();
-
-          if (Input.value) {
-            Input.value.value = format(v);
-          }
+        if (Input.value) {
+          Input.value.value = format(v);
         }
       }
-    },
-  );
-
-  watch(
-    () => props.disabled,
-    v => v && resetValidate(),
-  );
-
-  /**
-   *
-   * @deprecated successful style,변수 감시용도 아닌 그냥 존재하여 삭제 예정.
-   */
-  // const successful = computed<boolean>(() => isValidate.value && checkPass.value);
-
-  /**
-   *
-   * @deprecated [error|success] style,변수 감시용도 아닌 그냥 존재하여 삭제 예정.
-   */
-  const wrapperStyle = computed<StyleValue>(() => [
-    'input-wrap',
-    {
-      'with-label': props.label,
-      // error: !isValidate.value,
-      // success: successful,
-      block: props.block,
-    },
-  ]);
-
-  /**
-   * 입력 폼이 focus, blur 됐을때 해당 값을 체크 하여 값을 비우거나 0으로 채워 준다.
-   *
-   * @param { Event } evt
-   */
-  const zeroCheck = (evt: Event) => {
-    if (evt.type === 'focus' && Input.value!.value === '0') {
-      Input.value!.value = '';
-      emit('update:modelValue', 0);
-    } else if (evt.type === 'blur' && !Input.value!.value.length) {
-      Input.value!.value = '0';
-      emit('update:modelValue', 0);
-
-      if (!attrs.onBlur && !attrs.onFocusout) {
-        check();
-      }
     }
-  };
+  },
+);
 
-  /**
-   * 전달된 값을 천단위로 콤마(,)를 생성하여 반환
-   *
-   * @param v
-   * @return format number string
-   */
-  const format = (v: number | string): string =>
-    v === '-' ? v : new Intl.NumberFormat().format(Number(v));
+watch(
+  () => props.disabled,
+  v => v && resetValidate(),
+);
 
-  const updateValue = (evt: Event): void => {
-    if (props.disabled) {
-      return;
-    }
+/**
+ *
+ * @deprecated successful style,변수 감시용도 아닌 그냥 존재하여 삭제 예정.
+ */
+// const successful = computed<boolean>(() => isValidate.value && checkPass.value);
 
-    const e = evt.target as HTMLInputElement;
+/**
+ *
+ * @deprecated [error|success] style,변수 감시용도 아닌 그냥 존재하여 삭제 예정.
+ */
+const wrapperStyle = computed<StyleValue>(() => [
+  'input-wrap',
+  {
+    'with-label': props.label,
+    // error: !isValidate.value,
+    // success: successful,
+    block: props.block,
+  },
+]);
 
-    let value: string = e.value
-      .replace(/[^\d\-]/g, '')
-      .replace(/\-{2,}/g, '-')
-      .replace(/^$/, '');
-
-    value =
-      value.charAt(0) === '-' ? '-'.concat(value.replace(/[-]/g, '')) : value.replace(/[-]/g, '');
-
-    if (value) {
-      e.value = format(value);
-      emit('update:modelValue', isNaN(Number(value)) ? 0 : Number(value));
-    }
-  };
-
-  const check = (silence: boolean = false): boolean => {
-    if (props.disabled) {
-      return true;
-    }
-
-    // 임의로 지정된 에러가 없는 경우
-    if (!props.errorMessage) {
-      // validate check
-      if (props.validate.length) {
-        for (let i: number = 0; i < props.validate.length; i++) {
-          const result: string | boolean = props.validate[i](props.modelValue);
-
-          if (typeof result === 'string') {
-            if (!silence) {
-              message.value = result;
-              isValidate.value = false;
-              checkPass.value = false;
-              errorTransition.value = true;
-            }
-
-            return false;
-          } else {
-            message.value = '';
-          }
-        }
-      }
-
-      isValidate.value = true;
-      checkPass.value = true;
-
-      return true;
-    }
-
-    errorTransition.value = true;
-
-    return false;
-  };
-
-  const resetForm = (): void => {
-    if (Input.value) {
-      Input.value.value = '0';
-    }
-
+/**
+ * 입력 폼이 focus, blur 됐을때 해당 값을 체크 하여 값을 비우거나 0으로 채워 준다.
+ *
+ * @param { Event } evt
+ */
+const zeroCheck = (evt: Event) => {
+  if (evt.type === 'focus' && Input.value!.value === '0') {
+    Input.value!.value = '';
     emit('update:modelValue', 0);
-  };
+  } else if (evt.type === 'blur' && !Input.value!.value.length) {
+    Input.value!.value = '0';
+    emit('update:modelValue', 0);
 
-  const resetValidate = (): void => {
-    message.value = '';
+    if (!attrs.onBlur && !attrs.onFocusout) {
+      check();
+    }
+  }
+};
+
+/**
+ * 전달된 값을 천단위로 콤마(,)를 생성하여 반환
+ *
+ * @param v
+ * @return format number string
+ */
+const format = (v: number | string): string =>
+  v === '-' ? v : new Intl.NumberFormat().format(Number(v));
+
+const updateValue = (evt: Event): void => {
+  if (props.disabled) {
+    return;
+  }
+
+  const e = evt.target as HTMLInputElement;
+
+  let value: string = e.value
+    .replace(/[^\d\-]/g, '')
+    .replace(/\-{2,}/g, '-')
+    .replace(/^$/, '');
+
+  value =
+    value.charAt(0) === '-' ? '-'.concat(value.replace(/[-]/g, '')) : value.replace(/[-]/g, '');
+
+  if (value) {
+    e.value = format(value);
+    emit('update:modelValue', isNaN(Number(value)) ? 0 : Number(value));
+  }
+};
+
+const check = (silence: boolean = false): boolean => {
+  if (props.disabled) {
+    return true;
+  }
+
+  // 임의로 지정된 에러가 없는 경우
+  if (!props.errorMessage) {
+    // validate check
+    if (props.validate.length) {
+      for (let i: number = 0; i < props.validate.length; i++) {
+        const result: string | boolean = props.validate[i](props.modelValue);
+
+        if (typeof result === 'string') {
+          if (!silence) {
+            message.value = result;
+            isValidate.value = false;
+            checkPass.value = false;
+            errorTransition.value = true;
+          }
+
+          return false;
+        } else {
+          message.value = '';
+        }
+      }
+    }
+
     isValidate.value = true;
-    errorTransition.value = false;
-  };
+    checkPass.value = true;
 
-  onMounted(() => {
-    if (props.autofocus && Input.value) {
-      Input.value.focus();
-    }
+    return true;
+  }
 
-    if (props.modelValue && Input.value) {
-      Input.value.value = format(props.modelValue);
-    }
-  });
+  errorTransition.value = true;
 
-  defineExpose({
-    check,
-    resetForm,
-    resetValidate,
-  });
+  return false;
+};
+
+const resetForm = (): void => {
+  if (Input.value) {
+    Input.value.value = '0';
+  }
+
+  emit('update:modelValue', 0);
+};
+
+const resetValidate = (): void => {
+  message.value = '';
+  isValidate.value = true;
+  errorTransition.value = false;
+};
+
+onMounted(() => {
+  if (props.autofocus && Input.value) {
+    Input.value.focus();
+  }
+
+  if (props.modelValue && Input.value) {
+    Input.value.value = format(props.modelValue);
+  }
+});
+
+defineExpose({
+  check,
+  resetForm,
+  resetValidate,
+});
 </script>
 
 <template>
@@ -251,8 +248,8 @@
 </template>
 
 <style scoped lang="scss">
-  @use './style';
+@use './style';
 </style>
 <script lang="ts">
-  export default { name: 'NumberFormat' };
+export default { name: 'NumberFormat' };
 </script>

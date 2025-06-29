@@ -1,124 +1,213 @@
-@charset "UTF-8";
-/* @/components/Form/TextField/_style.scss */
-@use "sass:meta";
-@use "sass:map";
-@use "sass:color";
-@use "../../styles" as _;
-@use "../../common";
-
-/// 초기화 버튼 스타일 정의
-/// @output
-@mixin defineBtnClear {
-  position: relative;
-
-  .btn-clear {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 4rem;
-    height: 4rem;
-    position: absolute;
-    top: 0;
-    right: 0;
-
-    svg {
-      margin-top: 0.3rem;
-      color: _.$gray-600;
-    }
-
-    &.with-icon {
-      right: 2.4rem;
-    }
-  }
-}
+@import '@/components/styles/index.scss';
 
 .input-wrap {
   display: inline-block;
+  width: 100%;
+  max-width: 300px;
+
+  &.block {
+    max-width: none;
+  }
+}
+
+.options-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.input-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
+
+  .required {
+    color: #dc3545;
+    margin-left: 0.25rem;
+  }
+}
+
+.counting {
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+
+textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #e9ecef;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #333;
+  background-color: #fff;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
+  resize: vertical;
+
+  &:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+  }
+
+  &:disabled {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    cursor: not-allowed;
+  }
+
+  &.error {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+  }
+
+  &::placeholder {
+    color: #6c757d;
+  }
+}
+
+.with-slot {
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
 
-  .options-wrap .counting {
-    margin-bottom: 0.4rem;
-    padding: 0 0.6rem;
+.input-relative {
+  position: relative;
+  flex: 1;
+}
 
-    font-size: 1.2rem;
-    color: _.$text-default;
-    line-height: 1.9rem;
+input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #e9ecef;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #333;
+  background-color: #fff;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
+
+  &:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
   }
 
-  .input-relative {
-    width: 100%;
-    @include defineBtnClear;
+  &:disabled {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    cursor: not-allowed;
   }
 
-  input,
-  textarea {
-    width: 100%;
-    border: 0.1rem solid _.$gray-300;
-    border-radius: 0.4rem;
-    padding: 0.9rem 1.6rem;
-    margin: 0;
-    resize: vertical;
-    color: _.$text-default;
-
-    @if (meta.mixin-exists("scrollbar")) {
-      // global scrollbar가 정의 되었있을 경우
-      @include scrollbar;
-    }
-
-    &:not(:read-only, :disabled):focus {
-      outline: none;
-      border-color: _.$primary;
-    }
-
-    &.error {
-      border-color: _.$danger;
-    }
-
-    &:read-only,
-    &:disabled {
-      cursor: default;
-      background-color: _.$gray-100;
-    }
-
-    &::placeholder {
-      font-size: 1.4rem;
-      font-weight: 400;
-      color: _.$text-placeholder;
-    }
-
-    &.left-space {
-      text-indent: 2.5rem;
-    }
-
-    &.right-space {
-      padding-right: 4rem !important;
-    }
+  &.error {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
   }
 
-  input {
-    height: 4rem;
+  &.left-space {
+    padding-left: 2.5rem;
   }
 
-  .with-slot {
-    display: flex;
-    align-items: center;
-    position: relative;
-
-    input + * {
-      flex: 1;
-      margin-right: 0.4rem;
-    }
-
-    svg {
-      display: block;
-      position: absolute;
-      right: 0.8rem;
-      top: 0.8rem;
-      color: _.$gray-800;
-
-      &.left {
-        left: 0.8rem !important;
-      }
-    }
+  &.right-space {
+    padding-right: 2.5rem;
   }
+
+  &::placeholder {
+    color: #6c757d;
+  }
+}
+
+.btn-clear {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #6c757d;
+  text-decoration: none;
+  border-radius: 50%;
+  transition:
+    color 0.15s ease-in-out,
+    background-color 0.15s ease-in-out;
+
+  &:hover {
+    color: #333;
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  &.with-icon {
+    right: 2.5rem;
+  }
+}
+
+.icon-left {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  transition: color 0.15s ease-in-out;
+
+  &:hover {
+    color: #667eea;
+  }
+}
+
+.icon-right {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  transition: color 0.15s ease-in-out;
+
+  &:hover {
+    color: #667eea;
+  }
+}
+
+.feedback {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: #dc3545;
+  min-height: 1rem;
+  opacity: 0;
+  transform: translateY(-0.25rem);
+  transition:
+    opacity 0.3s ease-in-out,
+    transform 0.3s ease-in-out;
+
+  &.error {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes errorShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-0.25rem);
+  }
+  75% {
+    transform: translateX(0.25rem);
+  }
+}
+
+.feedback.error {
+  animation: errorShake 0.3s ease-in-out;
 }

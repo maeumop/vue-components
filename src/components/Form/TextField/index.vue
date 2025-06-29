@@ -3,12 +3,12 @@ import { Icon } from '@iconify/vue';
 import type { StyleValue } from 'vue';
 import { computed, onMounted, ref, watch } from 'vue';
 import type { RuleFunc } from '../../types';
-import { useAddFormValidate } from '../common';
+import { textFieldType } from './const';
 import type { TextFieldEmits, TextFieldProps } from './types';
 
 const props = withDefaults(defineProps<TextFieldProps>(), {
   rows: 5,
-  type: 'text',
+  type: textFieldType.text,
   validate: (): RuleFunc[] => [],
   blurValidate: true,
   errorMessage: '',
@@ -17,10 +17,7 @@ const props = withDefaults(defineProps<TextFieldProps>(), {
 
 const emit = defineEmits<TextFieldEmits>();
 
-useAddFormValidate();
-
 const isValidate = ref<boolean>(true);
-const checkPass = ref<boolean>(false);
 const message = ref<string>('');
 const errorTransition = ref<boolean>(false);
 
@@ -30,16 +27,13 @@ const Input = ref<HTMLInputElement>();
 watch(
   () => props.errorMessage,
   v => {
-    // 임의로 지정된 에러가 있는 경우 에러 아이콘 표기
     if (v) {
       message.value = v;
       isValidate.value = false;
-      checkPass.value = false;
       errorTransition.value = true;
     } else {
       message.value = '';
       isValidate.value = true;
-      checkPass.value = true;
       errorTransition.value = false;
     }
   },
@@ -47,36 +41,37 @@ watch(
 
 watch(
   () => props.validate,
-  () => {
-    resetValidate();
+  (newVal, oldVal) => {
+    if (newVal && newVal.length !== oldVal.length) {
+      resetValidate();
+    }
   },
 );
 
 watch(
   () => props.modelValue,
-  v => v && resetValidate(),
+  (newVal, oldVal) => {
+    // 값이 변경되면 유효성 검사를 초기화
+    if (newVal && newVal !== oldVal) {
+      resetValidate();
+    }
+  },
+  { flush: 'post' },
 );
 
 watch(
   () => props.disabled,
-  v => v && resetValidate(),
+  (newVal, oldVal) => {
+    // disabled 상태가 변경되면 유효성 검사를 초기화
+    if (newVal !== oldVal) {
+      resetValidate();
+    }
+  },
 );
 
-/**
- *
- * @deprecated successful style,변수 감시용도 아닌 그냥 존재하여 삭제 예정.
- */
-// const successful = computed<boolean>(() => isValidate.value && checkPass.value);
-
-/**
- *
- * @deprecated [error|success] style,변수 감시용도 아닌 그냥 존재하여 삭제 예정.
- */
 const wrapperStyle = computed<StyleValue>(() => [
   'input-wrap',
   {
-    // error: !isValidate.value,
-    // success: successful,
     block: props.block,
   },
 ]);
@@ -90,9 +85,8 @@ const inputStyleClass = computed<StyleValue>(() => [
 ]);
 
 const updateValue = (evt: Event): void => {
-  const target = evt.target as HTMLInputElement;
+  const target = evt.target as HTMLInputElement | HTMLTextAreaElement;
 
-  // textarea maxlength 기능이 없기 때문에 코드로 구현
   if (props.isCounting && props.maxLength) {
     if (target.value.length > props.maxLength) {
       const cut = target.value.substring(0, props.maxLength);
@@ -110,16 +104,10 @@ const clearButtonShow = computed<boolean>(
   () => props.clearable && props.modelValue !== '' && !props.disabled && !props.readonly,
 );
 
-/**
- * blur 이벤트 핸들러에서 check() 함수의 반환값이 true 일경우에만 trim추가 처리 진행
- * disabled 일때에는 이벤트 발생하지 않기에 정의 하지 않습니다.
- * @author hjs0818
- * @returns
- */
 const updateTrimValue = (evt: Event): void => {
   const target = evt.target as HTMLInputElement | HTMLTextAreaElement;
-
   const result: string = target.value.trim();
+
   if (result.length > 0) {
     emit('update:modelValue', result);
   }
@@ -130,41 +118,32 @@ const check = (silence?: boolean): boolean => {
     return true;
   }
 
-  // 임의로 지정된 에러가 없는 경우
   if (props.errorMessage === '') {
-    // trim 되지 않은 value 값
-    const checkValue: string = (props.multiline ? Textarea.value?.value : Input.value?.value) || '';
+    const checkValue: string = (props.multiline ? Textarea.value?.value : Input.value?.value) ?? '';
 
     // pattern check
     if (Array.isArray(props.pattern)) {
       const [regExp, errMsg] = props.pattern;
 
-      if (regExp) {
-        if (regExp.test(checkValue)) {
-          message.value = '';
-        } else {
-          if (!silence) {
-            message.value = errMsg ? errMsg : '형식이 일치 하지 않습니다.';
-            isValidate.value = false;
-            checkPass.value = false;
-            errorTransition.value = true;
-          }
-
-          return false;
+      if (regExp && !regExp.test(checkValue)) {
+        if (!silence) {
+          message.value = errMsg ?? '형식이 일치하지 않습니다.';
+          isValidate.value = false;
+          errorTransition.value = true;
         }
+        return false;
       }
     }
 
     // validate check
     if (props.validate.length) {
-      for (let i: number = 0; i < props.validate.length; i++) {
-        const result: string | boolean = props.validate[i](checkValue);
+      for (const validateFunc of props.validate) {
+        const result: string | boolean = validateFunc(checkValue);
 
         if (typeof result === 'string') {
           if (!silence) {
             message.value = result;
             isValidate.value = false;
-            checkPass.value = false;
             errorTransition.value = true;
           }
 
@@ -176,12 +155,10 @@ const check = (silence?: boolean): boolean => {
     }
 
     isValidate.value = true;
-    checkPass.value = true;
     return true;
   }
 
   errorTransition.value = true;
-
   return false;
 };
 
@@ -190,6 +167,7 @@ const resetForm = (): void => {
 };
 
 const resetValidate = (): void => {
+  console.log('resetValidate', props.modelValue);
   isValidate.value = true;
   if (!props.errorMessage) {
     message.value = '';
@@ -202,9 +180,9 @@ const feedback = ref<HTMLDivElement>();
 onMounted(() => {
   if (props.autofocus) {
     if (props.multiline) {
-      Textarea.value!.focus();
+      Textarea.value?.focus();
     } else {
-      Input.value!.focus();
+      Input.value?.focus();
     }
   }
 });
@@ -219,7 +197,6 @@ defineExpose({
 <template>
   <div ref="TextField" :class="wrapperStyle" :style="{ width: props.width }">
     <div class="options-wrap" v-if="props.label || (props.isCounting && props.maxLength)">
-      <!-- label -->
       <label class="input-label" v-if="props.label">
         {{ props.label }}
         <span class="required" v-if="props.required">*</span>
@@ -230,66 +207,79 @@ defineExpose({
       </div>
     </div>
 
-    <textarea
-      ref="Textarea"
-      :class="{ error: message }"
-      :style="[{ height: props.height }]"
-      :rows="props.rows"
-      :placeholder="props.placeholder"
-      :value="props.disabled ? '' : props.modelValue"
-      :readonly="props.readonly"
-      :disabled="disabled"
-      @blur="[emit('blur', $event), props.blurValidate && check() && updateTrimValue($event)]"
-      @input="updateValue"
-      v-if="multiline"
-    >
-    </textarea>
+    <template v-if="props.multiline">
+      <textarea
+        ref="Textarea"
+        :class="{ error: message }"
+        :style="[{ height: props.height }]"
+        :rows="props.rows"
+        :placeholder="props.placeholder"
+        :value="props.disabled ? '' : props.modelValue"
+        :readonly="props.readonly"
+        :disabled="disabled"
+        @blur="[emit('blur', $event), props.blurValidate && check() && updateTrimValue($event)]"
+        @input="updateValue"
+      ></textarea>
+    </template>
+    <template v-else>
+      <div class="with-slot">
+        <div class="input-relative">
+          <input
+            ref="Input"
+            :type="props.type"
+            :class="inputStyleClass"
+            :style="[{ width: props.width }]"
+            :placeholder="props.placeholder"
+            :value="props.disabled ? '' : props.modelValue"
+            :disabled="props.disabled"
+            :readonly="props.readonly"
+            :maxlength="props.maxLength > 0 ? props.maxLength : ''"
+            :autocomplete="props.type === 'password' ? 'on' : 'off'"
+            @blur="[emit('blur', $event), props.blurValidate && check() && updateTrimValue($event)]"
+            @input="updateValue"
+          />
 
-    <div class="with-slot" v-else>
-      <div class="input-relative">
-        <input
-          ref="Input"
-          :type="props.type"
-          :class="inputStyleClass"
-          :style="[{ width: props.width }]"
-          :placeholder="props.placeholder"
-          :value="props.disabled ? '' : props.modelValue"
-          :disabled="props.disabled"
-          :readonly="props.readonly"
-          :maxlength="props.maxLength > 0 ? props.maxLength : ''"
-          :autocomplete="props.type === 'password' ? 'on' : 'off'"
-          @blur="[emit('blur', $event), props.blurValidate && check() && updateTrimValue($event)]"
-          @input="updateValue"
-        />
+          <!-- 왼쪽 아이콘 -->
+          <template v-if="props.icon && props.iconLeft">
+            <a
+              href="#"
+              @click.prevent="props.iconAction"
+              v-if="typeof props.iconAction === 'function'"
+            >
+              <Icon :icon="props.icon" :width="24" :height="24" class="icon-left" />
+            </a>
+            <Icon :icon="props.icon" :width="24" :height="24" class="icon-left" v-else />
+          </template>
 
-        <a
-          href="#"
-          :class="['btn-clear', props.icon && !props.iconLeft && 'with-icon']"
-          @click.prevent="clearValue"
-          v-if="clearButtonShow"
-        >
-          <Icon icon="mdi:close-circle" :width="20" :height="20" />
-        </a>
+          <!-- 오른쪽 아이콘 -->
+          <template v-if="props.icon && !props.iconLeft">
+            <a
+              href="#"
+              @click.prevent="props.iconAction"
+              v-if="typeof props.iconAction === 'function'"
+            >
+              <Icon :icon="props.icon" :width="24" :height="24" class="icon-right" />
+            </a>
+            <Icon :icon="props.icon" :width="24" :height="24" class="icon-right" v-else />
+          </template>
+
+          <!-- 클리어 버튼 -->
+          <a
+            href="#"
+            :class="['btn-clear', props.icon && !props.iconLeft && 'with-icon']"
+            @click.prevent="clearValue"
+            v-if="clearButtonShow"
+          >
+            <Icon icon="mdi:close-circle" :width="20" :height="20" />
+          </a>
+        </div>
+        <slot></slot>
       </div>
-      <template v-if="props.icon">
-        <a href="#" @click.prevent="props.iconAction" v-if="typeof props.iconAction === 'function'">
-          <Icon :icon="props.icon" :width="24" :height="24" :class="{ left: props.iconLeft }" />
-        </a>
-        <Icon
-          :icon="props.icon"
-          :width="24"
-          :height="24"
-          :class="{ left: props.iconLeft }"
-          v-else
-        />
-      </template>
-      <slot></slot>
-    </div>
+    </template>
 
     <div
       ref="feedback"
       :class="['feedback', { error: errorTransition }]"
-      @animationend="errorTransition = false"
       v-show="message && !props.hideMessage"
     >
       {{ message }}
@@ -297,8 +287,8 @@ defineExpose({
   </div>
 </template>
 
-<style scoped lang="scss">
-@use './style';
+<style lang="scss" scoped>
+@import './style.scss';
 </style>
 <script lang="ts">
 export default { name: 'TextField' };

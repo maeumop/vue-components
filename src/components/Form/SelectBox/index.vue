@@ -12,7 +12,6 @@ import {
   watch,
 } from 'vue';
 import type { RuleFunc } from '../../types';
-import { useAddFormValidate } from '../common';
 import type { SelectBoxEmits, SelectBoxItem, SelectBoxProps } from './types';
 
 const props = withDefaults(defineProps<SelectBoxProps>(), {
@@ -38,8 +37,6 @@ const props = withDefaults(defineProps<SelectBoxProps>(), {
 });
 
 const emit = defineEmits<SelectBoxEmits>();
-
-useAddFormValidate();
 
 const isValidate = ref<boolean>(true);
 const message = ref<string>('');

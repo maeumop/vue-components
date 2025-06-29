@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
 import { nextTick, ref, watch } from 'vue';
-import { useAddFormValidate } from '../common';
 import { switchButtonColor } from './const';
 import type { SwitchButtonEmits, SwitchButtonProps } from './types';
 
@@ -15,8 +14,6 @@ const props = withDefaults(defineProps<SwitchButtonProps>(), {
 });
 
 const emit = defineEmits<SwitchButtonEmits>();
-
-useAddFormValidate();
 
 const onError = ref<boolean>(false);
 const errorTransition = ref<boolean>(false);

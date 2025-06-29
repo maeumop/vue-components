@@ -1,7 +1,5 @@
 import { getCurrentInstance, onMounted } from 'vue';
 
-import type { ValidateFormModel } from './ValidateForm/types';
-
 export const useAddFormValidate = () => {
   const instance = getCurrentInstance();
 
@@ -16,11 +14,9 @@ export const useAddFormValidate = () => {
         parent = parent.parent;
       }
 
-      console.log('parent :>> ', parent);
-
-      if (parent && instance.vnode) {
-        (parent.exposed as ValidateFormModel).addComponant(instance.vnode);
-      }
+      // if (parent && instance.vnode) {
+      //   (parent.exposed as ValidateFormModel).addComponant(instance.vnode);
+      // }
     }
   };
 

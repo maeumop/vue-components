@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import type { RuleFunc } from '../../types';
-import { useAddFormValidate } from '../common';
 import { checkButtonColor, checkButtonIcons, checkButtonType } from './const';
 import type { CheckButtonEmits, CheckButtonItem, CheckButtonProps } from './types';
 
@@ -18,8 +17,6 @@ const props = withDefaults(defineProps<CheckButtonProps>(), {
 });
 
 const emit = defineEmits<CheckButtonEmits>();
-
-useAddFormValidate();
 
 const list = ref<CheckButtonItem[]>([]);
 const val = ref<string | string[]>(props.type === checkButtonType.radio ? '' : []);

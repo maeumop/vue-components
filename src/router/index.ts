@@ -78,6 +78,11 @@ const router = createRouter({
       name: 'switchbutton',
       component: () => import('../components/Form/SwitchButton/ex.vue'),
     },
+    {
+      path: '/components/textfield',
+      name: 'textfield',
+      component: () => import('../components/Form/TextField/ex.vue'),
+    },
   ],
 });
 
