@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { computed, nextTick, onBeforeMount, onMounted, provide, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue';
 import type { RuleFunc } from '../../types';
 import CalendarPart from './Calendar/index.vue';
 import DateController from './DateController/index.vue';
@@ -58,6 +58,40 @@ const _modelValue = ref<string | string[]>(props.modelValue);
 
 const startCalendar = ref<Calendar>();
 const endCalendar = ref<Calendar>();
+
+// 스크롤 이벤트 리스너 배열 (여러 요소에 등록할 수 있도록)
+const scrollEventListeners: Array<{
+  element: HTMLElement | Window;
+  listener: () => void;
+}> = [];
+
+// 스크롤 이벤트 등록/해제 함수
+const addAllScrollEvents = () => {
+  if (el.value) {
+    setScrollEvent(el.value);
+  }
+
+  addWindowScrollEvent();
+};
+const removeAllScrollEvents = () => {
+  scrollEventListeners.forEach(({ element, listener }) => {
+    if (element === window) {
+      window.removeEventListener('scroll', listener);
+    } else if (element instanceof HTMLElement) {
+      element.removeEventListener('scroll', listener);
+    }
+  });
+  scrollEventListeners.length = 0;
+};
+
+// 달력 열림/닫힘에 따라 스크롤 이벤트 등록/해제
+watch(isShow, v => {
+  if (v) {
+    addAllScrollEvents();
+  } else {
+    removeAllScrollEvents();
+  }
+});
 
 watch(
   () => [startDate.value, endDate.value],
@@ -124,19 +158,37 @@ const dateUpdate = (v: string | string[]): void => {
 
 // 선택된 날짜 기간을 보여준다.
 const selectedDateView = computed<string>(() => {
-  let v: string = '';
-
-  if (props.range) {
-    if (selectedError.value !== '') {
-      // 날짜 선택을 잘못한 경우 오류 메시지 표시
-      v = selectedError.value;
-    } else if (startDate.value !== '' && endDate.value !== '') {
-      v = `${startDate.value} ~ ${endDate.value}`;
-    }
+  if (!props.range) {
+    return '';
   }
 
-  return v;
+  if (selectedError.value !== '') {
+    // 날짜 선택을 잘못한 경우 오류 메시지 표시
+    return selectedError.value;
+  }
+
+  if (startDate.value !== '' && endDate.value !== '') {
+    return `${startDate.value} ~ ${endDate.value}`;
+  }
+
+  return '';
 });
+
+// 플레이스홀더 텍스트 메모이제이션
+const placeholderText = computed<string[]>(() => {
+  if (props.placeholder) {
+    if (Array.isArray(props.placeholder)) {
+      return props.placeholder;
+    } else if (typeof props.placeholder === 'string') {
+      return [props.placeholder, ''];
+    }
+  }
+  return ['', ''];
+});
+
+// 최대/최소 연도 메모이제이션
+const maxYear = computed<number>(() => props.maxYear);
+const minYear = computed<number>(() => props.minYear);
 
 /**
  * 배치된 위치에 따라 달력이 보여지는 위치와 방향을 변경
@@ -384,58 +436,52 @@ const check = (silence: boolean = false): boolean => {
   return true;
 };
 
-/**
- * 달력 컴포넌트 외의 구역을 클릭할 경우 팝업 닫힘
- * @param evt
- */
-const outsideClickEvent = (evt: Event): void => {
-  if (el.value && isShow.value) {
-    const target = evt.target as HTMLElement;
-    const classList = target.classList.value;
-    const indexOf1 = classList.indexOf('current');
-    const indexOf2 = classList.indexOf('today');
-    const indexOf3 = classList.indexOf('date-range');
+// 외부 클릭 감지
+const outsideClickEvent = (evt: MouseEvent): void => {
+  const target = evt.target as HTMLElement;
 
-    if (indexOf1 === -1 && indexOf2 === -1 && indexOf3 === -1) {
-      if (!el.value.contains(target)) {
-        check();
-        isShow.value = false;
-      }
-    }
+  if (!isShow.value || !el.value) {
+    return;
   }
-};
 
-let eventParentElement: HTMLElement;
+  // DatePicker 컴포넌트 내부 클릭인지 확인
+  if (el.value.contains(target)) {
+    return;
+  }
 
-/**
- * 달력 팝업이 표시되어 있는 상태에서 스크롤 이벤트 발생시 팝업 닫음
- */
-const parentScrollEvent = (): void => {
+  // 외부 클릭 시 달력 닫기
   isShow.value = false;
 };
 
-/**
- * 컴포넌트 상위 element를 탐색(재귀)하며 scroll이 있는 Element에
- * scroll event를 추가 하여 scorll 발생시 layer 창을 닫아 준다.
- * @param el
- */
+// 스크롤 이벤트 처리
 const setScrollEvent = (el: HTMLElement): void => {
   const parent = el.parentElement as HTMLElement;
 
-  if (parent) {
-    if (parent.tagName.toLowerCase() === 'html') {
-      return;
-    }
-
-    if (parent.scrollHeight > parent.clientHeight) {
-      eventParentElement = parent;
-      eventParentElement.addEventListener('scroll', parentScrollEvent);
-
-      return;
-    }
-
-    setScrollEvent(parent);
+  if (!parent || parent.tagName.toLowerCase() === 'html') {
+    return;
   }
+
+  // 스크롤 가능한 요소인지 확인 (overflow: auto/scroll)
+  const computedStyle = window.getComputedStyle(parent);
+  const overflow = computedStyle.overflow + computedStyle.overflowY + computedStyle.overflowX;
+
+  if (
+    overflow.includes('auto') ||
+    overflow.includes('scroll') ||
+    parent.scrollHeight > parent.clientHeight
+  ) {
+    const listener = () => {
+      if (isShow.value) {
+        isShow.value = false;
+      }
+    };
+
+    parent.addEventListener('scroll', listener, { passive: true });
+    scrollEventListeners.push({ element: parent, listener });
+  }
+
+  // 재귀적으로 상위 요소 탐색
+  setScrollEvent(parent);
 };
 
 /**
@@ -480,6 +526,17 @@ const dateTermCheck = (isEnd: boolean): void => {
   });
 };
 
+// window 스크롤 이벤트 추가
+const addWindowScrollEvent = (): void => {
+  const listener = () => {
+    if (isShow.value) {
+      isShow.value = false;
+    }
+  };
+  window.addEventListener('scroll', listener, { passive: true });
+  scrollEventListeners.push({ element: window, listener });
+};
+
 init();
 
 dateUpdate(props.modelValue);
@@ -511,19 +568,12 @@ if (props.modelValue) {
 }
 
 onMounted(() => {
-  // 달력 외의 영역 클릭시 달력 닫기
   document.addEventListener('click', outsideClickEvent);
-
-  // 스크롤 시 달력 닫기
-  setScrollEvent(el.value!);
 });
 
-onBeforeMount(() => {
-  if (eventParentElement) {
-    eventParentElement.removeEventListener('scroll', parentScrollEvent);
-  }
-
+onUnmounted(() => {
   document.removeEventListener('click', outsideClickEvent);
+  removeAllScrollEvents();
 });
 
 defineExpose({
@@ -534,10 +584,17 @@ defineExpose({
 </script>
 
 <template>
-  <div ref="el" :class="['date-picker', { block }]">
+  <div
+    ref="el"
+    :class="['date-picker', { block }]"
+    role="combobox"
+    :aria-expanded="isShow"
+    aria-haspopup="true"
+    :aria-describedby="message ? 'datepicker-error' : undefined"
+  >
     <div class="wrap" @click="toggleCalendar">
       <div class="options-wrap" v-if="props.label">
-        <label class="input-label">
+        <label class="input-label" :for="`datepicker-${props.label}`">
           {{ props.label }}
           <span class="required" v-if="props.required">*</span>
         </label>
@@ -549,30 +606,40 @@ defineExpose({
           'picker-date-text',
           { error: message, disabled: props.disabled, readonly: props.readonly, active: isShow },
         ]"
+        tabindex="0"
+        @keydown.enter="toggleCalendar"
+        @keydown.escape="isShow = false"
+        :aria-label="props.label ? `${props.label} 날짜 선택` : '날짜 선택'"
       >
         <input
           readonly
           type="text"
-          :placeholder="holderText[0]"
+          :placeholder="placeholderText[0]"
           :value="props.disabled ? '' : startDate"
+          :id="`datepicker-${props.label}`"
+          :aria-label="props.range ? '시작일' : '선택된 날짜'"
         />
         <template v-if="props.range">
-          <span class="input-group-text">~</span>
+          <span class="input-group-text" aria-label="날짜 범위 구분자">~</span>
           <input
             readonly
             type="text"
-            :placeholder="holderText[1]"
+            :placeholder="placeholderText[1]"
             :value="props.disabled ? '' : endDate"
+            aria-label="종료일"
           />
         </template>
 
-        <Icon icon="mdi:calendar-month" :width="22" :height="22" />
+        <Icon icon="mdi:calendar-month" :width="22" :height="22" aria-hidden="true" />
       </div>
 
       <div
         :class="['feedback', { error: errorTransition }]"
         @animationend="errorTransition = false"
         v-show="message && !props.hideMessage"
+        id="datepicker-error"
+        role="alert"
+        aria-live="polite"
       >
         {{ message }}
       </div>
@@ -580,28 +647,38 @@ defineExpose({
 
     <!-- 달력 표시 -->
     <Transition name="picker-scale" @leave="[emit('blur'), props.blurValidate && check()]">
-      <div ref="picker" class="picker-popup" v-show="isShow">
+      <div
+        ref="picker"
+        class="picker-popup"
+        v-show="isShow"
+        role="dialog"
+        aria-modal="true"
+        :aria-label="props.range ? '날짜 범위 선택' : '날짜 선택'"
+      >
         <template v-if="props.range">
-          <div class="search-date">
+          <div class="search-date" role="group" aria-label="빠른 날짜 선택">
             <a
               :key="v.text"
               href="#"
               :class="[v.checked && 'active']"
               @click.prevent="pickCaseDate(i)"
               v-for="(v, i) in toggleDateButton"
+              role="button"
+              :aria-pressed="v.checked"
+              :aria-label="v.text"
             >
               {{ v.text }}
             </a>
           </div>
 
-          <ul class="pick-name-text">
-            <li>시작일</li>
-            <li>종료일</li>
+          <ul class="pick-name-text" role="list">
+            <li role="listitem">시작일</li>
+            <li role="listitem">종료일</li>
           </ul>
         </template>
 
         <div class="picker-wrap">
-          <div class="calendar">
+          <div class="calendar" role="group" aria-label="시작일 달력">
             <DateController :max-year="maxYear" :min-year="minYear" />
 
             <CalendarPart
@@ -614,7 +691,7 @@ defineExpose({
           </div>
 
           <template v-if="props.range">
-            <div class="calendar">
+            <div class="calendar" role="group" aria-label="종료일 달력">
               <DateController end :max-year="maxYear" :min-year="minYear" />
 
               <CalendarPart
@@ -627,13 +704,33 @@ defineExpose({
               />
             </div>
 
-            <div class="btn-area">
-              <div :class="['select-date', { 'selected-error': selectedError }]">
+            <div class="btn-area" role="group" aria-label="날짜 선택 액션">
+              <div
+                :class="['select-date', { 'selected-error': selectedError }]"
+                role="status"
+                aria-live="polite"
+              >
                 {{ selectedDateView }}
               </div>
               <div>
-                <a href="#" class="cancel" @click.prevent="cancel">취소</a>
-                <a href="#" class="okay" @click.prevent="accept">적용</a>
+                <a
+                  href="#"
+                  class="cancel"
+                  @click.prevent="cancel"
+                  role="button"
+                  aria-label="날짜 선택 취소"
+                >
+                  취소
+                </a>
+                <a
+                  href="#"
+                  class="okay"
+                  @click.prevent="accept"
+                  role="button"
+                  aria-label="날짜 선택 적용"
+                >
+                  적용
+                </a>
               </div>
             </div>
           </template>
@@ -646,6 +743,7 @@ defineExpose({
 <style scoped lang="scss">
 @use './style';
 </style>
+
 <script lang="ts">
 export default { name: 'DatePicker' };
 </script>

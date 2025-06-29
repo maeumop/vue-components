@@ -1,7 +1,14 @@
-import type { DatePickerHelper } from './types';
+import type { DatePickerHelper, LayerPosition } from './types';
 
 class helper implements DatePickerHelper {
-  public getLayerPosition(input: HTMLDivElement, isRange: boolean = false) {
+  /**
+   * 달력 표시 전 처리
+   *
+   * @param input 달력 요소
+   * @param isRange 범위 선택 여부
+   * @returns 달력 위치 스타일
+   */
+  public getLayerPosition(input: HTMLDivElement, isRange: boolean = false): LayerPosition {
     // 달력 표시 전 처리
     const bodyRect: DOMRect = document.body.getBoundingClientRect();
     const rect: DOMRect = input.getBoundingClientRect();
@@ -9,7 +16,7 @@ class helper implements DatePickerHelper {
     const windowWidth: number = window.innerWidth;
     const pickerHeight: number = isRange ? 454 : 280;
 
-    const styles: any = {
+    const styles: LayerPosition = {
       top: '',
       bottom: '',
       right: '',
@@ -52,6 +59,7 @@ class helper implements DatePickerHelper {
    * @param d 날짜 객체
    * @param format 변경할 포멧
    * @param days 날짜 가감
+   * @returns 날짜 문자열
    */
   public getDateFormat(d: Date, format: string, days?: number) {
     let date = d;
@@ -92,6 +100,8 @@ class helper implements DatePickerHelper {
    * @param year
    * @param month
    * @param day
+   * @param s
+   * @returns 날짜 문자열
    */
   public getDateString(year: number, month: number, day: number, s: string) {
     let date: string = `${year}${s}`;
@@ -108,6 +118,7 @@ class helper implements DatePickerHelper {
    * @param year 연도
    * @param month 월
    * @param week 주 0 ~ 6
+   * @returns 전달의 마지막 날짜
    */
   public getBeforeDay(year: number, month: number, week: number) {
     const day = new Date(year, month, 0).getDate();

@@ -1,5 +1,5 @@
-import { ref, reactive } from 'vue';
-import type { DatePickerStore, DateStateType, SelectedDateType } from './types';
+import { reactive, ref } from 'vue';
+import type { DatePickerStore, DateStateType, DropdownStateType, SelectedDateType } from './types';
 
 /**
  * 기간 선택 달력에서 사용되는 참조용
@@ -40,6 +40,11 @@ export const useDatePickerStore = (): DatePickerStore => {
     end: '',
   });
 
+  const dropdownState = reactive<DropdownStateType>({
+    year: false,
+    month: false,
+  });
+
   /**
    * startDate update
    * @param v
@@ -73,6 +78,29 @@ export const useDatePickerStore = (): DatePickerStore => {
   };
 
   /**
+   * 드롭다운 상태 업데이트
+   * @param type year | month
+   * @param isOpen 열림/닫힘 상태
+   */
+  const setDropdownState = (type: 'year' | 'month', isOpen: boolean): void => {
+    // 다른 드롭다운이 열려있으면 닫기
+    if (isOpen) {
+      dropdownState.year = type === 'year';
+      dropdownState.month = type === 'month';
+    } else {
+      dropdownState[type] = false;
+    }
+  };
+
+  /**
+   * 모든 드롭다운 닫기
+   */
+  const closeAllDropdowns = (): void => {
+    dropdownState.year = false;
+    dropdownState.month = false;
+  };
+
+  /**
    * 각종 변수 초기화
    */
   const init = (): void => {
@@ -89,6 +117,7 @@ export const useDatePickerStore = (): DatePickerStore => {
 
     setStartDate('');
     setEndDate('');
+    closeAllDropdowns();
   };
 
   return {
@@ -100,10 +129,13 @@ export const useDatePickerStore = (): DatePickerStore => {
     dateState,
     beforeState,
     selectedDate,
+    dropdownState,
     setStartDate,
     setEndDate,
     setDateState,
     setSelected,
+    setDropdownState,
+    closeAllDropdowns,
     init,
   };
 };

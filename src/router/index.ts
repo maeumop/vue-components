@@ -93,6 +93,11 @@ const router = createRouter({
       name: 'selectbox',
       component: () => import('../components/Form/SelectBox/ex.vue'),
     },
+    {
+      path: '/components/datepicker',
+      name: 'datepicker',
+      component: () => import('../components/Form/DatePicker/ex.vue'),
+    },
   ],
 });
 

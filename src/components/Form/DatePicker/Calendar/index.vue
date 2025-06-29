@@ -1,230 +1,341 @@
 <script setup lang="ts">
-  import { inject, ref, watch } from 'vue';
-  import { transitionCase } from '../const';
-  import { useDatePickerHelper } from '../helper';
-  import type { DateCellType, DatePickerStore, DateStateValueType, TransitionCase } from '../types';
+import { computed, inject, nextTick, ref, watch } from 'vue';
+import { transitionCase } from '../const';
+import { useDatePickerHelper } from '../helper';
+import type {
+  CalendarEmits,
+  CalendarProps,
+  DateCellType,
+  DatePickerStore,
+  DateStateValueType,
+  TransitionCase,
+} from '../types';
 
-  const props = withDefaults(
-    defineProps<{
-      end?: boolean;
-      range: boolean;
-      separator: string;
-      maxRange: number;
-    }>(),
-    {
-      modelValue: '',
-      end: false,
-    },
-  );
+const props = withDefaults(defineProps<CalendarProps>(), {
+  modelValue: '',
+  end: false,
+});
 
-  const emit = defineEmits<{
-    (event: 'update:date', value: boolean): void;
-  }>();
+const emit = defineEmits<CalendarEmits>();
 
-  const store = inject('datePickerStore') as DatePickerStore;
-  const {
-    startDate,
-    endDate,
-    curYear,
-    curMonth,
-    curDay,
-    beforeState,
-    dateState,
-    selectedDate,
-    setStartDate,
-    setEndDate,
-    setSelected,
-  } = store;
-  const helper = useDatePickerHelper();
+const store = inject('datePickerStore') as DatePickerStore;
+const {
+  startDate,
+  endDate,
+  curYear,
+  curMonth,
+  curDay,
+  beforeState,
+  dateState,
+  selectedDate,
+  setStartDate,
+  setEndDate,
+  setSelected,
+} = store;
+const helper = useDatePickerHelper();
 
-  const caseStartEnd: string = props.end ? 'end' : 'start';
-  const before: DateStateValueType = beforeState[caseStartEnd];
-  const state: DateStateValueType = dateState[caseStartEnd];
+const caseStartEnd: string = props.end ? 'end' : 'start';
+const before: DateStateValueType = beforeState[caseStartEnd];
+const state: DateStateValueType = dateState[caseStartEnd];
 
-  const isShow = ref<boolean>(true);
+const isShow = ref<boolean>(true);
+const focusedDateIndex = ref<{ row: number; col: number } | null>(null);
 
-  const head: string[] = ['일', '월', '화', '수', '목', '금', '토'];
-  const transitionName = ref<TransitionCase>(transitionCase.down);
-  const dateRender = ref<DateCellType[][]>([]);
+const head: string[] = ['일', '월', '화', '수', '목', '금', '토'];
+const transitionName = ref<TransitionCase>(transitionCase.down);
 
-  watch([startDate, endDate], v => {
-    const date = props.end ? endDate.value : startDate.value;
+// 달력 데이터 메모이제이션
+const dateRender = computed<DateCellType[][]>(() => {
+  return generateCalendarData();
+});
 
-    if (v) {
-      setSelected(caseStartEnd, date);
-    } else {
-      setSelected(caseStartEnd, '');
-    }
-  });
+// 달력 데이터 생성 함수
+const generateCalendarData = (): DateCellType[][] => {
+  const startWeek: number = new Date(state.year, state.month - 1, 1).getDay();
+  const lastDay: number = new Date(state.year, state.month, 0).getDate();
 
-  watch(
-    () => state.year,
-    v => {
-      if (v > before.year) {
-        transitionName.value = transitionCase.down;
+  let day: number = 1;
+  let afterDay: number = 1;
+  let beforeDay: number = helper.getBeforeDay(state.year, state.month - 1, startWeek);
+
+  const startTime: number = new Date(startDate.value).getTime();
+  const endTime: number = new Date(endDate.value).getTime();
+
+  const calendarData: DateCellType[][] = [];
+
+  // 달력 총 7일 6줄을 생성한다
+  for (let i = 0; i < 6; i++) {
+    calendarData[i] = [];
+  }
+
+  let objData: DateCellType = { day: 0, type: '' };
+  const { year, month } = state;
+
+  for (let j = 0; j < 6 * 7; j++) {
+    if (j >= startWeek && day <= lastDay) {
+      const formatDate = helper.getDateString(year, month, day, props.separator);
+
+      if (selectedDate[caseStartEnd] === formatDate) {
+        objData = { day, type: 'selected' };
+      } else if (year === curYear.value && month === curMonth.value && day === curDay.value) {
+        objData = { day, type: 'today' };
       } else {
-        transitionName.value = transitionCase.up;
+        objData = { day, type: 'current' };
       }
 
-      isShow.value = false;
-    },
-  );
+      // 시작 날짜와 끝 날짜 사이에 색상 표시
+      if (objData.type !== 'selected' && props.range) {
+        const time = new Date(formatDate).getTime();
 
-  watch(
-    () => state.month,
-    v => {
-      if (v > before.month) {
-        transitionName.value = transitionCase.left;
-      } else {
-        transitionName.value = transitionCase.right;
-      }
-
-      isShow.value = false;
-    },
-  );
-  /**
-   * 날짜 선택
-   * 달력의 2차원 배열에 맞게 전달 값을 받아 날짜 정보 확인 후 처리
-   *
-   * @param tr 1차 배열 index
-   * @param td 2차 배열 index
-   * @param flag  start | end
-   */
-  const selectedDay = (tr: number, td: number): void => {
-    // 날짜 선택
-    const { type, day } = dateRender.value[tr][td];
-
-    if (['current', 'today', 'date-range'].includes(type)) {
-      const date: string = helper.getDateString(state.year, state.month, day, props.separator);
-      setSelected(caseStartEnd, date);
-
-      if (props.end) {
-        const startTime = new Date(startDate.value).getTime();
-        const endTime = new Date(selectedDate[caseStartEnd]).getTime();
-
-        if (endTime >= startTime) {
-          setEndDate(selectedDate[caseStartEnd]);
-        } else {
-          // 종료일이 시작일 보다 이전 날짜일 경우(오늘 날짜 선택가능) 이전 선택된 날짜로 돌린다.
-          setSelected(caseStartEnd, endDate.value);
-        }
-      } else {
-        setStartDate(selectedDate[caseStartEnd]);
-      }
-
-      emit('update:date', props.end);
-    }
-  };
-
-  /**
-   * 달력 랜더링 기초 데이터 생성
-   *
-   * @param flag start, end
-   */
-  const makeCalendar = (): void => {
-    const startWeek: number = new Date(state.year, state.month - 1, 1).getDay();
-    const lastDay: number = new Date(state.year, state.month, 0).getDate();
-
-    let day: number = 1;
-    let afterDay: number = 1;
-    let beforeDay: number = helper.getBeforeDay(state.year, state.month - 1, startWeek);
-
-    const startTime: number = new Date(startDate.value).getTime();
-    const endTime: number = new Date(endDate.value).getTime();
-
-    // 달력 총 7일 6줄을 생성한다
-    for (let i = 0; i < 6; i++) {
-      dateRender.value[i] = [];
-    }
-
-    let objData: DateCellType = { day: 0, type: '' };
-    const { year, month } = state;
-
-    for (let j = 0; j < 6 * 7; j++) {
-      if (j >= startWeek && day <= lastDay) {
-        const formatDate = helper.getDateString(year, month, day, props.separator);
-
-        if (selectedDate[caseStartEnd] === formatDate) {
-          objData = { day, type: 'selected' };
-        } else if (year === curYear.value && month === curMonth.value && day === curDay.value) {
-          objData = { day, type: 'today' };
-        } else {
-          objData = { day, type: 'current' };
-        }
-
-        // 시작 날짜와 끝 날짜 사이에 색상 표시
-        if (objData.type !== 'selected' && props.range) {
-          // 랜더링 하는 날짜의 time 값
-          const time = new Date(formatDate).getTime();
-
-          // 선택된 날짜 사이의 색상을 변경
-          if (selectedDate[caseStartEnd]) {
-            if (time >= startTime && time <= endTime) {
-              if (props.end === false && time >= startTime) {
-                objData.type = 'date-range';
-              } else if (props.end && time <= endTime) {
-                objData.type = 'date-range';
-              }
-            }
-
-            // 시작일과 종료일 기준으로 선택 할 수 없도록 처리
-            if (props.end && selectedDate[caseStartEnd] && time < startTime) {
-              objData.type = 'disabled';
-            } else if (props.end === false && selectedDate[caseStartEnd] && time > endTime) {
-              objData.type = 'disabled';
+        if (selectedDate[caseStartEnd]) {
+          if (time >= startTime && time <= endTime) {
+            if (props.end === false && time >= startTime) {
+              objData.type = 'date-range';
+            } else if (props.end && time <= endTime) {
+              objData.type = 'date-range';
             }
           }
-        }
 
-        day++;
-      } else if (day > lastDay) {
-        objData = { day: afterDay++, type: 'afterMonth' };
-      } else if (j < startWeek) {
-        objData = { day: beforeDay++, type: 'beforeMonth' };
+          // 시작일과 종료일 기준으로 선택 할 수 없도록 처리
+          if (props.end && selectedDate[caseStartEnd] && time < startTime) {
+            objData.type = 'disabled';
+          } else if (props.end === false && selectedDate[caseStartEnd] && time > endTime) {
+            objData.type = 'disabled';
+          }
+        }
       }
 
-      const index = Math.floor(j / 7);
-      dateRender.value[index][j % 7] = objData;
+      day++;
+    } else if (day > lastDay) {
+      objData = { day: afterDay++, type: 'afterMonth' };
+    } else if (j < startWeek) {
+      objData = { day: beforeDay++, type: 'beforeMonth' };
     }
-  };
 
-  const resetTransition = (): void => {
-    setTimeout(() => {
-      makeCalendar();
-      isShow.value = true;
-    }, 30);
-  };
+    const index = Math.floor(j / 7);
+    calendarData[index][j % 7] = objData;
+  }
 
-  const resetSelected = (): void => {
+  return calendarData;
+};
+
+// 날짜 선택 처리
+const selectedDay = (tr: number, td: number): void => {
+  const { type, day } = dateRender.value[tr][td];
+
+  if (['current', 'today', 'date-range'].includes(type)) {
+    const date: string = helper.getDateString(state.year, state.month, day, props.separator);
+    setSelected(caseStartEnd, date);
+
+    if (props.end) {
+      const startTime = new Date(startDate.value).getTime();
+      const endTime = new Date(selectedDate[caseStartEnd]).getTime();
+
+      if (endTime >= startTime) {
+        setEndDate(selectedDate[caseStartEnd]);
+      } else {
+        setSelected(caseStartEnd, endDate.value);
+      }
+    } else {
+      setStartDate(selectedDate[caseStartEnd]);
+    }
+
+    emit('update:date', props.end);
+  }
+};
+
+// 키보드 네비게이션
+const handleKeydown = (event: KeyboardEvent, row: number, col: number): void => {
+  const { type } = dateRender.value[row][col];
+
+  if (['beforeMonth', 'afterMonth', 'disabled'].includes(type)) {
+    return;
+  }
+
+  let newRow = row;
+  let newCol = col;
+
+  switch (event.key) {
+    case 'ArrowLeft':
+      if (col > 0) {
+        newCol = col - 1;
+      } else if (row > 0) {
+        newRow = row - 1;
+        newCol = 6;
+      }
+      break;
+    case 'ArrowRight':
+      if (col < 6) {
+        newCol = col + 1;
+      } else if (row < 5) {
+        newRow = row + 1;
+        newCol = 0;
+      }
+      break;
+    case 'ArrowUp':
+      if (row > 0) {
+        newRow = row - 1;
+      }
+      break;
+    case 'ArrowDown':
+      if (row < 5) {
+        newRow = row + 1;
+      }
+      break;
+    case 'Enter':
+    case ' ':
+      event.preventDefault();
+      selectedDay(row, col);
+      return;
+    default:
+      return;
+  }
+
+  // 유효한 날짜인지 확인
+  const newCell = dateRender.value[newRow]?.[newCol];
+  if (newCell && !['beforeMonth', 'afterMonth', 'disabled'].includes(newCell.type)) {
+    focusedDateIndex.value = { row: newRow, col: newCol };
+  }
+};
+
+// 포커스 설정
+const setFocus = (row: number, col: number): void => {
+  focusedDateIndex.value = { row, col };
+};
+
+// 날짜 셀의 ARIA 라벨 생성
+const getAriaLabel = (cell: DateCellType): string => {
+  const { day, type } = cell;
+
+  if (type === 'beforeMonth' || type === 'afterMonth') {
+    return `${day}일 (다른 달)`;
+  }
+
+  if (type === 'disabled') {
+    return `${day}일 (선택 불가)`;
+  }
+
+  if (type === 'today') {
+    return `${day}일 (오늘)`;
+  }
+
+  if (type === 'selected') {
+    return `${day}일 (선택됨)`;
+  }
+
+  if (type === 'date-range') {
+    return `${day}일 (범위 내)`;
+  }
+
+  return `${day}일`;
+};
+
+// 날짜 셀의 선택 가능 여부 확인
+const isSelectable = (type: string): boolean => {
+  return ['current', 'today', 'date-range'].includes(type);
+};
+
+// 날짜 셀의 포커스 가능 여부 확인
+const isFocusable = (type: string): boolean => {
+  return !['beforeMonth', 'afterMonth', 'disabled'].includes(type);
+};
+
+watch([startDate, endDate], v => {
+  const date = props.end ? endDate.value : startDate.value;
+
+  if (v) {
+    setSelected(caseStartEnd, date);
+  } else {
     setSelected(caseStartEnd, '');
-  };
+  }
+});
 
-  makeCalendar();
+watch(
+  () => state.year,
+  v => {
+    if (v > before.year) {
+      transitionName.value = transitionCase.down;
+    } else {
+      transitionName.value = transitionCase.up;
+    }
 
-  defineExpose({
-    resetSelected,
-    makeCalendar,
-  });
+    isShow.value = false;
+  },
+);
+
+watch(
+  () => state.month,
+  v => {
+    if (v > before.month) {
+      transitionName.value = transitionCase.left;
+    } else {
+      transitionName.value = transitionCase.right;
+    }
+
+    isShow.value = false;
+  },
+);
+
+const resetTransition = (): void => {
+  setTimeout(() => {
+    isShow.value = true;
+    // 포커스 초기화
+    nextTick(() => {
+      focusedDateIndex.value = null;
+    });
+  }, 30);
+};
+
+const resetSelected = (): void => {
+  setSelected(caseStartEnd, '');
+};
+
+defineExpose({
+  resetSelected,
+  makeCalendar: () => {
+    // computed로 변경되어 자동으로 업데이트됨
+  },
+});
 </script>
 
 <template>
-  <div class="select-calendar-wrap">
+  <div
+    class="select-calendar-wrap"
+    role="grid"
+    :aria-label="props.end ? '종료일 달력' : '시작일 달력'"
+  >
     <Transition :name="transitionName" @after-leave="resetTransition">
       <div class="select-calendar" v-show="isShow">
-        <ul class="header">
+        <ul class="header" role="row">
           <li
             :key="`start-head-${name}`"
             :class="{ sun: i === 0, sat: i === 6 }"
             v-for="(name, i) in head"
+            role="columnheader"
+            :aria-label="`${name}요일`"
           >
             {{ name }}
           </li>
         </ul>
-        <ul :key="`start-tr-${i}`" v-for="(li, i) in dateRender">
+        <ul :key="`start-tr-${i}`" v-for="(li, i) in dateRender" role="row">
           <li
             :key="`calendar-${item.type}-${item.day}`"
-            :class="[item.type, { sun: j === 0, sat: j === 6 }]"
+            :class="[
+              item.type,
+              {
+                sun: j === 0,
+                sat: j === 6,
+                focused: focusedDateIndex?.row === i && focusedDateIndex?.col === j,
+              },
+            ]"
             @click.prevent="selectedDay(i, j)"
+            @keydown="handleKeydown($event, i, j)"
+            @focus="setFocus(i, j)"
+            :tabindex="isFocusable(item.type) ? 0 : -1"
+            :aria-label="getAriaLabel(item)"
+            :aria-selected="item.type === 'selected'"
+            :aria-disabled="!isSelectable(item.type)"
+            role="gridcell"
             v-for="(item, j) in li"
           >
             {{ item.day }}
@@ -236,5 +347,5 @@
 </template>
 
 <style scoped lang="scss">
-  @use './style';
+@use './style';
 </style>

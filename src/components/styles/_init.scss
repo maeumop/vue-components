@@ -44,12 +44,12 @@ $scrollbar-color: (
 $white: #ffffff !default;
 $gray-900: #141414 !default;
 $gray-800: #262626 !default;
-// $gray-700: #434343;
+$gray-700: #434343 !default;
 
 /// [TextField|SelectBox] .btn-clear svg 초기화 버튼 아이콘 공통 색상
 $gray-600: #595959 !default;
 
-// $gray-500: #9e9e9e;
+$gray-500: #9e9e9e !default;
 
 /// [CheckButton] svg 버튼 아이콘 공통 색상
 /// [StyledButton] .text svg 버튼 아이콘 공통 색상
@@ -60,7 +60,7 @@ $gray-400: #bfbfbf !default;
 /// [CheckButton] :disabled svg 버튼 아이콘 공통 색상
 /// [SwitchButton] 버튼 기본 배경 색상
 $gray-300: #d9d9d9 !default;
-// $gray-200: #f0f0f0;
+$gray-200: #f0f0f0 !default;
 
 /// [TextField|NumberFormat] [:disabled|:read-only] 배경 공통 색상
 /// [ListTable] tr:hover 공통 색상

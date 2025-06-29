@@ -1,6 +1,5 @@
-import type { KeyIndex, RuleFunc } from '../../types';
-
 import type { Ref } from 'vue';
+import type { RuleFunc } from '../../types';
 import type { transitionCase } from './const';
 
 export type TransitionCase = (typeof transitionCase)[keyof typeof transitionCase];
@@ -10,19 +9,19 @@ export interface ToggleButtonType {
   checked: boolean;
 }
 
-export interface TimeoutType extends KeyIndex<number> {}
+export type TimeoutType = Record<string, number>;
 
 export interface DateCellType {
   day: number;
   type: string;
 }
 
-export interface DateStateValueType extends KeyIndex<number> {
+export interface DateStateValueType extends Record<string, number> {
   year: number;
   month: number;
 }
 
-export interface DateStateType extends KeyIndex<DateStateValueType> {
+export interface DateStateType extends Record<string, DateStateValueType> {
   start: DateStateValueType;
   end: DateStateValueType;
 }
@@ -32,9 +31,14 @@ export interface DateOptionType {
   month: number[];
 }
 
-export interface SelectedDateType extends KeyIndex<string> {
+export interface SelectedDateType extends Record<string, string> {
   start: string;
   end: string;
+}
+
+export interface DropdownStateType {
+  year: boolean;
+  month: boolean;
 }
 
 export interface DatePickerModel {
@@ -57,15 +61,26 @@ export interface DatePickerStore {
   dateState: DateStateType;
   beforeState: DateStateType;
   selectedDate: SelectedDateType;
+  dropdownState: DropdownStateType;
   setStartDate(v: string): void;
   setEndDate(v: string): void;
   setDateState(main: string, sub: string, v: number): void;
   setSelected(flag: string, v: string): void;
+  setDropdownState(type: 'year' | 'month', isOpen: boolean): void;
+  closeAllDropdowns(): void;
   init(): void;
 }
 
+export interface LayerPosition {
+  top: string;
+  bottom: string;
+  left: string;
+  right: string;
+  transformOrigin: string;
+}
+
 export interface DatePickerHelper {
-  getLayerPosition(input: HTMLDivElement, isRange?: boolean): any;
+  getLayerPosition(input: HTMLDivElement, isRange?: boolean): LayerPosition;
   getDateFormat(d: Date, format: string, days?: number): string;
   getDateString(year: number, month: number, day: number, s: string): string;
   getBeforeDay(year: number, month: number, week: number): number;
@@ -94,4 +109,28 @@ export interface DatePickerEmits {
   (event: 'update:modelValue', value: string[] | string): void;
   (event: 'update:set', value: string[] | string): void;
   (event: 'blur'): void;
+}
+
+export interface CalendarProps {
+  end?: boolean;
+  range: boolean;
+  separator: string;
+}
+
+export interface CalendarEmits {
+  (event: 'update:date', value: boolean): void;
+}
+
+export interface SelectorProps {
+  year?: boolean;
+  month?: boolean;
+  end?: boolean;
+  max?: number;
+  min?: number;
+}
+
+export interface DateControllerProps {
+  end?: boolean;
+  maxYear: number;
+  minYear: number;
 }

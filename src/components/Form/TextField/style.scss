@@ -1,4 +1,4 @@
-@import '@/components/styles/index.scss';
+@use '@/components/styles/index.scss' as *;
 
 .input-wrap {
   display: inline-block;

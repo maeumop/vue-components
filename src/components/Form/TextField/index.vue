@@ -282,8 +282,9 @@ defineExpose({
 </template>
 
 <style lang="scss" scoped>
-@import './style.scss';
+@use './style.scss' as *;
 </style>
+
 <script lang="ts">
 export default { name: 'TextField' };
 </script>

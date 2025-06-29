@@ -1,35 +1,69 @@
 @charset "UTF-8";
 /* @/components/Form/DatePicker/_style.scss */
 
-@use "sass:map";
-@use "../../styles" as _;
-@use "../../common";
+@use 'sass:map';
+@use '../../styles' as _;
+@use '../../common';
 
 /// date-picker의 a 버튼 공통 스타일
 @mixin picker-button {
-  // .search-date > a
-  // .btn-area  a
   display: inline-block;
   text-decoration: none;
   border: 0.1rem solid _.$gray-300;
   border-radius: 0.4rem;
-  font-size: 1.4rem;
-  padding: 0.8rem 1.2rem;
+  font-size: 0.9rem;
+  padding: 0.6rem 1rem;
   color: _.$text-default;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    background-color: _.$gray-200;
+  }
 }
 
 /// @access private
-$-button-colors: _.fn-getButtonColors();
+$_button-colors: _.getButtonColors();
 
 .date-picker {
   position: relative;
   display: inline-block;
+  max-width: 300px;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+
+  &.block {
+    max-width: none;
+    width: 100%;
+  }
+
+  .wrap {
+    width: 100%;
+  }
+
+  .options-wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+
+    .input-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #333;
+      margin: 0;
+      cursor: pointer;
+
+      .required {
+        color: #dc3545;
+        margin-left: 0.25rem;
+      }
+    }
+  }
 
   .picker-popup {
     position: fixed;
@@ -41,14 +75,16 @@ $-button-colors: _.fn-getButtonColors();
 
     .pick-name-text {
       border-bottom: 0.1rem solid _.$gray-300;
-
       display: flex;
       align-items: center;
       justify-content: center;
+      margin: 0;
+      padding: 0;
+      list-style: none;
 
       li {
-        line-height: 4.5rem;
-        font-size: 1.5rem;
+        line-height: 3;
+        font-size: 1rem;
         font-weight: 400;
         width: 100%;
         text-align: center;
@@ -64,7 +100,6 @@ $-button-colors: _.fn-getButtonColors();
         display: inline-block;
         box-sizing: border-box;
         vertical-align: top;
-        height: 28.4rem;
 
         & + .calendar {
           border-left: 0.1rem solid _.$gray-300;
@@ -85,30 +120,26 @@ $-button-colors: _.fn-getButtonColors();
         margin-left: 0.3rem;
       }
 
-      &:not(&.active):hover {
-        background-color: _.$gray-100;
-      }
-
       &.active {
-        @if map.has-key($-button-colors, primary) {
-          color: map.get($-button-colors, primary, text);
-          border-color: map.get($-button-colors, primary, default);
+        @if map.has-key($_button-colors, primary) {
+          color: map.get($_button-colors, primary, text);
+          border-color: map.get($_button-colors, primary, default);
+          background-color: map.get($_button-colors, primary, default);
         }
       }
     }
   }
 
   .btn-area {
-    // 취소, 적용 버튼 라인
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     padding: 1rem;
     border-top: 0.1rem solid _.$gray-300;
 
     .select-date {
       font-size: 0.9em;
+      color: _.$text-default;
 
       &.selected-error {
         color: _.$danger;
@@ -118,116 +149,164 @@ $-button-colors: _.fn-getButtonColors();
     a {
       @include picker-button;
 
-      &:hover {
-        background-color: _.$gray-100;
-      }
-
       &.okay {
         margin-left: 0.5rem;
 
-        @if map.has-key($-button-colors, primary) {
+        @if map.has-key($_button-colors, primary) {
           color: #fff;
-          border-color: map.get($-button-colors, primary, default);
-          background-color: map.get($-button-colors, primary, default);
+          border-color: map.get($_button-colors, primary, default);
+          background-color: map.get($_button-colors, primary, default);
+
           &:hover {
-            border-color: map.get($-button-colors, primary, hover);
-            background-color: map.get($-button-colors, primary, hover);
+            border-color: map.get($_button-colors, primary, hover);
+            background-color: map.get($_button-colors, primary, hover);
           }
         }
       }
     }
   }
-  /// @deprecated  .show class 확인 불가 스타일
-  // &.show .picker-popup {
-  //   display: block;
-  // }
-
-  /// @deprecated .show class 확인 불가 스타일
-  // &.show .picker-date-text:after {
-  //   transform: rotate(-180deg);
-  //   transition: all 0.5s;
-  // }
 
   .picker-date-text {
     width: 100%;
     border: 0.1rem solid _.$gray-300;
     border-radius: 0.4rem;
-    height: 4rem;
-    padding: 1rem 1.5rem;
+    height: auto;
+    padding: 0;
     margin: 0;
-
     display: flex;
     flex-direction: row;
     align-items: center;
+    background-color: #fff;
+    transition:
+      border-color 0.15s ease-in-out,
+      box-shadow 0.15s ease-in-out;
+    cursor: pointer;
 
     input {
       border: 0 !important;
       flex: 1;
-      padding: 0;
+      padding: 0.75rem;
       margin: 0;
       width: 100%;
       text-align: center;
       background-color: transparent;
       color: _.$text-default;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      cursor: pointer;
 
       &:focus {
         outline: none;
       }
 
       &::placeholder {
-        font-size: 1.4rem;
+        font-size: 0.875rem;
         font-weight: 400;
         color: _.$text-placeholder;
       }
     }
 
-    svg {
-      margin-top: 0.2rem;
-      color: _.$gray-800;
+    .input-group-text {
+      margin: 0 0.5rem;
+      color: _.$gray-600;
+      font-weight: 500;
+    }
 
-      /// @deprecated 사용하는 부분 미확인
-      // & + input {
-      //   margin-left: 0.5rem;
-      // }
+    svg {
+      margin-right: 0.75rem;
+      color: _.$gray-800;
     }
 
     &.active {
       border-color: _.$primary;
+      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
     }
 
     &.error {
       border-color: _.$danger;
-
-      & * {
-        color: _.$danger;
-      }
+      box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
     }
 
-    &:not(.readonly, .disabled) {
-      // 달력 아이콘 활성화
-      svg {
-        cursor: pointer;
-      }
-    }
-
-    &.readonly,
     &.disabled {
       background-color: _.$gray-100;
+      color: _.$gray-500;
+      cursor: not-allowed;
+
+      input {
+        color: _.$gray-500;
+        cursor: not-allowed;
+      }
+
+      svg {
+        color: _.$gray-400;
+      }
     }
 
-    &.disabled > :not(svg) {
-      color: _.$text-placeholder;
+    &.readonly {
+      background-color: _.$gray-100;
+      cursor: default;
+    }
+  }
+
+  .feedback {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: _.$danger;
+    min-height: 1rem;
+    opacity: 0;
+    transform: translateY(-0.25rem);
+    transition:
+      opacity 0.3s ease-in-out,
+      transform 0.3s ease-in-out;
+
+    &.error {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 }
 
-// transitions
+// 트랜지션 애니메이션
 .picker-scale-enter-from,
 .picker-scale-leave-to {
   opacity: 0;
-  transform: scale(0.5);
+  transform: scale(0.95);
 }
+
 .picker-scale-enter-active,
 .picker-scale-leave-active {
-  transition: all 0.2s ease-out;
+  transition: all 0.2s ease;
+}
+
+// 반응형 디자인
+@media (max-width: 768px) {
+  .date-picker {
+    .picker-popup {
+      position: fixed;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      width: 90vw;
+      max-width: 400px;
+    }
+
+    .picker-wrap {
+      .calendar {
+        display: block;
+        width: 100%;
+
+        & + .calendar {
+          border-left: none;
+          border-top: 0.1rem solid _.$gray-300;
+        }
+      }
+    }
+
+    .search-date {
+      a {
+        font-size: 0.9rem;
+        padding: 0.6rem 0.8rem;
+      }
+    }
+  }
 }
