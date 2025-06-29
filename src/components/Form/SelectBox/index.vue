@@ -38,23 +38,39 @@ const props = withDefaults(defineProps<SelectBoxProps>(), {
 
 const emit = defineEmits<SelectBoxEmits>();
 
+// 반응형 상태
 const isValidate = ref<boolean>(true);
 const message = ref<string>('');
 const errorTransition = ref<boolean>(false);
 const isShowOption = ref<boolean>(false);
 const showBottom = ref<boolean>(false);
-// 검색어 입력중인지 체크 변수
 const isSearchFilter = ref<boolean>(false);
+const transitionStatus = ref<boolean>(false);
 
-const selectedText = ref<any>(props.multiple ? [] : '');
-const selectedValue = ref<any>(props.multiple ? [] : '');
+// 선택된 값들
+const selectedText = ref<string | string[]>(props.multiple ? [] : '');
+const selectedValue = ref<string | string[]>(props.multiple ? [] : '');
 
-const optionList = ref<SelectBoxItem[]>([]);
+// 옵션 리스트 (메모이제이션 적용)
+const optionList = computed(() => {
+  if (isSearchFilter.value && props.searchable) {
+    return props.options.filter(({ text }) =>
+      text.toLowerCase().includes(searchText.value.toLowerCase()),
+    );
+  }
+  return props.options;
+});
 
-const SelectBox = ref<HTMLSelectElement>();
-const searchInput = ref<HTMLInputElement>();
-const ul = ref<HTMLUListElement>();
+// 검색 텍스트
+const searchText = ref<string>('');
 
+// DOM 참조
+const SelectBox = ref<HTMLDivElement>();
+const SearchInput = ref<HTMLInputElement>();
+const OptionList = ref<HTMLUListElement>();
+const main = ref<HTMLDivElement>();
+
+// 레이어 위치 스타일
 const layerPositionStyle = reactive<CSSProperties>({
   top: '',
   left: '',
@@ -64,6 +80,54 @@ const layerPositionStyle = reactive<CSSProperties>({
 
 const selectedKeyIndex = ref<number>(0);
 
+// 이벤트 리스너 참조 (메모리 누수 방지)
+let timeout: number = 0;
+
+// 스크롤 이벤트 리스너 배열 (여러 요소에 등록할 수 있도록)
+const scrollEventListeners: Array<{
+  element: HTMLElement | Window;
+  listener: () => void;
+}> = [];
+
+// Computed 속성들
+const isSelectAll = computed<boolean>(() => {
+  if (!props.multiple || !Array.isArray(selectedValue.value)) {
+    return false;
+  }
+
+  return (
+    optionList.value.length > 0 &&
+    optionList.value.every(item => selectedValue.value.includes(item.value))
+  );
+});
+
+const wrapperStyle = computed<StyleValue>(() => ({
+  block: props.block,
+}));
+
+const getShowText = computed<string[]>(() => {
+  if (props.btnAccept) {
+    return Array.isArray(selectedText.value) ? selectedText.value : [selectedText.value];
+  }
+
+  const values: string[] = Array.isArray(props.modelValue) ? props.modelValue : [props.modelValue];
+
+  return props.options.filter(option => values.includes(option.value)).map(({ text }) => text);
+});
+
+const clearButtonShow = computed<boolean>(() => {
+  if (!props.clearable || props.disabled || props.readonly) {
+    return false;
+  }
+
+  if (Array.isArray(props.modelValue)) {
+    return props.modelValue.length > 0;
+  }
+
+  return !!props.modelValue;
+});
+
+// Watch 함수들
 watch(
   () => props.errorMessage,
   v => {
@@ -91,7 +155,6 @@ watch(
 watch(
   () => props.options,
   () => {
-    optionList.value = [...props.options];
     setDefaultModelValue();
   },
   { deep: true },
@@ -102,58 +165,29 @@ watch(
   v => v && resetValidate(),
 );
 
-const isSelectAll = computed<boolean>(() => {
-  if (props.multiple) {
-    return optionList.value.length > 0
-      ? optionList.value.every(item => (selectedValue.value as string[]).includes(item.value))
-      : false;
-  }
-
-  return false;
-});
-
-const wrapperStyle = computed<StyleValue>(() => {
-  return {
-    // error: !isValidate.value,
-    block: props.block,
-  };
-});
-
-const getShowText = computed<string[]>(() => {
-  if (props.btnAccept) {
-    return Array.isArray(selectedText.value) ? selectedText.value : [selectedText.value];
-  }
-  const values: string[] = Array.isArray(props.modelValue) ? props.modelValue : [props.modelValue];
-  return props.options.filter(option => values.includes(option.value)).map(({ text }) => text);
-});
-
-/**
- * 초기 modelValue 바로 대입할시 selectedValue의 값이 modelValue 메모리를 참조
- * 다중선택(btnAccept) 적용 버튼을 만족 시키기 위해 구조분해 할당 적용
- */
-const setDefaultModelValue = () => {
+// 메서드들
+const setDefaultModelValue = (): void => {
   if (Array.isArray(props.modelValue)) {
     selectedValue.value = [...props.modelValue];
+  } else {
+    selectedValue.value = '';
   }
 
   if (props.multiple) {
     selectedText.value = [];
   } else {
     selectedText.value = '';
-    selectedValue.value = '';
   }
 
   props.options.forEach(item => {
     if (props.multiple && Array.isArray(props.modelValue)) {
-      if (props.modelValue.includes(item.value as never)) {
+      if (props.modelValue.includes(item.value) && Array.isArray(selectedText.value)) {
         selectedText.value.push(item.text);
-        return;
       }
     } else {
       if (props.modelValue === item.value) {
         selectedText.value = item.text;
         selectedValue.value = item.value;
-        return;
       }
     }
   });
@@ -162,94 +196,80 @@ const setDefaultModelValue = () => {
 const updateValue = (v: string | string[], index: number = -1): void => {
   emit('update:modelValue', v);
   emit('update:selectedIndex', index);
+  emit('change', v);
   check();
 };
 
-/**
- * 유효성 검사
- */
 const check = (silence: boolean = false): boolean => {
-  if (!props.disabled) {
-    // 폼을 검수하여 값을 반환, 임의로 지정된 에러가 없는 경우
-    // validate check
-    if (!props.errorMessage && props.validate.length) {
-      for (let i: number = 0; i < props.validate.length; i++) {
-        const result: string | boolean = props.validate[i](selectedValue.value);
-
-        if (typeof result === 'string') {
-          if (!silence) {
-            message.value = result;
-            isValidate.value = false;
-            errorTransition.value = true;
-          }
-
-          return false;
-        }
-      }
-    }
-
-    message.value = '';
-    isValidate.value = true;
+  if (props.disabled) {
+    return true;
   }
 
+  if (!props.errorMessage && props.validate.length) {
+    for (let i: number = 0; i < props.validate.length; i++) {
+      const result: string | boolean = props.validate[i](selectedValue.value);
+
+      if (typeof result === 'string') {
+        if (!silence) {
+          message.value = result;
+          isValidate.value = false;
+          errorTransition.value = true;
+        }
+        return false;
+      }
+    }
+  }
+
+  message.value = '';
+  isValidate.value = true;
   return true;
 };
 
-/**
- * 폼 value 초기화
- */
 const resetForm = (): void => {
   if (props.multiple) {
     selectedText.value = [];
     selectedValue.value = [];
-
     emit('update:modelValue', []);
   } else {
     selectedText.value = '';
     selectedValue.value = '';
-
     emit('update:modelValue', '');
   }
 };
 
-/**
- * 유효성 검사 초기화
- */
 const resetValidate = (): void => {
   message.value = '';
   isValidate.value = true;
   errorTransition.value = false;
 };
 
-/**
- * options 항목 선택 이벤트
- *
- * @param index
- */
-const selectOption = (v: any): void => {
+const selectOption = (v: string): void => {
   let index = -1;
-
-  const [{ text }] = optionList.value.filter((item, i) => {
+  const selectedItem = optionList.value.find((item, i) => {
     if (item.value === v) {
       index = i;
       return true;
     }
+    return false;
   });
 
-  if (props.multiple) {
+  if (!selectedItem) {
+    return;
+  }
+
+  if (props.multiple && Array.isArray(selectedValue.value) && Array.isArray(selectedText.value)) {
     const indexOf: number = selectedValue.value.indexOf(v);
 
     if (indexOf > -1) {
-      // 이미 선택된 값이라면 값 제거
       selectedValue.value.splice(indexOf, 1);
       selectedText.value.splice(indexOf, 1);
     } else {
       selectedValue.value.push(v);
-      selectedText.value.push(text);
+      selectedText.value.push(selectedItem.text);
     }
   } else {
     selectedValue.value = v;
-    selectedText.value = text;
+    selectedText.value = selectedItem.text;
   }
 
   if (!props.btnAccept) {
@@ -261,21 +281,15 @@ const selectOption = (v: any): void => {
   }
 };
 
-/**
- * 이미 선택된 옵션인지 판별
- *
- * @param index
- */
-const isOptionSelected = (v: any): boolean => {
+const isOptionSelected = (v: string): boolean => {
   if (props.multiple) {
-    return selectedValue.value.includes(v);
+    return Array.isArray(selectedValue.value) && selectedValue.value.includes(v);
   }
-
   return props.modelValue === v;
 };
 
 const removeSelected = (index: number): void => {
-  if (props.multiple) {
+  if (props.multiple && Array.isArray(selectedValue.value) && Array.isArray(selectedText.value)) {
     selectedText.value.splice(index, 1);
     selectedValue.value.splice(index, 1);
   }
@@ -285,173 +299,154 @@ const removeSelected = (index: number): void => {
   }
 };
 
-/**
- * 검색 유무에 따른 옵션 focus인지 판별
- * @param i
- */
 const isOptionFocused = (i: number): boolean => {
   let index: number = i;
-
   if (props.multiple) {
     index = !isSearchFilter.value ? i + 1 : i;
   }
-
   return selectedKeyIndex.value === index;
 };
 
-/**
- * 전체 선택
- */
 const selectAll = (): void => {
-  if (props.multiple) {
-    const value: boolean = isSelectAll.value;
+  if (!props.multiple) {
+    return;
+  }
 
-    selectedText.value = [];
-    selectedValue.value = [];
+  const value: boolean = isSelectAll.value;
+  selectedText.value = [];
+  selectedValue.value = [];
 
-    if (!value) {
-      optionList.value.forEach(({ text, value }) => {
-        selectedText.value.push(text);
-        selectedValue.value.push(value);
-      });
-    }
+  if (!value) {
+    optionList.value.forEach(({ text, value }) => {
+      (selectedText.value as string[]).push(text);
+      (selectedValue.value as string[]).push(value);
+    });
+  }
 
-    if (!props.btnAccept) {
-      updateValue([...selectedValue.value]);
-    }
+  if (!props.btnAccept) {
+    updateValue([...selectedValue.value]);
   }
 };
 
-const transitionStatus = ref<boolean>(false);
-
-/**
- * 옵션 목록 표시
- */
 const toggleOption = (): void => {
-  if (!props.disabled && !props.readonly && !transitionStatus.value) {
-    if (!isShowOption.value) {
-      const windowHeight: number = window.innerHeight;
-      const rect: DOMRect = SelectBox.value!.getBoundingClientRect();
+  if (props.disabled || props.readonly || transitionStatus.value) {
+    return;
+  }
 
-      if (windowHeight / 2 < rect.top) {
-        showBottom.value = true;
-      } else {
-        showBottom.value = false;
-      }
+  if (!isShowOption.value) {
+    calculateLayerPosition();
+  }
 
-      layerPositionStyle.top = '';
-      layerPositionStyle.bottom = '';
+  isShowOption.value = !isShowOption.value;
 
-      layerPositionStyle.left = `${rect.left}px`;
-      layerPositionStyle.width = `${rect.width}px`;
-      layerPositionStyle.bottom = showBottom.value ? `${windowHeight - rect.top + 3}px` : '';
-      layerPositionStyle.top = !showBottom.value ? `${rect.top + 43}px` : '';
+  if (isShowOption.value) {
+    if (props.searchable && SearchInput.value) {
+      SearchInput.value.value = '';
+      searchText.value = '';
+      isSearchFilter.value = false;
     }
 
-    isShowOption.value = !isShowOption.value;
-    if (isShowOption.value) {
-      if (props.searchable) {
-        searchInput.value!.value = '';
-        isSearchFilter.value = false;
-      }
+    selectedKeyIndex.value = 0;
 
-      selectedKeyIndex.value = 0;
-      optionList.value = [...props.options];
-
-      nextTick(() => {
-        const selected = ul.value?.querySelector('.selected');
-        selected?.scrollIntoView();
-      });
-    }
+    nextTick(() => {
+      const selected = OptionList.value?.querySelector('.selected');
+      selected?.scrollIntoView();
+    });
   }
 };
 
-let timeout: number = 0;
+const calculateLayerPosition = (): void => {
+  const windowHeight: number = window.innerHeight;
+  const rect: DOMRect | undefined = SelectBox.value?.getBoundingClientRect();
 
-// props.searchable 적용시
-const searchText = (evt: KeyboardEvent): void => {
+  if (!rect) {
+    return;
+  }
+
+  showBottom.value = windowHeight / 2 < rect.top;
+
+  layerPositionStyle.top = '';
+  layerPositionStyle.bottom = '';
+  layerPositionStyle.left = `${rect.left}px`;
+  layerPositionStyle.width = `${rect.width}px`;
+
+  if (showBottom.value) {
+    layerPositionStyle.bottom = `${windowHeight - rect.top + 6}px`;
+  } else {
+    layerPositionStyle.top = `${rect.top + rect.height + 6}px`;
+  }
+};
+
+const searchTextHandler = (evt: KeyboardEvent): void => {
   const key = evt.key.toLowerCase();
-
   clearTimeout(timeout);
 
-  if (!['arrowup', 'arrowdown', 'enter'].includes(key)) {
-    selectedKeyIndex.value = 0;
-    timeout = setTimeout(() => {
-      const { value } = evt.target as HTMLInputElement;
-      isSearchFilter.value = value ? true : false;
-      if (value) {
-        optionList.value = props.options.filter(
-          ({ text }) => text.toLowerCase().indexOf(value) > -1,
-        );
-      } else {
-        optionList.value = [...props.options];
-      }
-
-      nextTick(() => {
-        const li = ul.value?.querySelector<HTMLLIElement>('.option-item');
-        li?.scrollIntoView({ block: 'center' });
-      });
-    }, 300);
+  if (['arrowup', 'arrowdown', 'enter'].includes(key)) {
+    return;
   }
+
+  selectedKeyIndex.value = 0;
+  timeout = setTimeout(() => {
+    const { value } = evt.target as HTMLInputElement;
+    searchText.value = value;
+    isSearchFilter.value = !!value;
+
+    nextTick(() => {
+      if (OptionList.value) {
+        const li = OptionList.value.querySelector<HTMLLIElement>('.option-item');
+        li?.scrollIntoView({ block: 'center' });
+      }
+    });
+  }, 300);
 };
 
-// props.isAccept 적용시
 const accept = (): void => {
   isShowOption.value = false;
   updateValue(selectedValue.value);
 };
 
-/**
- * 적용 버튼 활성화시 적용 버튼을 클릭하지 않고 창을 닫을 경우
- * 값을 전으로 돌려 준다.
- */
 const noneAccept = (): void => {
-  if (props.btnAccept) {
-    selectedText.value = [];
-    selectedValue.value = [];
-
-    selectedValue.value = [...props.modelValue];
-    for (let index = 0; index < props.options.length; index++) {
-      const option = props.options[index];
-      if (selectedValue.value.includes(option.value)) {
-        selectedText.value.push(option.text);
-      }
-      if (selectedText.value.length === selectedValue.value.length) {
-        break;
-      }
-    }
-
-    updateValue([...selectedValue.value]);
+  if (!props.btnAccept) {
+    return;
   }
+
+  selectedText.value = [];
+  selectedValue.value = [];
+
+  selectedValue.value = [...props.modelValue];
+  for (let index = 0; index < props.options.length; index++) {
+    const option = props.options[index];
+    if (selectedValue.value.includes(option.value)) {
+      selectedText.value.push(option.text);
+    }
+    if (selectedText.value.length === selectedValue.value.length) {
+      break;
+    }
+  }
+
+  updateValue([...selectedValue.value]);
 };
 
-/**
- * 본 객체 외의 부분을 클릭할 경우 옵션 목록 숨김
- *
- * @param evt
- */
 const outSideClickEvent = (evt: MouseEvent): void => {
-  const target = evt.target as HTMLBodyElement;
+  const target = evt.target as HTMLElement;
 
-  if (isShowOption.value) {
-    if (!SelectBox.value!.contains(target)) {
-      noneAccept();
-      toggleOption();
-    }
+  if (!isShowOption.value || !main.value) {
+    return;
   }
-};
 
-optionList.value = [...props.options];
+  // SelectBox 컴포넌트 내부 클릭인지 확인 (main 요소 기준)
+  if (main.value.contains(target)) {
+    return;
+  }
 
-const main = ref<HTMLDivElement>();
-
-let eventParentElement: HTMLElement;
-
-const parentScrollEvent = (): void => {
+  // 외부 클릭 시 옵션 목록 닫기
+  if (props.btnAccept) {
+    noneAccept();
+  }
   isShowOption.value = false;
 };
 
-const preventDefaultScrollEvent = (evt: KeyboardEvent) => {
+const preventDefaultScrollEvent = (evt: KeyboardEvent): void => {
   if (isShowOption.value) {
     const code = evt.code.toLowerCase();
     if (['arrowdown', 'arrowup'].includes(code)) {
@@ -460,35 +455,47 @@ const preventDefaultScrollEvent = (evt: KeyboardEvent) => {
   }
 };
 
-/**
- * 컴포넌트 상위 element를 탐색(재귀)하며 scroll이 있는 Element에
- * scroll event를 추가 하여 scorll 발생시 layer 창을 닫아 준다.
- * @param el
- */
 const setScrollEvent = (el: HTMLElement): void => {
   const parent = el.parentElement as HTMLElement;
 
-  if (parent) {
-    if (parent.tagName.toLowerCase() === 'html') {
-      return;
-    }
-
-    if (parent.scrollHeight > parent.clientHeight) {
-      eventParentElement = parent;
-      eventParentElement.addEventListener('scroll', parentScrollEvent);
-      return;
-    }
-    setScrollEvent(parent);
+  if (!parent || parent.tagName.toLowerCase() === 'html') {
+    return;
   }
+
+  // 스크롤 가능한 요소인지 확인 (overflow: auto/scroll)
+  const computedStyle = window.getComputedStyle(parent);
+  const overflow = computedStyle.overflow + computedStyle.overflowY + computedStyle.overflowX;
+
+  if (
+    overflow.includes('auto') ||
+    overflow.includes('scroll') ||
+    parent.scrollHeight > parent.clientHeight
+  ) {
+    const listener = () => {
+      if (isShowOption.value) {
+        isShowOption.value = false;
+      }
+    };
+
+    parent.addEventListener('scroll', listener, { passive: true });
+    scrollEventListeners.push({ element: parent, listener });
+  }
+
+  // 재귀적으로 상위 요소 탐색
+  setScrollEvent(parent);
 };
 
-const clearButtonShow = computed<boolean>(() => {
-  if (props.modelValue) {
-    return props.clearable && !props.disabled && !props.readonly && props.modelValue.length > 0;
-  } else {
-    return false;
-  }
-});
+// window 스크롤 이벤트 추가
+const addWindowScrollEvent = (): void => {
+  const listener = () => {
+    if (isShowOption.value) {
+      isShowOption.value = false;
+    }
+  };
+
+  window.addEventListener('scroll', listener, { passive: true });
+  scrollEventListeners.push({ element: window, listener });
+};
 
 const clearValue = (): void => {
   updateValue(props.multiple ? [] : '');
@@ -501,42 +508,41 @@ const onBlur = (): void => {
 };
 
 const onKeyDownHandler = (event: KeyboardEvent): void => {
-  if (isShowOption.value) {
-    const li = ul.value?.querySelectorAll<HTMLLIElement>('.option-item');
+  if (!isShowOption.value) {
+    return;
+  }
 
-    if (li) {
-      const len = li.length;
-      const code = event.code.toLowerCase();
+  const li = OptionList.value?.querySelectorAll<HTMLLIElement>('.option-item');
+  if (!li) {
+    return;
+  }
 
-      if (code === 'arrowdown' && selectedKeyIndex.value < len) {
-        selectedKeyIndex.value++;
+  const len = li.length;
+  const code = event.code.toLowerCase();
 
-        if (selectedKeyIndex.value >= len) {
-          selectedKeyIndex.value = 0;
-        }
-
-        len && li[selectedKeyIndex.value].scrollIntoView({ block: 'center' });
-      } else if (code === 'arrowup' && selectedKeyIndex.value >= -1) {
-        selectedKeyIndex.value--;
-
-        if (selectedKeyIndex.value === -1) {
-          selectedKeyIndex.value = len - 1;
-        }
-
-        len && li[selectedKeyIndex.value].scrollIntoView({ block: 'center' });
-      } else if (['numpadenter', 'enter'].includes(code)) {
-        if (props.multiple && !isSearchFilter.value && selectedKeyIndex.value === 0) {
-          selectAll();
-        } else {
-          const index =
-            props.multiple && !isSearchFilter.value
-              ? selectedKeyIndex.value - 1
-              : selectedKeyIndex.value;
-          if (index > -1 && index < optionList.value.length) {
-            const value = optionList.value[index].value;
-            selectOption(value);
-          }
-        }
+  if (code === 'arrowdown' && selectedKeyIndex.value < len) {
+    selectedKeyIndex.value++;
+    if (selectedKeyIndex.value >= len) {
+      selectedKeyIndex.value = 0;
+    }
+    li[selectedKeyIndex.value].scrollIntoView({ block: 'center' });
+  } else if (code === 'arrowup' && selectedKeyIndex.value >= -1) {
+    selectedKeyIndex.value--;
+    if (selectedKeyIndex.value === -1) {
+      selectedKeyIndex.value = len - 1;
+    }
+    li[selectedKeyIndex.value].scrollIntoView({ block: 'center' });
+  } else if (['numpadenter', 'enter'].includes(code)) {
+    if (props.multiple && !isSearchFilter.value && selectedKeyIndex.value === 0) {
+      selectAll();
+    } else {
+      const index =
+        props.multiple && !isSearchFilter.value
+          ? selectedKeyIndex.value - 1
+          : selectedKeyIndex.value;
+      if (index > -1 && index < optionList.value.length) {
+        const value = optionList.value[index].value;
+        selectOption(value);
       }
     }
   }
@@ -544,13 +550,12 @@ const onKeyDownHandler = (event: KeyboardEvent): void => {
 
 const onKeyUpHandler = (event: KeyboardEvent): void => {
   const code = event.code.toLowerCase();
-  if (code === 'tab' && document.activeElement instanceof HTMLElement) {
-    const parentElement = SelectBox.value?.parentElement || undefined;
+  if (code === 'tab' && document.activeElement instanceof HTMLElement && SelectBox.value) {
+    const parentElement = SelectBox.value.parentElement;
     const isFocused: boolean = parentElement
       ? document.activeElement.contains(parentElement)
       : false;
 
-    // 해당 SelectBox 포커스영역에서 포커스 이동시, 옵션 영역 활성화 해제 진행.
     if (!isFocused) {
       noneAccept();
       toggleOption();
@@ -560,18 +565,19 @@ const onKeyUpHandler = (event: KeyboardEvent): void => {
 
 const onEscapeKeyHandler = (event: KeyboardEvent): void => {
   const code = event.code.toLowerCase();
+
   if (isShowOption.value && code === 'escape') {
     isShowOption.value = false;
     noneAccept();
 
-    // eventPhase : 0 = none / 1 = capture / 2 = target / 3 = bubbling
-    // 모달 내부의 SelectBox 키 이벤트와 동시에 Modal도 같이 이벤트 수행이 되기 때문에
-    // SelectBox 이벤트만 수행 후, 이벤트 전파 중지.
-    const eventPhase: number = event.eventPhase;
-    (eventPhase === 1 || eventPhase === 2) && event.stopPropagation();
+    const { eventPhase } = event;
+    if ([1, 2].includes(eventPhase)) {
+      event.stopPropagation();
+    }
   }
 };
 
+// 이벤트 리스너 관리
 watch(isShowOption, v => {
   if (v) {
     document.addEventListener('keydown', onKeyDownHandler);
@@ -585,15 +591,19 @@ watch(isShowOption, v => {
 onMounted(() => {
   setDefaultModelValue();
 
-  setScrollEvent(main.value!);
+  if (main.value) {
+    setScrollEvent(main.value);
+  }
+
+  // window 스크롤 이벤트 추가
+  addWindowScrollEvent();
+
   document.addEventListener('click', outSideClickEvent);
   document.addEventListener('keydown', preventDefaultScrollEvent, { capture: true });
 });
 
 onBeforeMount(() => {
-  if (eventParentElement) {
-    eventParentElement.removeEventListener('scroll', parentScrollEvent);
-  }
+  // 이전 버전과의 호환성을 위한 빈 함수
 });
 
 onUnmounted(() => {
@@ -601,6 +611,20 @@ onUnmounted(() => {
   document.removeEventListener('keydown', onKeyDownHandler);
   document.removeEventListener('keyup', onKeyUpHandler);
   document.removeEventListener('keydown', preventDefaultScrollEvent, { capture: true });
+
+  // 스크롤 이벤트 리스너 정리
+  scrollEventListeners.forEach(({ element, listener }) => {
+    if (element === window) {
+      window.removeEventListener('scroll', listener);
+    } else if (element instanceof HTMLElement) {
+      element.removeEventListener('scroll', listener);
+    }
+  });
+  scrollEventListeners.length = 0;
+
+  if (timeout) {
+    clearTimeout(timeout);
+  }
 });
 
 defineExpose({
@@ -700,7 +724,7 @@ defineExpose({
       </a>
 
       <div :class="['arrow', { rotate: isShowOption }]">
-        <Icon icon="mdi:chevron-down" :width="16" :height="16" />
+        <Icon icon="mdi:chevron-down" :width="25" :height="25" />
       </div>
 
       <Transition
@@ -717,18 +741,18 @@ defineExpose({
           <div class="search" @click.stop v-if="props.searchable">
             <div class="search-wrap">
               <input
-                ref="searchInput"
+                ref="SearchInput"
                 placeholder="검색어 입력"
                 type="text"
                 @keydown.up.prevent="onKeyDownHandler"
                 @keydown.down.prevent="onKeyDownHandler"
                 @keydown.enter.prevent="onKeyDownHandler"
-                @keydown.stop="searchText"
+                @keydown.stop="searchTextHandler"
               />
-              <Icon icon="mdi:magnify" />
+              <Icon icon="mdi:magnify" :width="28" :heigh="28" />
             </div>
           </div>
-          <ul ref="ul" class="scrollbar">
+          <ul ref="OptionList" class="scrollbar">
             <li
               :class="['option-item', selectedKeyIndex === 0 && !isSearchFilter && 'key-selected']"
               @click.stop="selectAll"
@@ -737,6 +761,8 @@ defineExpose({
               <Icon
                 :class="['checkbox', isSelectAll && 'checked']"
                 :icon="isSelectAll ? 'mdi:checkbox-marked' : 'mdi:checkbox-blank-outline'"
+                :width="20"
+                :height="20"
               />
               {{ isSelectAll ? '전체 해제' : '전체 선택' }}
             </li>
@@ -758,6 +784,8 @@ defineExpose({
                         ? 'mdi:checkbox-marked'
                         : 'mdi:checkbox-blank-outline'
                     "
+                    :width="20"
+                    :height="20"
                   />
                 </template>
                 {{ item.text }}
@@ -777,11 +805,7 @@ defineExpose({
       </Transition>
     </div>
 
-    <div
-      :class="['feedback', { error: errorTransition }]"
-      @animationend="errorTransition = false"
-      v-show="message && !props.hideMessage"
-    >
+    <div :class="['feedback', { error: errorTransition }]" v-show="message && !props.hideMessage">
       {{ message }}
     </div>
   </div>
@@ -790,6 +814,7 @@ defineExpose({
 <script lang="ts">
 export default { name: 'SelectBox' };
 </script>
+
 <style scoped lang="scss">
 @use './style';
 </style>

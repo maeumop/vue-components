@@ -24,7 +24,7 @@ const attrs = useAttrs();
 
 // 이벤트 속성들을 computed로 처리하여 성능 최적화
 const eventComputing = computed(() => {
-  const events: Record<string, any> = {};
+  const events: Record<string, unknown> = {};
 
   Object.keys(attrs).forEach(key => {
     if (key.startsWith('on')) {

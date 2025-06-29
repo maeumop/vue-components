@@ -1,8 +1,6 @@
 import type { OptionItem, RuleFunc } from '../../types';
 
-export interface SelectBoxItem extends OptionItem {
-  [K: string]: any;
-}
+export type SelectBoxItem = OptionItem;
 
 export interface SelectBoxProps {
   modelValue: string | string[];
@@ -30,13 +28,15 @@ export interface SelectBoxProps {
 }
 
 export interface SelectBoxEmits {
-  (event: 'update:modelValue', value: any): void;
+  (event: 'update:modelValue', value: string | string[]): void;
   (event: 'update:selectedIndex', index: number): void;
   (event: 'blur', value: string | string[]): void;
+  (event: 'focus', event: FocusEvent): void;
+  (event: 'change', value: string | string[]): void;
 }
 
 export interface SelectBoxModel {
-  check(silence?: boolean): void;
+  check(silence?: boolean): boolean;
   resetForm(): void;
   resetValidate(): void;
 }

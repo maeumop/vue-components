@@ -88,6 +88,11 @@ const router = createRouter({
       name: 'numberformat',
       component: () => import('../components/Form/NumberFormat/ex.vue'),
     },
+    {
+      path: '/components/selectbox',
+      name: 'selectbox',
+      component: () => import('../components/Form/SelectBox/ex.vue'),
+    },
   ],
 });
 

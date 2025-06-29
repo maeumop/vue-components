@@ -8,6 +8,7 @@ import router from './router';
 import App from './App.vue';
 import Badge from './components/Badge/index.vue';
 import CheckButton from './components/Form/CheckButton/index.vue';
+import SelectBox from './components/Form/SelectBox/index.vue';
 import TextField from './components/Form/TextField/index.vue';
 import ListTable from './components/ListTable/index.vue';
 import MessageBox from './components/MessageBox';
@@ -31,6 +32,7 @@ app.component('ListTable', ListTable);
 app.component('Pagination', Pagination);
 app.component('CheckButton', CheckButton);
 app.component('TextField', TextField);
+app.component('SelectBox', SelectBox);
 
 // 플러그인 등록
 app.use(SpinnerPlugin);
