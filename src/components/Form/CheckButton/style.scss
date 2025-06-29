@@ -80,7 +80,7 @@
       line-height: 3.5rem;
       font-weight: 400;
       transition: all 0.2s ease;
-      border-right: 0.1rem solid lighten(_.$gray-300, 5);
+      border-right: 0.1rem solid color.adjust(_.$gray-300, $lightness: 5%);
       cursor: pointer;
 
       &.last {
@@ -92,7 +92,7 @@
       border-color: map.get($color-map, default);
 
       label {
-        border-color: lighten(map.get($color-map, default), 25);
+        border-color: color.adjust(map.get($color-map, default), $lightness: 25%);
         color: map.get($color-map, default);
 
         &:hover {
@@ -113,7 +113,7 @@
           color: _.$text-disabled;
           background-color: _.$gray-100;
           cursor: not-allowed;
-          border-color: lighten(_.$gray-300, 5);
+          border-color: color.adjust(_.$gray-300, $lightness: 5%);
         }
 
         input:checked + label {

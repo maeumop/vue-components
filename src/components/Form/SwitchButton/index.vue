@@ -1,126 +1,156 @@
 <script setup lang="ts">
-  import {
-    mdiCheckboxBlank,
-    mdiCheckboxBlankOutline,
-    mdiCheckboxMarked,
-  } from '@/assets/svg/iconPath';
-  import { nextTick, ref, watch } from 'vue';
-  import { useAddFormValidate } from '../common';
-  import { switchButtonColors } from './const';
-  import type { SwitchButtonProps } from './types';
+import { Icon } from '@iconify/vue';
+import { nextTick, ref, watch } from 'vue';
+import { useAddFormValidate } from '../common';
+import { switchButtonColor } from './const';
+import type { SwitchButtonEmits, SwitchButtonProps } from './types';
 
-  const props = withDefaults(defineProps<SwitchButtonProps>(), {
-    label: (): string[] => ['미설정', '설정'],
-    validate: false,
-    trueValue: true,
-    falseValue: false,
-    color: switchButtonColors.primary,
-  });
+const props = withDefaults(defineProps<SwitchButtonProps>(), {
+  label: (): string[] => ['미설정', '설정'],
+  validate: undefined,
+  trueValue: true,
+  falseValue: false,
+  color: switchButtonColor.primary,
+  small: false,
+});
 
-  const emit = defineEmits<{
-    (event: 'update:modelValue', value: string | boolean): void;
-    (event: 'update:after'): void;
-  }>();
+const emit = defineEmits<SwitchButtonEmits>();
 
-  useAddFormValidate();
+useAddFormValidate();
 
-  const onError = ref<boolean>(false);
-  const errorTransition = ref<boolean>(false);
-  const message = ref<string>('');
-  const isValidate = ref<boolean>(true);
+const onError = ref<boolean>(false);
+const errorTransition = ref<boolean>(false);
+const message = ref<string>('');
+const isValidate = ref<boolean>(true);
 
-  watch(
-    () => props.modelValue,
-    () => {
-      resetForm();
-    },
-  );
+// 고유 id 생성 (접근성)
+const inputId = `switch-btn-${Math.random().toString(36).slice(2, 10)}`;
 
-  watch(errorTransition, v => {
-    if (v) {
-      setTimeout(() => {
-        errorTransition.value = false;
-      }, 300);
+watch(
+  () => props.modelValue,
+  (newVal, oldVal) => {
+    // 유효성 검사가 있을 때만 리셋하고, 값이 실제로 변경된 경우에만 처리
+    if (props.validate && newVal !== oldVal) {
+      resetValidate();
     }
-  });
+  },
+);
 
-  const check = (silence: boolean = false): boolean => {
-    // validate check
-    if (props.validate) {
-      if (props.modelValue === props.trueValue) {
-        resetForm();
-        return true;
-      } else {
+watch(errorTransition, v => {
+  if (v) {
+    setTimeout(() => {
+      errorTransition.value = false;
+    }, 300);
+  }
+});
+
+/**
+ * 유효성 검사
+ */
+const check = (silence: boolean = false): boolean => {
+  if (props.validate !== undefined) {
+    let valid = true;
+    if (typeof props.validate === 'function') {
+      const result = (props.validate as (value: unknown) => boolean | string)(props.modelValue);
+      if (typeof result === 'string') {
+        valid = false;
         if (!silence) {
-          message.value =
-            typeof props.validate === 'string'
-              ? props.validate
-              : `${props.label[1]}을(를) 선택해주세요.`;
+          message.value = result;
           onError.value = true;
           isValidate.value = false;
           errorTransition.value = true;
         }
-
-        return false;
+      } else if (result === false) {
+        valid = false;
+        if (!silence) {
+          message.value = `${props.label[1]}을(를) 선택해주세요.`;
+          onError.value = true;
+          isValidate.value = false;
+          errorTransition.value = true;
+        }
+      }
+    } else if (props.modelValue !== props.trueValue) {
+      valid = false;
+      if (!silence) {
+        message.value =
+          typeof props.validate === 'string'
+            ? props.validate
+            : `${props.label[1]}을(를) 선택해주세요.`;
+        onError.value = true;
+        isValidate.value = false;
+        errorTransition.value = true;
       }
     }
-
-    return true;
-  };
-
-  const resetForm = (): void => {
-    resetValidate();
-  };
-
-  const resetValidate = (): void => {
-    message.value = '';
-    onError.value = false;
-    isValidate.value = true;
-    errorTransition.value = false;
-  };
-
-  const updateValue = (evt: Event): void => {
-    const e = evt.target as HTMLInputElement;
-
-    if (!props.readonly) {
-      emit('update:modelValue', e.checked ? props.trueValue : props.falseValue);
-
-      nextTick(() => {
-        emit('update:after');
-      });
-    } else {
-      // 상태가 변경 되지 않도록 처리
-      e.checked = !e.checked;
+    if (valid) {
+      resetForm();
+      return true;
     }
-  };
+    return false;
+  }
+  return true;
+};
 
-  defineExpose({
-    resetValidate,
-    check,
-    resetForm,
+/**
+ * 폼 리셋 (초기화)
+ */
+const resetForm = (): void => {
+  emit('update:modelValue', props.falseValue);
+  resetValidate();
+};
+
+/**
+ * 유효성 메시지 리셋
+ */
+const resetValidate = (): void => {
+  message.value = '';
+  onError.value = false;
+  isValidate.value = true;
+  errorTransition.value = false;
+};
+
+/**
+ * 값 변경 핸들러
+ */
+const updateValue = (evt: Event): void => {
+  const e = evt.target as HTMLInputElement;
+  if (props.readonly) {
+    // 상태가 변경 되지 않도록 처리
+    e.checked = !e.checked;
+    return;
+  }
+
+  emit('update:modelValue', e.checked ? props.trueValue : props.falseValue);
+
+  nextTick(() => {
+    emit('update:after');
   });
+};
+
+defineExpose({
+  resetValidate,
+  check,
+  resetForm,
+});
 </script>
 
 <template>
   <div :class="['switch-wrap', props.color]">
-    <label :class="['switch', { small, checkbox: props.checkbox }]">
+    <label :for="inputId" :class="['switch', { small: props.small, checkbox: props.checkbox }]">
       <input
+        :id="inputId"
         type="checkbox"
         :disabled="props.disabled || props.readonly"
         :checked="props.modelValue == props.trueValue"
         @change="updateValue"
+        :aria-checked="props.modelValue == props.trueValue ? 'true' : 'false'"
+        role="switch"
       />
 
       <template v-if="props.checkbox">
         <Transition name="check-scale" mode="out-in">
-          <SvgIcon
-            type="mdi"
-            :path="mdiCheckboxMarked"
-            v-if="props.modelValue == props.trueValue"
-          />
-          <SvgIcon
-            type="mdi"
-            :path="props.disabled ? mdiCheckboxBlank : mdiCheckboxBlankOutline"
+          <Icon icon="mdi:checkbox-marked" v-if="props.modelValue == props.trueValue" />
+          <Icon
+            :icon="props.disabled ? 'mdi:checkbox-blank' : 'mdi:checkbox-blank-outline'"
             v-else
           />
         </Transition>
@@ -130,10 +160,10 @@
       </template>
 
       <Transition name="label-fade" mode="out-in">
-        <div class="label-text" v-if="props.modelValue === props.trueValue">
+        <div class="label-text" v-if="props.modelValue === props.trueValue" aria-live="polite">
           {{ props.label[1] }}
         </div>
-        <div class="label-text" v-else>{{ props.label[0] }}</div>
+        <div class="label-text" v-else aria-live="polite">{{ props.label[0] }}</div>
       </Transition>
     </label>
 
@@ -148,8 +178,9 @@
 </template>
 
 <style lang="scss" scoped>
-  @use './style';
+@use './style.scss';
 </style>
+
 <script lang="ts">
-  export default { name: 'SwitchButton' };
+export default { name: 'SwitchButton' };
 </script>

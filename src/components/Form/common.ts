@@ -17,6 +17,7 @@ export const useAddFormValidate = () => {
       }
 
       console.log('parent :>> ', parent);
+
       if (parent && instance.vnode) {
         (parent.exposed as ValidateFormModel).addComponant(instance.vnode);
       }

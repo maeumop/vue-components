@@ -73,6 +73,11 @@ const router = createRouter({
       name: 'checkbutton',
       component: () => import('../components/Form/CheckButton/ex.vue'),
     },
+    {
+      path: '/components/switchbutton',
+      name: 'switchbutton',
+      component: () => import('../components/Form/SwitchButton/ex.vue'),
+    },
   ],
 });
 

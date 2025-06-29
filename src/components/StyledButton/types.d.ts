@@ -23,3 +23,11 @@ export interface StyledButtonProps {
   tag?: string;
   dropMenuToggle?: boolean;
 }
+
+export interface StyledButtonOptions {
+  class: string[];
+  onClick: (event: MouseEvent) => void;
+  href?: string;
+  target?: string;
+  type?: string;
+}

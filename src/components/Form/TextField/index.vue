@@ -1,220 +1,219 @@
 <script setup lang="ts">
-  import { mdiCloseCircle } from '@/assets/svg/iconPath';
-  import type { StyleValue } from 'vue';
-  import { computed, onMounted, ref, watch } from 'vue';
-  import type { RuleFunc } from '../../types';
-  import { useAddFormValidate } from '../common';
-  import type { TextFieldEmits, TextFieldProps } from './types';
+import { Icon } from '@iconify/vue';
+import type { StyleValue } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
+import type { RuleFunc } from '../../types';
+import { useAddFormValidate } from '../common';
+import type { TextFieldEmits, TextFieldProps } from './types';
 
-  const props = withDefaults(defineProps<TextFieldProps>(), {
-    rows: 5,
-    type: 'text',
-    validate: (): RuleFunc[] => [],
-    blurValidate: true,
-    errorMessage: '',
-    maxLength: 0,
-  });
+const props = withDefaults(defineProps<TextFieldProps>(), {
+  rows: 5,
+  type: 'text',
+  validate: (): RuleFunc[] => [],
+  blurValidate: true,
+  errorMessage: '',
+  maxLength: 0,
+});
 
-  const emit = defineEmits<TextFieldEmits>();
+const emit = defineEmits<TextFieldEmits>();
 
-  useAddFormValidate();
+useAddFormValidate();
 
-  const isValidate = ref<boolean>(true);
-  const checkPass = ref<boolean>(false);
-  const message = ref<string>('');
-  const errorTransition = ref<boolean>(false);
+const isValidate = ref<boolean>(true);
+const checkPass = ref<boolean>(false);
+const message = ref<string>('');
+const errorTransition = ref<boolean>(false);
 
-  const Textarea = ref<HTMLTextAreaElement>();
-  const Input = ref<HTMLInputElement>();
+const Textarea = ref<HTMLTextAreaElement>();
+const Input = ref<HTMLInputElement>();
 
-  watch(
-    () => props.errorMessage,
-    v => {
-      // 임의로 지정된 에러가 있는 경우 에러 아이콘 표기
-      if (v) {
-        message.value = v;
-        isValidate.value = false;
-        checkPass.value = false;
-        errorTransition.value = true;
-      } else {
-        message.value = '';
-        isValidate.value = true;
-        checkPass.value = true;
-        errorTransition.value = false;
-      }
-    },
-  );
-
-  watch(
-    () => props.validate,
-    () => {
-      resetValidate();
-    },
-  );
-
-  watch(
-    () => props.modelValue,
-    v => v && resetValidate(),
-  );
-
-  watch(
-    () => props.disabled,
-    v => v && resetValidate(),
-  );
-
-  /**
-   *
-   * @deprecated successful style,변수 감시용도 아닌 그냥 존재하여 삭제 예정.
-   */
-  // const successful = computed<boolean>(() => isValidate.value && checkPass.value);
-
-  /**
-   *
-   * @deprecated [error|success] style,변수 감시용도 아닌 그냥 존재하여 삭제 예정.
-   */
-  const wrapperStyle = computed<StyleValue>(() => [
-    'input-wrap',
-    {
-      // error: !isValidate.value,
-      // success: successful,
-      block: props.block,
-    },
-  ]);
-
-  const inputStyleClass = computed<StyleValue>(() => [
-    {
-      error: message.value,
-      'left-space': props.icon && props.iconLeft,
-      'right-space': props.icon && !props.iconLeft,
-    },
-  ]);
-
-  const updateValue = (evt: Event): void => {
-    const target = evt.target as HTMLInputElement;
-
-    // textarea maxlength 기능이 없기 때문에 코드로 구현
-    if (props.isCounting && props.maxLength) {
-      if (target.value.length > props.maxLength) {
-        const cut = target.value.substring(0, props.maxLength);
-        target.value = cut;
-      }
-    }
-    emit('update:modelValue', target.value);
-  };
-
-  const clearValue = (): void => {
-    emit('update:modelValue', '');
-  };
-
-  const clearButtonShow = computed<boolean>(
-    () => props.clearable && props.modelValue !== '' && !props.disabled && !props.readonly,
-  );
-
-  /**
-   * blur 이벤트 핸들러에서 check() 함수의 반환값이 true 일경우에만 trim추가 처리 진행
-   * disabled 일때에는 이벤트 발생하지 않기에 정의 하지 않습니다.
-   * @author hjs0818
-   * @returns
-   */
-  const updateTrimValue = (evt: Event): void => {
-    const target = evt.target as HTMLInputElement | HTMLTextAreaElement;
-
-    const result: string = target.value.trim();
-    if (result.length > 0) {
-      emit('update:modelValue', result);
-    }
-  };
-
-  const check = (silence?: boolean): boolean => {
-    if (props.disabled) {
-      return true;
-    }
-
-    // 임의로 지정된 에러가 없는 경우
-    if (props.errorMessage === '') {
-      // trim 되지 않은 value 값
-      const checkValue: string =
-        (props.multiline ? Textarea.value?.value : Input.value?.value) || '';
-
-      // pattern check
-      if (Array.isArray(props.pattern)) {
-        const [regExp, errMsg] = props.pattern;
-
-        if (regExp) {
-          if (regExp.test(checkValue)) {
-            message.value = '';
-          } else {
-            if (!silence) {
-              message.value = errMsg ? errMsg : '형식이 일치 하지 않습니다.';
-              isValidate.value = false;
-              checkPass.value = false;
-              errorTransition.value = true;
-            }
-
-            return false;
-          }
-        }
-      }
-
-      // validate check
-      if (props.validate.length) {
-        for (let i: number = 0; i < props.validate.length; i++) {
-          const result: string | boolean = props.validate[i](checkValue);
-
-          if (typeof result === 'string') {
-            if (!silence) {
-              message.value = result;
-              isValidate.value = false;
-              checkPass.value = false;
-              errorTransition.value = true;
-            }
-
-            return false;
-          } else {
-            message.value = '';
-          }
-        }
-      }
-
+watch(
+  () => props.errorMessage,
+  v => {
+    // 임의로 지정된 에러가 있는 경우 에러 아이콘 표기
+    if (v) {
+      message.value = v;
+      isValidate.value = false;
+      checkPass.value = false;
+      errorTransition.value = true;
+    } else {
+      message.value = '';
       isValidate.value = true;
       checkPass.value = true;
-      return true;
-    }
-
-    errorTransition.value = true;
-
-    return false;
-  };
-
-  const resetForm = (): void => {
-    emit('update:modelValue', '');
-  };
-
-  const resetValidate = (): void => {
-    isValidate.value = true;
-    if (!props.errorMessage) {
-      message.value = '';
       errorTransition.value = false;
     }
-  };
+  },
+);
 
-  const feedback = ref<HTMLDivElement>();
+watch(
+  () => props.validate,
+  () => {
+    resetValidate();
+  },
+);
 
-  onMounted(() => {
-    if (props.autofocus) {
-      if (props.multiline) {
-        Textarea.value!.focus();
-      } else {
-        Input.value!.focus();
+watch(
+  () => props.modelValue,
+  v => v && resetValidate(),
+);
+
+watch(
+  () => props.disabled,
+  v => v && resetValidate(),
+);
+
+/**
+ *
+ * @deprecated successful style,변수 감시용도 아닌 그냥 존재하여 삭제 예정.
+ */
+// const successful = computed<boolean>(() => isValidate.value && checkPass.value);
+
+/**
+ *
+ * @deprecated [error|success] style,변수 감시용도 아닌 그냥 존재하여 삭제 예정.
+ */
+const wrapperStyle = computed<StyleValue>(() => [
+  'input-wrap',
+  {
+    // error: !isValidate.value,
+    // success: successful,
+    block: props.block,
+  },
+]);
+
+const inputStyleClass = computed<StyleValue>(() => [
+  {
+    error: message.value,
+    'left-space': props.icon && props.iconLeft,
+    'right-space': props.icon && !props.iconLeft,
+  },
+]);
+
+const updateValue = (evt: Event): void => {
+  const target = evt.target as HTMLInputElement;
+
+  // textarea maxlength 기능이 없기 때문에 코드로 구현
+  if (props.isCounting && props.maxLength) {
+    if (target.value.length > props.maxLength) {
+      const cut = target.value.substring(0, props.maxLength);
+      target.value = cut;
+    }
+  }
+  emit('update:modelValue', target.value);
+};
+
+const clearValue = (): void => {
+  emit('update:modelValue', '');
+};
+
+const clearButtonShow = computed<boolean>(
+  () => props.clearable && props.modelValue !== '' && !props.disabled && !props.readonly,
+);
+
+/**
+ * blur 이벤트 핸들러에서 check() 함수의 반환값이 true 일경우에만 trim추가 처리 진행
+ * disabled 일때에는 이벤트 발생하지 않기에 정의 하지 않습니다.
+ * @author hjs0818
+ * @returns
+ */
+const updateTrimValue = (evt: Event): void => {
+  const target = evt.target as HTMLInputElement | HTMLTextAreaElement;
+
+  const result: string = target.value.trim();
+  if (result.length > 0) {
+    emit('update:modelValue', result);
+  }
+};
+
+const check = (silence?: boolean): boolean => {
+  if (props.disabled) {
+    return true;
+  }
+
+  // 임의로 지정된 에러가 없는 경우
+  if (props.errorMessage === '') {
+    // trim 되지 않은 value 값
+    const checkValue: string = (props.multiline ? Textarea.value?.value : Input.value?.value) || '';
+
+    // pattern check
+    if (Array.isArray(props.pattern)) {
+      const [regExp, errMsg] = props.pattern;
+
+      if (regExp) {
+        if (regExp.test(checkValue)) {
+          message.value = '';
+        } else {
+          if (!silence) {
+            message.value = errMsg ? errMsg : '형식이 일치 하지 않습니다.';
+            isValidate.value = false;
+            checkPass.value = false;
+            errorTransition.value = true;
+          }
+
+          return false;
+        }
       }
     }
-  });
 
-  defineExpose({
-    check,
-    resetForm,
-    resetValidate,
-  });
+    // validate check
+    if (props.validate.length) {
+      for (let i: number = 0; i < props.validate.length; i++) {
+        const result: string | boolean = props.validate[i](checkValue);
+
+        if (typeof result === 'string') {
+          if (!silence) {
+            message.value = result;
+            isValidate.value = false;
+            checkPass.value = false;
+            errorTransition.value = true;
+          }
+
+          return false;
+        } else {
+          message.value = '';
+        }
+      }
+    }
+
+    isValidate.value = true;
+    checkPass.value = true;
+    return true;
+  }
+
+  errorTransition.value = true;
+
+  return false;
+};
+
+const resetForm = (): void => {
+  emit('update:modelValue', '');
+};
+
+const resetValidate = (): void => {
+  isValidate.value = true;
+  if (!props.errorMessage) {
+    message.value = '';
+    errorTransition.value = false;
+  }
+};
+
+const feedback = ref<HTMLDivElement>();
+
+onMounted(() => {
+  if (props.autofocus) {
+    if (props.multiline) {
+      Textarea.value!.focus();
+    } else {
+      Input.value!.focus();
+    }
+  }
+});
+
+defineExpose({
+  check,
+  resetForm,
+  resetValidate,
+});
 </script>
 
 <template>
@@ -269,18 +268,18 @@
           @click.prevent="clearValue"
           v-if="clearButtonShow"
         >
-          <SvgIcon type="mdi" size="2.0rem" :path="mdiCloseCircle" />
+          <Icon icon="mdi:close-circle" :width="20" :height="20" />
         </a>
       </div>
       <template v-if="props.icon">
         <a href="#" @click.prevent="props.iconAction" v-if="typeof props.iconAction === 'function'">
-          <SvgIcon type="mdi" size="2.4rem" :class="{ left: props.iconLeft }" :path="props.icon" />
+          <Icon :icon="props.icon" :width="24" :height="24" :class="{ left: props.iconLeft }" />
         </a>
-        <SvgIcon
-          type="mdi"
-          size="2.4rem"
+        <Icon
+          :icon="props.icon"
+          :width="24"
+          :height="24"
           :class="{ left: props.iconLeft }"
-          :path="props.icon"
           v-else
         />
       </template>
@@ -299,8 +298,8 @@
 </template>
 
 <style scoped lang="scss">
-  @use './style';
+@use './style';
 </style>
 <script lang="ts">
-  export default { name: 'TextField' };
+export default { name: 'TextField' };
 </script>

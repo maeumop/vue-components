@@ -1,16 +1,17 @@
 @charset "UTF-8";
 /* @/components/Form/SwitchButton/_style.scss */
-@use "sass:map";
-@use "../../styles" as _;
-@use "../../common";
+@use 'sass:map';
+@use 'sass:color';
+@use '../../styles' as _;
+@use '../../common';
 
 .switch-wrap {
   display: inline-block;
   position: relative;
   vertical-align: middle;
 
-  @include _.mx-buttonColorStyle using ($color-map) {
-    .switch input[type="checkbox"]:checked {
+  @include _.buttonColorStyle using ($color-map) {
+    .switch input[type='checkbox']:checked {
       & + span {
         background-color: map.get($color-map, default);
       }
@@ -39,9 +40,9 @@
         color: _.$gray-400;
       }
 
-      input[type="checkbox"] {
+      input[type='checkbox'] {
         &:not(:disabled, :checked) + svg:hover {
-          color: darken(_.$gray-400, 15);
+          color: color.adjust(_.$gray-400, $lightness: -15%);
         }
 
         &:disabled + svg {
@@ -50,7 +51,7 @@
       }
     }
 
-    input[type="checkbox"] {
+    input[type='checkbox'] {
       position: absolute;
       clip: rect(0, 0, 0, 0);
 
@@ -74,7 +75,7 @@
       }
 
       &:not(&:disabled) + span:hover {
-        background-color: darken(_.$gray-400, 15);
+        background-color: color.adjust(_.$gray-400, $lightness: -15%);
       }
 
       &:disabled + span {
@@ -89,7 +90,7 @@
     &.small {
       line-height: 1.9rem;
 
-      input[type="checkbox"] {
+      input[type='checkbox'] {
         & + span {
           width: 3rem;
           height: 1.5rem;
@@ -112,7 +113,7 @@
       }
     }
 
-    &:has(input[type="checkbox"]:disabled) {
+    &:has(input[type='checkbox']:disabled) {
       cursor: default;
 
       .label-text {
