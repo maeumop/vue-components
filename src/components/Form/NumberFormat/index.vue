@@ -12,7 +12,7 @@ const props = withDefaults(defineProps<NumberFormatProps>(), {
   disabled: false,
   block: false,
   autofocus: false,
-  maxLength: '',
+  maxLength: undefined,
   readonly: false,
   required: false,
   hideMessage: false,
@@ -22,8 +22,9 @@ const emit = defineEmits<NumberFormatEmits>();
 
 const attrs = useAttrs();
 
+// 이벤트 속성들을 computed로 처리하여 성능 최적화
 const eventComputing = computed(() => {
-  const events: any = {};
+  const events: Record<string, any> = {};
 
   Object.keys(attrs).forEach(key => {
     if (key.startsWith('on')) {
@@ -55,43 +56,35 @@ watch(
   },
 );
 
+// modelValue 변경 시 중복 실행 방지를 위해 flush: 'post' 옵션 추가
 watch(
   () => props.modelValue,
-  v => {
-    if (!props.disabled) {
+  (newVal, oldVal) => {
+    if (!props.disabled && newVal && newVal !== oldVal) {
       // 외부에서 model이 업데이트 되도 유효성 검사
-      if (v !== '') {
-        resetValidate();
+      resetValidate();
 
-        if (Input.value) {
-          Input.value.value = format(v);
-        }
+      if (Input.value) {
+        Input.value.value = format(newVal);
       }
     }
   },
+  { flush: 'post' },
 );
 
 watch(
   () => props.disabled,
-  v => v && resetValidate(),
+  (newVal, oldVal) => {
+    if (newVal !== oldVal) {
+      resetValidate();
+    }
+  },
 );
 
-/**
- *
- * @deprecated successful style,변수 감시용도 아닌 그냥 존재하여 삭제 예정.
- */
-// const successful = computed<boolean>(() => isValidate.value && checkPass.value);
-
-/**
- *
- * @deprecated [error|success] style,변수 감시용도 아닌 그냥 존재하여 삭제 예정.
- */
 const wrapperStyle = computed<StyleValue>(() => [
   'input-wrap',
   {
     'with-label': props.label,
-    // error: !isValidate.value,
-    // success: successful,
     block: props.block,
   },
 ]);
@@ -101,28 +94,39 @@ const wrapperStyle = computed<StyleValue>(() => [
  *
  * @param { Event } evt
  */
-const zeroCheck = (evt: Event) => {
-  if (evt.type === 'focus' && Input.value!.value === '0') {
-    Input.value!.value = '';
+const zeroCheck = (evt: Event): void => {
+  if (evt.type === 'focus' && Input.value?.value === '0') {
+    Input.value.value = '';
     emit('update:modelValue', 0);
-  } else if (evt.type === 'blur' && !Input.value!.value.length) {
-    Input.value!.value = '0';
+  } else if (evt.type === 'blur' && Input.value?.value.length === 0) {
+    Input.value.value = '0';
     emit('update:modelValue', 0);
+  }
 
-    if (!attrs.onBlur && !attrs.onFocusout) {
-      check();
-    }
+  if (!attrs.onBlur && !attrs.onFocusout) {
+    check();
   }
 };
 
 /**
  * 전달된 값을 천단위로 콤마(,)를 생성하여 반환
+ * 숫자 검증 강화
  *
  * @param v
  * @return format number string
  */
-const format = (v: number | string): string =>
-  v === '-' ? v : new Intl.NumberFormat().format(Number(v));
+const format = (v: number | string): string => {
+  if (v === '-' || v === '') {
+    return v;
+  }
+
+  const num = Number(v);
+  if (isNaN(num)) {
+    return '0';
+  }
+
+  return new Intl.NumberFormat().format(num);
+};
 
 const updateValue = (evt: Event): void => {
   if (props.disabled) {
@@ -141,7 +145,8 @@ const updateValue = (evt: Event): void => {
 
   if (value) {
     e.value = format(value);
-    emit('update:modelValue', isNaN(Number(value)) ? 0 : Number(value));
+    const numValue = Number(value);
+    emit('update:modelValue', isNaN(numValue) ? 0 : numValue);
   }
 };
 
@@ -154,8 +159,9 @@ const check = (silence: boolean = false): boolean => {
   if (!props.errorMessage) {
     // validate check
     if (props.validate.length) {
-      for (let i: number = 0; i < props.validate.length; i++) {
-        const result: string | boolean = props.validate[i](props.modelValue);
+      for (const validateFunc of props.validate) {
+        console.log('props.modelValue', props.modelValue);
+        const result: string | boolean = validateFunc(props.modelValue);
 
         if (typeof result === 'string') {
           if (!silence) {
@@ -198,12 +204,14 @@ const resetValidate = (): void => {
 };
 
 onMounted(() => {
-  if (props.autofocus && Input.value) {
-    Input.value.focus();
-  }
+  if (Input.value) {
+    if (props.autofocus) {
+      Input.value.focus();
+    }
 
-  if (props.modelValue && Input.value) {
-    Input.value.value = format(props.modelValue);
+    if (props.modelValue) {
+      Input.value.value = format(props.modelValue);
+    }
   }
 });
 
@@ -237,11 +245,7 @@ defineExpose({
       @input="updateValue"
     />
 
-    <div
-      :class="['feedback', { error: errorTransition }]"
-      @animationend="errorTransition = false"
-      v-show="message && !props.hideMessage"
-    >
+    <div :class="['feedback', { error: errorTransition }]" v-show="message && !props.hideMessage">
       {{ message }}
     </div>
   </div>
@@ -250,6 +254,7 @@ defineExpose({
 <style scoped lang="scss">
 @use './style';
 </style>
+
 <script lang="ts">
 export default { name: 'NumberFormat' };
 </script>

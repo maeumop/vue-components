@@ -17,11 +17,13 @@ export interface NumberFormatProps {
 }
 
 export interface NumberFormatModel {
-  check(silence?: boolean): void;
+  check(silence?: boolean): boolean;
   resetForm(): void;
   resetValidate(): void;
 }
 
 export interface NumberFormatEmits {
   (event: 'update:modelValue', value: number): void;
+  (event: 'blur', event: FocusEvent): void;
+  (event: 'focus', event: FocusEvent): void;
 }

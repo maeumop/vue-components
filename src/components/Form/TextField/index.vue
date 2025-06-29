@@ -52,7 +52,7 @@ watch(
   () => props.modelValue,
   (newVal, oldVal) => {
     // 값이 변경되면 유효성 검사를 초기화
-    if (newVal && newVal !== oldVal) {
+    if (!props.disabled && newVal && newVal !== oldVal) {
       resetValidate();
     }
   },
@@ -175,8 +175,6 @@ const resetValidate = (): void => {
   }
 };
 
-const feedback = ref<HTMLDivElement>();
-
 onMounted(() => {
   if (props.autofocus) {
     if (props.multiline) {
@@ -277,11 +275,7 @@ defineExpose({
       </div>
     </template>
 
-    <div
-      ref="feedback"
-      :class="['feedback', { error: errorTransition }]"
-      v-show="message && !props.hideMessage"
-    >
+    <div :class="['feedback', { error: errorTransition }]" v-show="message && !props.hideMessage">
       {{ message }}
     </div>
   </div>

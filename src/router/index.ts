@@ -83,6 +83,11 @@ const router = createRouter({
       name: 'textfield',
       component: () => import('../components/Form/TextField/ex.vue'),
     },
+    {
+      path: '/components/numberformat',
+      name: 'numberformat',
+      component: () => import('../components/Form/NumberFormat/ex.vue'),
+    },
   ],
 });
 
