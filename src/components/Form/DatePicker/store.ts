@@ -41,8 +41,10 @@ export const useDatePickerStore = (): DatePickerStore => {
   });
 
   const dropdownState = reactive<DropdownStateType>({
-    year: false,
-    month: false,
+    startYear: false,
+    startMonth: false,
+    endYear: false,
+    endMonth: false,
   });
 
   /**
@@ -79,16 +81,26 @@ export const useDatePickerStore = (): DatePickerStore => {
 
   /**
    * 드롭다운 상태 업데이트
+   * @param flag start | end
    * @param type year | month
    * @param isOpen 열림/닫힘 상태
    */
-  const setDropdownState = (type: 'year' | 'month', isOpen: boolean): void => {
+  const setDropdownState = (
+    flag: 'start' | 'end',
+    type: 'year' | 'month',
+    isOpen: boolean,
+  ): void => {
+    const key = `${flag}${type.charAt(0).toUpperCase() + type.slice(1)}` as keyof DropdownStateType;
+
     // 다른 드롭다운이 열려있으면 닫기
     if (isOpen) {
-      dropdownState.year = type === 'year';
-      dropdownState.month = type === 'month';
+      dropdownState.startYear = false;
+      dropdownState.startMonth = false;
+      dropdownState.endYear = false;
+      dropdownState.endMonth = false;
+      dropdownState[key] = true;
     } else {
-      dropdownState[type] = false;
+      dropdownState[key] = false;
     }
   };
 
@@ -96,8 +108,10 @@ export const useDatePickerStore = (): DatePickerStore => {
    * 모든 드롭다운 닫기
    */
   const closeAllDropdowns = (): void => {
-    dropdownState.year = false;
-    dropdownState.month = false;
+    dropdownState.startYear = false;
+    dropdownState.startMonth = false;
+    dropdownState.endYear = false;
+    dropdownState.endMonth = false;
   };
 
   /**

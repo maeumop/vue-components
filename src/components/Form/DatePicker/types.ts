@@ -37,8 +37,10 @@ export interface SelectedDateType extends Record<string, string> {
 }
 
 export interface DropdownStateType {
-  year: boolean;
-  month: boolean;
+  startYear: boolean;
+  startMonth: boolean;
+  endYear: boolean;
+  endMonth: boolean;
 }
 
 export interface DatePickerModel {
@@ -66,7 +68,7 @@ export interface DatePickerStore {
   setEndDate(v: string): void;
   setDateState(main: string, sub: string, v: number): void;
   setSelected(flag: string, v: string): void;
-  setDropdownState(type: 'year' | 'month', isOpen: boolean): void;
+  setDropdownState(flag: 'start' | 'end', type: 'year' | 'month', isOpen: boolean): void;
   closeAllDropdowns(): void;
   init(): void;
 }

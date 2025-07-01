@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
 import { computed, inject, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
-import type { DatePickerStore, SelectorProps } from '../types';
+import type { DatePickerStore, DropdownStateType, SelectorProps } from '../types';
 
 const props = withDefaults(defineProps<SelectorProps>(), {
   max: 0,
@@ -20,11 +20,12 @@ const items = ref<number[]>([]);
 const searchText = ref<string>('');
 const focusedIndex = ref<number>(-1);
 
-const flag: string = props.end ? 'end' : 'start';
+const flag: 'start' | 'end' = props.end ? 'end' : 'start';
 
 // 현재 드롭다운 상태 계산
 const isShow = computed<boolean>(() => {
-  return props.year ? dropdownState.year : dropdownState.month;
+  const key = `${flag}${props.year ? 'Year' : 'Month'}` as keyof DropdownStateType;
+  return dropdownState[key];
 });
 
 // 필터링된 아이템 메모이제이션
@@ -94,7 +95,7 @@ watch(isShow, v => {
  */
 const changedDate = (v: number): void => {
   setDateState(flag, props.year ? 'year' : 'month', props.year ? v : v + 1);
-  setDropdownState(props.year ? 'year' : 'month', false);
+  setDropdownState(flag, props.year ? 'year' : 'month', false);
   searchText.value = '';
   focusedIndex.value = -1;
 };
@@ -105,7 +106,7 @@ const handleClick = (event: Event): void => {
   event.stopPropagation();
   const currentType = props.year ? 'year' : 'month';
   const newState = !isShow.value;
-  setDropdownState(currentType, newState);
+  setDropdownState(flag, currentType, newState);
 };
 
 // 키보드 네비게이션
@@ -113,7 +114,7 @@ const handleKeydown = (event: KeyboardEvent): void => {
   if (!isShow.value) {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      setDropdownState(props.year ? 'year' : 'month', true);
+      setDropdownState(flag, props.year ? 'year' : 'month', true);
     }
     return;
   }
@@ -145,7 +146,7 @@ const handleKeydown = (event: KeyboardEvent): void => {
       break;
     case 'Escape':
       event.preventDefault();
-      setDropdownState(props.year ? 'year' : 'month', false);
+      setDropdownState(flag, props.year ? 'year' : 'month', false);
       searchText.value = '';
       focusedIndex.value = -1;
       break;
@@ -197,7 +198,7 @@ const outsideClickEvent = (evt: Event): void => {
   const target = evt.target as HTMLElement;
 
   if (!Selector.value?.contains(target)) {
-    setDropdownState(props.year ? 'year' : 'month', false);
+    setDropdownState(flag, props.year ? 'year' : 'month', false);
     searchText.value = '';
     focusedIndex.value = -1;
   }
@@ -230,7 +231,7 @@ onUnmounted(() => {
     :aria-expanded="isShow"
     :aria-haspopup="true"
     role="combobox"
-    class="selector-trigger"
+    :class="['selector-trigger', { month: props.month, year: props.year }]"
   >
     <div class="selector-trigger-text">
       {{ getDateString }}

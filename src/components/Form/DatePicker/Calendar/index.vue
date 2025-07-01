@@ -44,6 +44,9 @@ const focusedDateIndex = ref<{ row: number; col: number } | null>(null);
 const head: string[] = ['일', '월', '화', '수', '목', '금', '토'];
 const transitionName = ref<TransitionCase>(transitionCase.down);
 
+// transition을 위한 별도 상태 변수
+const isTransitioning = ref<boolean>(false);
+
 // 달력 데이터 메모이제이션
 const dateRender = computed<DateCellType[][]>(() => {
   return generateCalendarData();
@@ -140,6 +143,8 @@ const selectedDay = (tr: number, td: number): void => {
       setStartDate(selectedDate[caseStartEnd]);
     }
 
+    // 범위 선택 모드에서는 날짜 선택 시 창을 닫지 않음
+    // 단일 날짜 선택 모드에서만 창이 닫힘
     emit('update:date', props.end);
   }
 };
@@ -259,6 +264,8 @@ watch(
       transitionName.value = transitionCase.up;
     }
 
+    // transition 효과를 위해 잠시 숨기고 다시 보이기
+    isTransitioning.value = true;
     isShow.value = false;
   },
 );
@@ -272,6 +279,8 @@ watch(
       transitionName.value = transitionCase.right;
     }
 
+    // transition 효과를 위해 잠시 숨기고 다시 보이기
+    isTransitioning.value = true;
     isShow.value = false;
   },
 );
@@ -279,11 +288,12 @@ watch(
 const resetTransition = (): void => {
   setTimeout(() => {
     isShow.value = true;
+    isTransitioning.value = false;
     // 포커스 초기화
     nextTick(() => {
       focusedDateIndex.value = null;
     });
-  }, 30);
+  }, 20);
 };
 
 const resetSelected = (): void => {
@@ -328,7 +338,7 @@ defineExpose({
                 focused: focusedDateIndex?.row === i && focusedDateIndex?.col === j,
               },
             ]"
-            @click.prevent="selectedDay(i, j)"
+            @click.stop.prevent="selectedDay(i, j)"
             @keydown="handleKeydown($event, i, j)"
             @focus="setFocus(i, j)"
             :tabindex="isFocusable(item.type) ? 0 : -1"

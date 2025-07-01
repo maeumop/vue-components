@@ -10,24 +10,27 @@
   display: inline-block;
   cursor: pointer;
   user-select: none;
-  padding: 0.5rem 0.8rem;
-  border-radius: 0.6rem;
+  padding: 0.3rem 0.4rem;
+  border-radius: 0.4rem;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  background: rgba(_.$gray-100, 0.5);
+  background: _.$gray-100;
   border: 1px solid transparent;
   font-weight: 500;
   color: _.$text-default;
+  width: 5.2rem;
+
+  &.month {
+    width: 4rem !important;
+  }
 
   &:hover {
     background: rgba(_.$primary, 0.1);
     border-color: rgba(_.$primary, 0.2);
-    transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(_.$primary, 0.15);
 
     .selector-trigger-text .selector-icon {
       color: _.$primary;
       opacity: 1;
-      transform: scale(1.1);
     }
   }
 
@@ -40,10 +43,25 @@
     outline: none;
   }
 
+  // active 상태 (드롭다운이 열려있을 때)
+  &[aria-expanded='true'] {
+    background: linear-gradient(135deg, _.$primary, color.change(_.$primary, $lightness: 85%));
+    border-color: _.$primary;
+    color: white;
+    box-shadow: 0 4px 12px rgba(_.$primary, 0.3);
+
+    .selector-trigger-text .selector-icon {
+      color: white;
+      opacity: 1;
+    }
+  }
+
   .selector-trigger-text {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 0.5rem;
+    font-size: 0.8rem;
 
     .selector-icon {
       font-size: 0.9rem;
@@ -73,13 +91,12 @@
 
   position: absolute;
   top: 100%;
-  left: calc(-50% + 1.2rem);
+  left: calc(-50% + 2.6rem);
   background: linear-gradient(135deg, $_bg-color, rgba(255, 255, 255, 0.95));
   backdrop-filter: blur(12px);
-  padding: 1rem 0.6rem 1rem 1rem;
-  margin-top: 0.8rem;
+  padding: 0.5rem;
+  margin-top: 1rem;
   border-radius: 0.4rem;
-  min-width: 8rem;
   z-index: 10000;
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.12),
@@ -88,8 +105,7 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
 
   &.month {
-    left: -50%;
-    min-width: 8rem;
+    left: calc(-50% + 2rem);
   }
 
   .selector-box-wrap {
@@ -98,7 +114,7 @@
     &::before {
       content: '';
       position: absolute;
-      top: -1.2rem;
+      top: -1rem;
       left: calc(50% - 0.4rem);
       width: 0.6rem;
       height: 0.6rem;
@@ -109,43 +125,8 @@
       box-shadow: -2px -2px 4px rgba(0, 0, 0, 0.04);
     }
 
-    .search-input {
-      margin-bottom: 0.8rem;
-      padding: 0 0.4rem;
-
-      input {
-        width: 100%;
-        padding: 0.8rem 1rem;
-        border: 1px solid rgba(_.$gray-300, 0.6);
-        border-radius: 0.8rem;
-        background: linear-gradient(135deg, rgba(_.$gray-100, 0.8), rgba(_.$gray-100, 0.6));
-        color: _.$text-default;
-        font-size: 0.9rem;
-        outline: none;
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow:
-          0 2px 4px rgba(0, 0, 0, 0.04),
-          inset 0 1px 0 rgba(255, 255, 255, 0.8);
-
-        &::placeholder {
-          color: color.change(_.$text-default, $lightness: 50%);
-        }
-
-        &:focus {
-          border-color: _.$primary;
-          background: linear-gradient(135deg, rgba(_.$primary, 0.05), rgba(_.$primary, 0.02));
-          color: _.$text-default;
-          box-shadow:
-            0 4px 12px rgba(_.$primary, 0.15),
-            0 2px 6px rgba(_.$primary, 0.1),
-            inset 0 1px 0 rgba(255, 255, 255, 0.9);
-          transform: translateY(-1px);
-        }
-      }
-    }
-
     ul {
-      max-height: 18rem;
+      max-height: 16rem;
       overflow-y: auto;
       padding: 0.2rem;
       margin: 0;
@@ -170,24 +151,23 @@
         ///지역 변수
         $_color: _.$text-default;
 
-        padding: 0.6rem;
+        padding: 0.5rem;
         color: $_color;
-        margin-bottom: 0.2rem;
-        border-radius: 0.7rem;
+        margin-bottom: 0.15rem;
+        border-radius: 0.4rem;
         cursor: pointer;
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
         background: rgba(255, 255, 255, 0.6);
         border: 1px solid transparent;
         font-weight: 500;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-        margin-right: 0.2rem;
+        margin-right: 0.15rem;
 
         &:hover {
           color: _.$primary;
           background: linear-gradient(135deg, rgba(_.$primary, 0.1), rgba(_.$primary, 0.05));
-          transform: translateX(0.3rem) scale(1.02);
           box-shadow:
             0 3px 8px rgba(_.$primary, 0.15),
             0 1px 3px rgba(_.$primary, 0.1);
@@ -211,7 +191,6 @@
           box-shadow:
             0 2px 6px rgba(_.$primary, 0.2),
             0 1px 3px rgba(_.$primary, 0.1);
-          transform: translateX(0.2rem);
         }
 
         &.focused {

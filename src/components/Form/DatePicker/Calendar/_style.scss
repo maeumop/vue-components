@@ -7,35 +7,34 @@
 
 .select-calendar-wrap {
   width: 100%;
-  height: 23rem;
-  min-height: 23rem !important;
-  padding: 0.5rem 0.5rem;
+  height: 19rem;
+  padding: 0.4rem 0.4rem;
   border-radius: 0.4rem;
   position: relative;
   z-index: 1;
+  overflow: hidden; // 트랜지션 중 넘치는 부분 숨김
 
   .select-calendar {
     margin: 0 auto;
 
     ul {
       display: table;
-      width: 100%;
       font-size: 0.8rem;
-      font-weight: 400;
       margin: 0;
       padding-left: 0;
       border-spacing: 0.2rem;
+      width: 100%;
 
       li {
         display: table-cell;
         text-align: center;
-        width: 2.6rem;
-        height: 2.6rem;
+        vertical-align: middle;
+        width: 2.2rem;
+        height: 2.2rem;
         border: 1px solid transparent;
-        line-height: 2.6rem;
         cursor: pointer;
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        border-radius: 0.5rem;
+        border-radius: 0.4rem;
         position: relative;
         font-weight: 500;
         color: _.$text-default;
@@ -56,13 +55,13 @@
         color: color.change(_.$text-default, $lightness: 40%);
         cursor: default !important;
         font-weight: 700;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         text-transform: uppercase;
         letter-spacing: 0.08em;
-        height: 2.6rem;
-        line-height: 2.6rem;
+        height: 2.2rem;
+        line-height: 2.2rem;
         border: none;
-        background: linear-gradient(135deg, rgba(_.$primary, 0.05), rgba(_.$primary, 0.02));
+        background: rgba(_.$primary, 0.1);
         border-radius: 0.4rem;
 
         &:focus {
@@ -84,10 +83,10 @@
         &.beforeMonth,
         &.afterMonth {
           // 이전달, 다음달 날짜 표시
-          color: color.change(_.$text-default, $lightness: 55%) !important;
+          color: color.change(_.$text-default, $lightness: 40%) !important;
           cursor: default;
           opacity: 0.6;
-          background: rgba(_.$gray-200, 0.3);
+          background: rgba(_.$gray-200, 0.5);
 
           &:focus {
             outline: none;
@@ -105,11 +104,11 @@
           &::after {
             content: '';
             position: absolute;
-            bottom: 0.3rem;
+            bottom: 0.2rem;
             left: 50%;
             transform: translateX(-50%);
-            width: 0.5rem;
-            height: 0.5rem;
+            width: 0.3rem;
+            height: 0.3rem;
             background: linear-gradient(
               135deg,
               _.$accent,
@@ -208,57 +207,65 @@
   }
 }
 
-// 트랜지션 애니메이션 개선
+// 트랜지션 애니메이션 개선 - 더 부드럽고 자연스러운 전환
 .trans-left-enter-from {
   opacity: 0;
-  transform: translateX(3rem) scale(0.95);
+  transform: translateX(2rem) scale(0.98);
+  filter: blur(1px);
 }
 .trans-left-leave-to {
   opacity: 0;
-  transform: translateX(-3rem) scale(0.95);
+  transform: translateX(-2rem) scale(0.98);
+  filter: blur(1px);
 }
 .trans-left-enter-active,
 .trans-left-leave-active {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .trans-right-enter-from {
   opacity: 0;
-  transform: translateX(-3rem) scale(0.95);
+  transform: translateX(-2rem) scale(0.98);
+  filter: blur(1px);
 }
 .trans-right-leave-to {
   opacity: 0;
-  transform: translateX(3rem) scale(0.95);
+  transform: translateX(2rem) scale(0.98);
+  filter: blur(1px);
 }
 .trans-right-enter-active,
 .trans-right-leave-active {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .trans-down-enter-from {
   opacity: 0;
-  transform: translateY(-3rem) scale(0.95);
+  transform: translateY(-2rem) scale(0.98);
+  filter: blur(1px);
 }
 .trans-down-leave-to {
   opacity: 0;
-  transform: translateY(3rem) scale(0.95);
+  transform: translateY(2rem) scale(0.98);
+  filter: blur(1px);
 }
 .trans-down-enter-active,
 .trans-down-leave-active {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .trans-up-enter-from {
   opacity: 0;
-  transform: translateY(3rem) scale(0.95);
+  transform: translateY(2rem) scale(0.98);
+  filter: blur(1px);
 }
 .trans-up-leave-to {
   opacity: 0;
-  transform: translateY(-3rem) scale(0.95);
+  transform: translateY(-2rem) scale(0.98);
+  filter: blur(1px);
 }
 .trans-up-enter-active,
 .trans-up-leave-active {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 // 반응형 디자인

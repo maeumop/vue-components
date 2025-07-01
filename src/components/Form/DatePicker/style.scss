@@ -11,15 +11,11 @@
   text-decoration: none;
   border: 0.1rem solid _.$gray-300;
   border-radius: 0.4rem;
-  font-size: 0.9rem;
-  padding: 0.6rem 1rem;
+  font-size: 0.8rem;
+  padding: 0.5rem 0.8rem;
   color: _.$text-default;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
-
-  &:hover {
-    background-color: _.$gray-200;
-  }
 }
 
 /// @access private
@@ -109,7 +105,7 @@ $_button-colors: _.getButtonColors();
   }
 
   .search-date {
-    padding: 1rem;
+    padding: 0.8rem;
     border-bottom: 0.1rem solid _.$gray-300;
     text-align: left;
 
@@ -120,11 +116,26 @@ $_button-colors: _.getButtonColors();
         margin-left: 0.3rem;
       }
 
+      &:hover {
+        background: linear-gradient(135deg, rgba(_.$primary, 0.1), rgba(_.$primary, 0.05));
+        border-color: rgba(_.$primary, 0.3);
+        color: _.$primary;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(_.$primary, 0.15);
+      }
+
       &.active {
         @if map.has-key($_button-colors, primary) {
-          color: map.get($_button-colors, primary, text);
+          color: white;
           border-color: map.get($_button-colors, primary, default);
-          background-color: map.get($_button-colors, primary, default);
+          background: linear-gradient(
+            135deg,
+            map.get($_button-colors, primary, default),
+            map.get($_button-colors, primary, hover)
+          );
+          font-weight: 600;
+          box-shadow: 0 2px 8px rgba(map.get($_button-colors, primary, default), 0.3);
+          transform: translateY(-1px);
         }
       }
     }
@@ -134,7 +145,7 @@ $_button-colors: _.getButtonColors();
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1rem;
+    padding: 0.8rem;
     border-top: 0.1rem solid _.$gray-300;
 
     .select-date {

@@ -56,6 +56,10 @@ const errorTransition = ref<boolean>(false);
 const isValidate = ref<boolean>(true);
 const _modelValue = ref<string | string[]>(props.modelValue);
 
+// 범위 선택 모드에서 임시 저장용 변수
+const tempStartDate = ref<string>('');
+const tempEndDate = ref<string>('');
+
 const startCalendar = ref<Calendar>();
 const endCalendar = ref<Calendar>();
 
@@ -194,20 +198,26 @@ const minYear = computed<number>(() => props.minYear);
  * 배치된 위치에 따라 달력이 보여지는 위치와 방향을 변경
  */
 const toggleCalendar = (): void => {
-  if (!isShow.value) {
+  if (!isShow.value && inputArea.value && picker.value) {
     const { top, bottom, left, right, transformOrigin } = helper.getLayerPosition(
-      inputArea.value!,
+      inputArea.value,
       props.range,
     );
 
-    picker.value!.style.top = top;
-    picker.value!.style.bottom = bottom;
-    picker.value!.style.left = left;
-    picker.value!.style.right = right;
-    picker.value!.style.transformOrigin = transformOrigin;
+    picker.value.style.top = top;
+    picker.value.style.bottom = bottom;
+    picker.value.style.left = left;
+    picker.value.style.right = right;
+    picker.value.style.transformOrigin = transformOrigin;
   }
 
   if (!props.readonly && !props.disabled) {
+    // 달력을 열 때 현재 선택된 날짜를 임시 저장
+    if (!isShow.value && props.range) {
+      tempStartDate.value = startDate.value;
+      tempEndDate.value = endDate.value;
+    }
+
     isShow.value = !isShow.value;
   }
 };
@@ -225,14 +235,17 @@ const setDateCalender = (): void => {
   setDateState('end', 'month', Number(end[1]));
 
   nextTick(() => {
-    startCalendar.value!.makeCalendar();
+    startCalendar.value?.makeCalendar();
 
     if (props.range) {
-      endCalendar.value!.makeCalendar();
+      endCalendar.value?.makeCalendar();
     }
   });
 
   updateValue();
+
+  // 범위 선택 모드에서는 자동으로 창을 닫지 않음
+  // 사용자가 적용 버튼을 클릭할 때만 창이 닫힘
 };
 
 let clickToggleDateButton = false;
@@ -293,6 +306,9 @@ const pickCaseDate = (index: number): void => {
   }
 
   setDateCalender();
+
+  // 범위 선택 모드에서는 빠른 선택 버튼 클릭 시에도 창을 유지
+  // 사용자가 적용 버튼을 클릭할 때만 창이 닫힘
 };
 
 /**
@@ -309,18 +325,35 @@ const setErrorMsg = (msg: string = '날짜를 선택해주세요.'): void => {
 
 /**
  * 취소 버튼 클릭
- * defaultDate === true 이고, 초기 값이 있을때 초기값 반영
+ * 임시 저장된 날짜로 되돌리기
  */
 const cancel = (): void => {
   if (props.range) {
-    if (props.defaultDate && props.modelValue[0] && props.modelValue[1]) {
-      toggleDateButton.value.map(item => (item.checked = false));
-      dateUpdate(_modelValue.value);
-      setDateCalender();
-      emit('update:modelValue', [_modelValue.value[0], _modelValue.value[1]]);
-    } else {
-      resetForm();
+    // 임시 저장된 날짜로 되돌리기
+    setStartDate(tempStartDate.value);
+    setEndDate(tempEndDate.value);
+    setSelected('start', tempStartDate.value);
+    setSelected('end', tempEndDate.value);
+
+    // 달력 상태도 임시 저장된 날짜로 업데이트
+    if (tempStartDate.value && tempEndDate.value) {
+      const s = props.separator;
+      const start: string[] = tempStartDate.value.split(s);
+      const end: string[] = tempEndDate.value.split(s);
+
+      setDateState('start', 'year', Number(start[0]));
+      setDateState('start', 'month', Number(start[1]));
+      setDateState('end', 'year', Number(end[0]));
+      setDateState('end', 'month', Number(end[1]));
+
+      nextTick(() => {
+        startCalendar.value?.makeCalendar();
+        endCalendar.value?.makeCalendar();
+      });
     }
+
+    // 빠른 선택 버튼 초기화
+    toggleDateButton.value.forEach(item => (item.checked = false));
   }
 
   isShow.value = false;
@@ -338,6 +371,13 @@ const accept = (): void => {
   updateValue();
   emit('update:set', [startDate.value, endDate.value]);
   _modelValue.value = [startDate.value, endDate.value];
+
+  // 적용 시 임시 저장 변수도 업데이트
+  if (props.range) {
+    tempStartDate.value = startDate.value;
+    tempEndDate.value = endDate.value;
+  }
+
   isShow.value = false;
 };
 
@@ -366,12 +406,15 @@ const resetForm = (): void => {
   init();
 
   toggleDateButton.value.forEach(item => (item.checked = false));
-  startCalendar.value!.resetSelected();
-  startCalendar.value!.makeCalendar();
 
-  if (props.range) {
-    endCalendar.value!.resetSelected();
-    endCalendar.value!.makeCalendar();
+  if (startCalendar.value) {
+    startCalendar.value.resetSelected();
+    startCalendar.value.makeCalendar();
+  }
+
+  if (props.range && endCalendar.value) {
+    endCalendar.value.resetSelected();
+    endCalendar.value.makeCalendar();
     emit('update:modelValue', ['', '']);
   } else {
     emit('update:modelValue', '');
@@ -489,10 +532,18 @@ const setScrollEvent = (el: HTMLElement): void => {
  * @param flag start | end
  */
 const dateTermCheck = (isEnd: boolean): void => {
+  // 단일 날짜 선택 모드
+  if (!props.range) {
+    updateValue();
+    isShow.value = false;
+    return;
+  }
+
   toggleDateButton.value.forEach(item => (item.checked = false));
 
   nextTick(() => {
-    if (props.range && props.maxRange && startDate.value && endDate.value) {
+    // 범위 선택 모드
+    if (props.maxRange && startDate.value && endDate.value) {
       const startTime: number = new Date(startDate.value).getTime();
       const endTime: number = new Date(endDate.value).getTime();
 
@@ -513,16 +564,8 @@ const dateTermCheck = (isEnd: boolean): void => {
     }
 
     // 달력을 다시 그려준다.
-    startCalendar.value!.makeCalendar();
-
-    if (props.range) {
-      endCalendar.value!.makeCalendar();
-    }
-
-    if (!props.range) {
-      updateValue();
-      isShow.value = false;
-    }
+    startCalendar.value?.makeCalendar();
+    endCalendar.value?.makeCalendar();
   });
 };
 
@@ -635,7 +678,6 @@ defineExpose({
 
       <div
         :class="['feedback', { error: errorTransition }]"
-        @animationend="errorTransition = false"
         v-show="message && !props.hideMessage"
         id="datepicker-error"
         role="alert"
@@ -670,11 +712,6 @@ defineExpose({
               {{ v.text }}
             </a>
           </div>
-
-          <ul class="pick-name-text" role="list">
-            <li role="listitem">시작일</li>
-            <li role="listitem">종료일</li>
-          </ul>
         </template>
 
         <div class="picker-wrap">
