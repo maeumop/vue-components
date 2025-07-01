@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { nextTick, ref, watch } from 'vue';
+import { nextTick, onMounted, ref, watch } from 'vue';
+import { useAddFormValidate } from '../common';
 import { switchButtonColor } from './const';
 import type { SwitchButtonEmits, SwitchButtonProps } from './types';
 
@@ -122,6 +123,10 @@ const updateValue = (evt: Event): void => {
     emit('update:after');
   });
 };
+
+onMounted(() => {
+  useAddFormValidate();
+});
 
 defineExpose({
   resetValidate,

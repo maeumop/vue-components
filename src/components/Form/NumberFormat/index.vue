@@ -2,6 +2,7 @@
 import type { StyleValue } from 'vue';
 import { computed, onMounted, ref, useAttrs, watch } from 'vue';
 import type { RuleFunc } from '../../types';
+import { useAddFormValidate } from '../common';
 import type { NumberFormatEmits, NumberFormatProps } from './types';
 
 const props = withDefaults(defineProps<NumberFormatProps>(), {
@@ -213,6 +214,8 @@ onMounted(() => {
       Input.value.value = format(props.modelValue);
     }
   }
+
+  useAddFormValidate();
 });
 
 defineExpose({

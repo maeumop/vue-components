@@ -12,6 +12,7 @@ import {
   watch,
 } from 'vue';
 import type { RuleFunc } from '../../types';
+import { useAddFormValidate } from '../common';
 import type { SelectBoxEmits, SelectBoxItem, SelectBoxProps } from './types';
 
 const props = withDefaults(defineProps<SelectBoxProps>(), {
@@ -600,6 +601,8 @@ onMounted(() => {
 
   document.addEventListener('click', outSideClickEvent);
   document.addEventListener('keydown', preventDefaultScrollEvent, { capture: true });
+
+  useAddFormValidate();
 });
 
 onBeforeMount(() => {

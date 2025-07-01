@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import type { RuleFunc } from '../../types';
+import { useAddFormValidate } from '../common';
 import { checkButtonColor, checkButtonIcons, checkButtonType } from './const';
 import type { CheckButtonEmits, CheckButtonItem, CheckButtonProps } from './types';
 
@@ -231,6 +232,10 @@ const resetValidate = (): void => {
 const resetForm = (): void => {
   val.value = props.type === 'radio' ? '' : [];
 };
+
+onMounted(() => {
+  useAddFormValidate();
+});
 
 defineExpose({
   check,

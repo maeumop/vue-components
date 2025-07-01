@@ -2,6 +2,7 @@
 import { Icon } from '@iconify/vue';
 import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue';
 import type { RuleFunc } from '../../types';
+import { useAddFormValidate } from '../common';
 import CalendarPart from './Calendar/index.vue';
 import DateController from './DateController/index.vue';
 import { useDatePickerHelper } from './helper';
@@ -611,6 +612,7 @@ if (props.modelValue) {
 }
 
 onMounted(() => {
+  useAddFormValidate();
   document.addEventListener('click', outsideClickEvent);
 });
 

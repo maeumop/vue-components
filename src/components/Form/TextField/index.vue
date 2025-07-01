@@ -3,6 +3,7 @@ import { Icon } from '@iconify/vue';
 import type { StyleValue } from 'vue';
 import { computed, onMounted, ref, watch } from 'vue';
 import type { RuleFunc } from '../../types';
+import { useAddFormValidate } from '../common';
 import { textFieldType } from './const';
 import type { TextFieldEmits, TextFieldProps } from './types';
 
@@ -183,6 +184,9 @@ onMounted(() => {
       Input.value?.focus();
     }
   }
+
+  // ValidateForm에 자동 등록
+  useAddFormValidate();
 });
 
 defineExpose({
