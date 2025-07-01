@@ -8,19 +8,14 @@ const props = withDefaults(defineProps<ValidateWrapProps>(), {
   errorMessage: '',
 });
 
-const emit = defineEmits<{
-  (event: 'update:checkValue'): void;
-}>();
+// emit은 현재 사용되지 않지만 향후 확장을 위해 유지
+// const emit = defineEmits<ValidateWrapEmits>();
 
 const slots = useSlots();
 
 watch(
-  () => [props.checkValue, props.validate, props.disabled],
-  (a, b) => {
-    if (a[0] !== b[0]) {
-      emit('update:checkValue');
-    }
-
+  () => props.checkValue,
+  () => {
     resetForm();
   },
 );
@@ -33,50 +28,52 @@ watch(
 );
 
 const isValidate = ref<boolean>(true);
-const checkPass = ref<boolean>(false);
 const message = ref<string>('');
-const errorTransition = ref<boolean>(false);
+const showError = ref<boolean>(false);
 
 const check = (silence: boolean = false): boolean => {
   if (props.disabled) {
     return true;
   }
 
-  // 임의로 지정된 에러가 없는 경우
-  if (props.errorMessage === '') {
-    // validate check
-    if (props.validate.length) {
-      for (let i = 0; i < props.validate.length; i++) {
-        const result = props.validate[i](props.checkValue);
-
-        if (typeof result === 'string') {
-          if (!silence) {
-            errorTransition.value = true;
-            message.value = result;
-            isValidate.value = false;
-            checkPass.value = false;
-          }
-
-          return false;
-        } else {
-          message.value = '';
-        }
-      }
+  // errorMessage가 설정되어 있으면 해당 메시지 사용
+  if (props.errorMessage) {
+    if (!silence) {
+      message.value = props.errorMessage;
+      showError.value = true;
+      isValidate.value = false;
     }
-
-    isValidate.value = true;
-    checkPass.value = true;
-
-    return true;
+    return false;
   }
 
-  return false;
+  // validate 함수들 실행
+  if (props.validate.length) {
+    for (const validateFunc of props.validate) {
+      const result = validateFunc(props.checkValue);
+
+      if (typeof result === 'string') {
+        if (!silence) {
+          message.value = result;
+          showError.value = true;
+          isValidate.value = false;
+        }
+
+        return false;
+      }
+    }
+  }
+
+  // 모든 검증 통과
+  message.value = '';
+  showError.value = false;
+  isValidate.value = true;
+  return true;
 };
 
 const resetForm = (): void => {
   isValidate.value = true;
-  checkPass.value = false;
   message.value = '';
+  showError.value = false;
 };
 
 const resetValidate = (): void => {
@@ -106,15 +103,11 @@ defineExpose({
       </div>
     </div>
 
-    <div :class="['input-wrap', { error: message }]">
+    <div :class="['input-wrap', { error: showError }]">
       <slot :on-blur="childBlur"></slot>
     </div>
 
-    <div
-      :class="['feedback', { error: errorTransition }]"
-      @animationend="errorTransition = false"
-      v-show="message"
-    >
+    <div :class="['feedback', { error: showError }]">
       {{ message }}
     </div>
   </div>

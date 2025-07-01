@@ -98,6 +98,11 @@ const router = createRouter({
       name: 'datepicker',
       component: () => import('../components/Form/DatePicker/ex.vue'),
     },
+    {
+      path: '/components/validatewrap',
+      name: 'validatewrap',
+      component: () => import('../components/Form/ValidateWrap/ex.vue'),
+    },
   ],
 });
 

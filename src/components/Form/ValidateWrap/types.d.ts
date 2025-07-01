@@ -1,7 +1,7 @@
 import type { RuleFunc } from '../../types';
 
 export interface ValidateWrapProps {
-  checkValue: any;
+  checkValue: unknown;
   validate?: RuleFunc[];
   errorMessage?: string;
   label?: string;
@@ -10,7 +10,11 @@ export interface ValidateWrapProps {
 }
 
 export interface ValidateWrapModel {
-  check(silence?: boolean): void;
+  check(silence?: boolean): boolean;
   resetForm(): void;
   resetValidate(): void;
+}
+
+export interface ValidateWrapEmits {
+  (event: 'update:checkValue'): void;
 }

@@ -220,31 +220,6 @@ const validateMaxSelection = (value: unknown): string | boolean => {
             </div>
           </div>
         </section>
-
-        <!-- 스크롤 테스트 -->
-        <section class="example-section">
-          <h2>스크롤 이벤트 테스트</h2>
-          <div class="scroll-test-container">
-            <div class="scroll-content">
-              <p>위쪽 스크롤 영역</p>
-              <p>SelectBox를 열고 스크롤해보세요</p>
-              <p>옵션 목록이 자동으로 닫혀야 합니다</p>
-
-              <div class="select-in-scroll">
-                <SelectBox
-                  v-model="basicSelect"
-                  :options="options"
-                  placeholder="스크롤 테스트용"
-                  block
-                />
-              </div>
-
-              <p>아래쪽 스크롤 영역</p>
-              <p>스크롤하면 옵션 목록이 닫힙니다</p>
-              <p>테스트 완료</p>
-            </div>
-          </div>
-        </section>
       </div>
     </main>
 
