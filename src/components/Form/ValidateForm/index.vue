@@ -1,65 +1,67 @@
 <script setup lang="ts">
-import type { ValidateExplorKeys } from '@/components/Form/ValidateForm/types';
 import type { ComponentInternalInstance, ComputedRef, VNode } from 'vue';
 import { Fragment, computed, h, ref, useSlots } from 'vue';
+import { useAddFormValidate } from '../common';
+import type { ValidatableComponent, ValidateExplorKeys } from './types';
 
 const slots = useSlots();
-
 const frm = ref<HTMLFormElement>();
-
 const isCover = ref<boolean>(false);
 const formValidItems = ref<VNode[]>([]);
 
-let checkState: boolean;
+// 유효성 검사 가능한 컴포넌트 타입
 
 const RenderSlotItems: ComputedRef = computed(() =>
   h(Fragment, slots.default ? slots.default() : []),
 );
 
 const validate = (silence: boolean = false): boolean => {
-  checkState = true;
-
-  const firstElArr: Node[] = [];
-  const list: typeof formValidItems.value = [...formValidItems.value];
-
-  for (let index = 0; index < list.length; index++) {
-    const instance = list[index].component;
+  let isValid = true;
+  const nodes: Node[] = [];
+  console.log('formValidItems.value.length', formValidItems.value.length);
+  // 역순 순회로 안전하게 제거
+  for (let i = formValidItems.value.length - 1; i >= 0; i--) {
+    const node = formValidItems.value[i];
+    const instance = node.component as ComponentInternalInstance & {
+      exposed?: ValidatableComponent;
+    };
 
     if (!instance || instance.isUnmounted) {
-      // Unmounted 된거 삭제
-      formValidItems.value.splice(index, 1);
+      formValidItems.value.splice(i, 1);
       continue;
     }
 
     const check = instance.exposed?.check;
-
-    if (check && typeof check === 'function') {
+    if (typeof check === 'function') {
       const result = check(silence);
+
       if (!result) {
-        instance.vnode.el && firstElArr.push(instance.vnode.el as Node);
-        checkState && (checkState = false);
+        if (instance.vnode.el) {
+          nodes.push(instance.vnode.el as Node);
+        }
+
+        isValid = false;
       }
     }
   }
 
-  if (!checkState) {
-    targetFirstEl(firstElArr);
+  if (!isValid) {
+    targetFirstEl(nodes);
   }
 
-  return checkState;
+  return isValid;
 };
 
-const targetFirstEl = (elList: Node[] = []): void => {
+// 첫 번째 에러 요소로 스크롤
+const targetFirstEl = (nodes: Node[] = []): void => {
   let result: HTMLElement | null = null;
   if (frm.value) {
     const treeWalker = document.createTreeWalker(frm.value, NodeFilter.SHOW_ELEMENT, {
-      acceptNode: function (node: Node) {
-        return elList.includes(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
-      },
+      acceptNode: node =>
+        nodes.includes(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP,
     });
 
     result = treeWalker.nextNode() as HTMLElement | null;
-
     result?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 };
@@ -77,44 +79,41 @@ const resetValidate = (): void => {
 };
 
 const validateCheck = (instance: ComponentInternalInstance, flag: ValidateExplorKeys): void => {
-  const { resetForm, resetValidate } = instance.exposed ?? {};
+  const { resetForm, resetValidate } = (instance.exposed as ValidatableComponent) ?? {};
 
   switch (flag) {
     case 'resetForm':
-      {
-        if (typeof resetForm === 'function') {
-          console.log('validateCheck :>> ', flag, instance);
-          resetForm();
-          resetValidate();
-        }
-      }
-      return;
+      if (typeof resetForm === 'function') {
+        resetForm();
 
-    case 'resetValidate':
-      {
         if (typeof resetValidate === 'function') {
           resetValidate();
         }
       }
-      return;
+
+      break;
+    case 'resetValidate':
+      if (typeof resetValidate === 'function') {
+        resetValidate();
+      }
   }
 };
 
 const explore = (flag: ValidateExplorKeys): void => {
-  const list: typeof formValidItems.value = [...formValidItems.value];
-  for (let index = 0; index < list.length; index++) {
-    const instance = list[index].component;
+  for (let i = formValidItems.value.length - 1; i >= 0; i--) {
+    const node = formValidItems.value[i];
+    const instance = node.component;
 
     if (!instance || instance.isUnmounted) {
-      // Unmounted 된거 삭제
-      formValidItems.value.splice(index, 1);
+      formValidItems.value.splice(i, 1);
       continue;
     }
     validateCheck(instance, flag);
   }
 };
 
-const addComponant = (node: VNode): void => {
+const addComponent = (node: VNode): void => {
+  console.log('addComponent', node);
   if (frm.value && node.component?.isMounted) {
     formValidItems.value.push(node);
   }
@@ -124,13 +123,14 @@ const formProtection = (protect: boolean = true): void => {
   isCover.value = protect;
 };
 
+useAddFormValidate();
+
 defineExpose({
   formProtection,
   resetValidate,
   resetForm,
   validate,
-
-  addComponant,
+  addComponent,
 });
 </script>
 

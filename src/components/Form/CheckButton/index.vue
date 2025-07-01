@@ -233,9 +233,7 @@ const resetForm = (): void => {
   val.value = props.type === 'radio' ? '' : [];
 };
 
-onMounted(() => {
-  useAddFormValidate();
-});
+useAddFormValidate();
 
 defineExpose({
   check,

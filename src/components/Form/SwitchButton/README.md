@@ -16,21 +16,22 @@ SwitchButton 컴포넌트는 토글 스위치 또는 체크박스 형태로 사�
 - **스타일 적용 문제 해결** (`@import` 사용)
 - **modelValue watch 로직 개선** (무한 루프 방지)
 - **예제 페이지 디자인 통일성 개선**
+- **사이즈 옵션 제거**: `small` prop 제거하고 기본 사이즈로 통일
+- **폰트 크기 조정**: 다른 컴포넌트들과 일치하는 `0.875rem` 적용
 
 ## Props
 
-| 이름       | 타입                                                                                | 필수    | 기본값            | 설명                      |
-| ---------- | ----------------------------------------------------------------------------------- | ------- | ----------------- | ------------------------- | ----------------------- |
-| modelValue | `string \| boolean`                                                                 | ●       |                   | 현재 값 (v-model)         |
-| label      | `string[]`                                                                          |         | ['미설정','설정'] | [false, true] 상태별 라벨 |
-| trueValue  | `string \| boolean`                                                                 |         | true              | true 상태 값              |
-| falseValue | `string \| boolean`                                                                 |         | false             | false 상태 값             |
-| readonly   | `boolean`                                                                           |         | false             | 읽기 전용                 |
-| checkbox   | `boolean`                                                                           |         | false             | 체크박스 스타일 사용      |
-| color      | `'primary' \| 'secondary' \| 'success' \| 'warning' \| 'error' \| 'info' \| 'dark'` |         | 'primary'         | 색상 테마                 |
-| disabled   | `boolean`                                                                           |         | false             | 비활성화                  |
-| validate   | `string \| (value) => boolean                                                       | string` |                   |                           | 유효성 검사 함수/메시지 |
-| small      | `boolean`                                                                           |         | false             | 작은 사이즈               |
+| 이름       | 타입                                                                                | 필수 | 기본값            | 설명                      |
+| ---------- | ----------------------------------------------------------------------------------- | ---- | ----------------- | ------------------------- |
+| modelValue | `string \| boolean`                                                                 | ●    |                   | 현재 값 (v-model)         |
+| label      | `string[]`                                                                          |      | ['미설정','설정'] | [false, true] 상태별 라벨 |
+| trueValue  | `string \| boolean`                                                                 |      | true              | true 상태 값              |
+| falseValue | `string \| boolean`                                                                 |      | false             | false 상태 값             |
+| readonly   | `boolean`                                                                           |      | false             | 읽기 전용                 |
+| checkbox   | `boolean`                                                                           |      | false             | 체크박스 스타일 사용      |
+| color      | `'primary' \| 'secondary' \| 'success' \| 'warning' \| 'error' \| 'info' \| 'dark'` |      | 'primary'         | 색상 테마                 |
+| disabled   | `boolean`                                                                           |      | false             | 비활성화                  |
+| validate   | `string \| (value) => boolean \| string`                                            |      |                   | 유효성 검사 함수/메시지   |
 
 ## Emits
 
@@ -62,7 +63,6 @@ SwitchButton 컴포넌트는 토글 스위치 또는 체크박스 형태로 사�
     :checkbox="true"
     :validate="validateFn"
     :disabled="isDisabled"
-    small
   />
 </template>
 
@@ -100,3 +100,6 @@ const validateFn = (val: unknown) => {
 - **스타일 적용 문제 해결**: `@use` → `@import` 변경으로 스타일 정상 적용
 - **로직 개선**: modelValue watch에서 무한 루프 방지 로직 추가
 - **예제 페이지 개선**: 기존 컴포넌트들과 동일한 레이아웃/디자인 적용
+- **사이즈 옵션 제거**: `small` prop을 제거하고 기본 사이즈로 통일하여 일관성 향상
+- **폰트 크기 통일**: 다른 폼 컴포넌트들과 동일한 `0.875rem` 폰트 크기 적용
+- **컴팩트한 디자인**: 스위치 크기를 `3rem × 1.5rem`으로 조정하여 더욱 깔끔한 UI 제공

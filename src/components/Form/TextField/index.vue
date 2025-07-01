@@ -176,6 +176,9 @@ const resetValidate = (): void => {
   }
 };
 
+// ValidateForm에 자동 등록
+useAddFormValidate();
+
 onMounted(() => {
   if (props.autofocus) {
     if (props.multiline) {
@@ -184,9 +187,6 @@ onMounted(() => {
       Input.value?.focus();
     }
   }
-
-  // ValidateForm에 자동 등록
-  useAddFormValidate();
 });
 
 defineExpose({

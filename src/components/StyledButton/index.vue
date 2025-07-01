@@ -20,6 +20,7 @@ const props = withDefaults(defineProps<StyledButtonProps>(), {
   outline: false,
   tag: 'a',
   dropMenuToggle: false,
+  width: undefined,
 });
 
 const emit = defineEmits<{
@@ -75,6 +76,20 @@ const buttonStyle = computed<string[]>(() => {
   return classes;
 });
 
+const buttonInlineStyle = computed(() => {
+  const style: Record<string, string> = {};
+
+  if (props.width) {
+    if (typeof props.width === 'number') {
+      style.width = `${props.width}px`;
+    } else {
+      style.width = props.width;
+    }
+  }
+
+  return style;
+});
+
 const hrefState = computed<string>(() => {
   if (!props.disabled) {
     return props.href ? props.href : '#';
@@ -119,7 +134,7 @@ const WrapperTag = computed<VNode>(() => h(props.style === 'text' ? 'a' : props.
 </script>
 
 <template>
-  <WrapperTag :class="buttonStyle">
+  <WrapperTag :class="buttonStyle" :style="buttonInlineStyle">
     <div class="btn-wrap">
       <template v-if="!props.onlyIcon">
         <template v-if="props.loading">

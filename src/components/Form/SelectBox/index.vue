@@ -1,16 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
 import type { CSSProperties, StyleValue } from 'vue';
-import {
-  computed,
-  nextTick,
-  onBeforeMount,
-  onMounted,
-  onUnmounted,
-  reactive,
-  ref,
-  watch,
-} from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import type { RuleFunc } from '../../types';
 import { useAddFormValidate } from '../common';
 import type { SelectBoxEmits, SelectBoxItem, SelectBoxProps } from './types';
@@ -589,6 +580,8 @@ watch(isShowOption, v => {
   }
 });
 
+useAddFormValidate();
+
 onMounted(() => {
   setDefaultModelValue();
 
@@ -601,12 +594,6 @@ onMounted(() => {
 
   document.addEventListener('click', outSideClickEvent);
   document.addEventListener('keydown', preventDefaultScrollEvent, { capture: true });
-
-  useAddFormValidate();
-});
-
-onBeforeMount(() => {
-  // 이전 버전과의 호환성을 위한 빈 함수
 });
 
 onUnmounted(() => {

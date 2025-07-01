@@ -210,6 +210,37 @@ const handleClick = (event: MouseEvent) => {
           </div>
         </section>
 
+        <!-- Width 설정 버튼 -->
+        <section class="example-section">
+          <h2>Width 설정 버튼</h2>
+          <div class="example-grid">
+            <div class="example-item">
+              <StyledButton :width="120" color="primary">120px</StyledButton>
+              <span class="example-label">숫자 (120px)</span>
+            </div>
+            <div class="example-item">
+              <StyledButton width="200px" color="success">200px</StyledButton>
+              <span class="example-label">문자열 (200px)</span>
+            </div>
+            <div class="example-item">
+              <StyledButton width="50%" color="warning">50%</StyledButton>
+              <span class="example-label">퍼센트 (50%)</span>
+            </div>
+            <div class="example-item">
+              <StyledButton width="10rem" color="info">10rem</StyledButton>
+              <span class="example-label">rem 단위 (10rem)</span>
+            </div>
+            <div class="example-item">
+              <StyledButton :width="300" color="secondary">300px</StyledButton>
+              <span class="example-label">넓은 버튼 (300px)</span>
+            </div>
+            <div class="example-item">
+              <StyledButton width="100%" color="dark">전체 너비</StyledButton>
+              <span class="example-label">전체 너비 (100%)</span>
+            </div>
+          </div>
+        </section>
+
         <!-- 상태별 버튼 -->
         <section class="example-section">
           <h2>상태별 버튼</h2>

@@ -12,7 +12,6 @@ export interface SwitchButtonProps {
   color?: SwitchButtonColor;
   disabled?: boolean;
   validate?: string | ((value: unknown) => boolean | string);
-  small?: boolean;
 }
 
 export interface SwitchButtonEmits {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { nextTick, onMounted, ref, watch } from 'vue';
+import { nextTick, ref, watch } from 'vue';
 import { useAddFormValidate } from '../common';
 import { switchButtonColor } from './const';
 import type { SwitchButtonEmits, SwitchButtonProps } from './types';
@@ -11,7 +11,6 @@ const props = withDefaults(defineProps<SwitchButtonProps>(), {
   trueValue: true,
   falseValue: false,
   color: switchButtonColor.primary,
-  small: false,
 });
 
 const emit = defineEmits<SwitchButtonEmits>();
@@ -124,9 +123,7 @@ const updateValue = (evt: Event): void => {
   });
 };
 
-onMounted(() => {
-  useAddFormValidate();
-});
+useAddFormValidate();
 
 defineExpose({
   resetValidate,
@@ -137,7 +134,7 @@ defineExpose({
 
 <template>
   <div :class="['switch-wrap', props.color]">
-    <label :for="inputId" :class="['switch', { small: props.small, checkbox: props.checkbox }]">
+    <label :for="inputId" :class="['switch', { checkbox: props.checkbox }]">
       <input
         :id="inputId"
         type="checkbox"

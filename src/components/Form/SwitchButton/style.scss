@@ -28,7 +28,7 @@
 
   .switch {
     cursor: pointer;
-    font-size: 1.4rem;
+    font-size: 0.875rem;
     margin: 0;
     display: flex;
     align-items: center;
@@ -57,17 +57,17 @@
 
       & + span {
         display: inline-block;
-        width: 4.1rem;
-        height: 2rem;
+        width: 3rem;
+        height: 1.5rem;
         background: _.$gray-400;
-        border-radius: 1rem;
+        border-radius: 0.75rem;
         margin-right: 0.5rem;
 
         i {
           display: inline-block;
-          margin: 0.4rem;
-          width: 1.2rem;
-          height: 1.2rem;
+          margin: 0.3rem;
+          width: 0.9rem;
+          height: 0.9rem;
           background: white;
           border-radius: 50%;
           transition: all 0.2s;
@@ -83,33 +83,7 @@
       }
 
       &:checked + span > i {
-        transform: translateX(4.1rem - 1.2rem - 0.8rem);
-      }
-    }
-
-    &.small {
-      line-height: 1.9rem;
-
-      input[type='checkbox'] {
-        & + span {
-          width: 3rem;
-          height: 1.5rem;
-          margin-right: 0.5rem;
-
-          i {
-            margin: 0.3rem;
-            width: 0.9rem;
-            height: 0.9rem;
-          }
-        }
-
-        &:checked + span > i {
-          transform: translateX(3rem - 0.9rem - 0.6rem);
-        }
-      }
-
-      svg {
-        height: 1.6rem;
+        transform: translateX(3rem - 0.9rem - 0.6rem);
       }
     }
 

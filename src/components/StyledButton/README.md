@@ -39,7 +39,7 @@ app.mount('#app');
 
 ```vue
 <script setup lang="ts">
-  import StyledButton from '@/components/StyledButton';
+import StyledButton from '@/components/StyledButton';
 </script>
 ```
 
@@ -71,25 +71,26 @@ app.mount('#app');
 
 ## ⚙️ Props
 
-| Prop             | Type           | Default     | Description               |
-| ---------------- | -------------- | ----------- | ------------------------- |
-| `color`          | `ButtonColors` | `'primary'` | 버튼 색상                 |
-| `class`          | `string`       | `undefined` | 추가 CSS 클래스           |
-| `href`           | `string`       | `'#'`       | 링크 URL (tag가 'a'일 때) |
-| `target`         | `string`       | `'_blank'`  | 링크 타겟                 |
-| `icon`           | `string`       | `undefined` | Iconify 아이콘명          |
-| `iconRight`      | `boolean`      | `false`     | 아이콘을 오른쪽에 배치    |
-| `onlyIcon`       | `boolean`      | `false`     | 아이콘만 표시             |
-| `text`           | `boolean`      | `false`     | 텍스트 스타일 버튼        |
-| `outline`        | `boolean`      | `false`     | 아웃라인 스타일           |
-| `block`          | `boolean`      | `false`     | 전체 너비 버튼            |
-| `disabled`       | `boolean`      | `false`     | 비활성화 상태             |
-| `loading`        | `boolean`      | `false`     | 로딩 상태                 |
-| `large`          | `boolean`      | `false`     | 큰 크기                   |
-| `small`          | `boolean`      | `false`     | 작은 크기                 |
-| `xSmall`         | `boolean`      | `false`     | 매우 작은 크기            |
-| `tag`            | `string`       | `'a'`       | HTML 태그 ('a', 'button') |
-| `dropMenuToggle` | `boolean`      | `false`     | 드롭다운 토글 상태        |
+| Prop             | Type               | Default     | Description               |
+| ---------------- | ------------------ | ----------- | ------------------------- |
+| `color`          | `ButtonColors`     | `'primary'` | 버튼 색상                 |
+| `class`          | `string`           | `undefined` | 추가 CSS 클래스           |
+| `href`           | `string`           | `'#'`       | 링크 URL (tag가 'a'일 때) |
+| `target`         | `string`           | `'_blank'`  | 링크 타겟                 |
+| `icon`           | `string`           | `undefined` | Iconify 아이콘명          |
+| `iconRight`      | `boolean`          | `false`     | 아이콘을 오른쪽에 배치    |
+| `onlyIcon`       | `boolean`          | `false`     | 아이콘만 표시             |
+| `text`           | `boolean`          | `false`     | 텍스트 스타일 버튼        |
+| `outline`        | `boolean`          | `false`     | 아웃라인 스타일           |
+| `block`          | `boolean`          | `false`     | 전체 너비 버튼            |
+| `disabled`       | `boolean`          | `false`     | 비활성화 상태             |
+| `loading`        | `boolean`          | `false`     | 로딩 상태                 |
+| `large`          | `boolean`          | `false`     | 큰 크기                   |
+| `small`          | `boolean`          | `false`     | 작은 크기                 |
+| `xSmall`         | `boolean`          | `false`     | 매우 작은 크기            |
+| `tag`            | `string`           | `'a'`       | HTML 태그 ('a', 'button') |
+| `dropMenuToggle` | `boolean`          | `false`     | 드롭다운 토글 상태        |
+| `width`          | `string \| number` | `undefined` | 버튼 너비 (px, %, rem 등) |
 
 ### ButtonColors 타입
 
@@ -119,9 +120,9 @@ type ButtonColors =
 </template>
 
 <script setup lang="ts">
-  const handleClick = (event: MouseEvent) => {
-    console.log('버튼이 클릭되었습니다!', event);
-  };
+const handleClick = (event: MouseEvent) => {
+  console.log('버튼이 클릭되었습니다!', event);
+};
 </script>
 ```
 
@@ -173,6 +174,21 @@ type ButtonColors =
 </template>
 ```
 
+### Width 설정
+
+```vue
+<template>
+  <!-- 숫자로 설정 (px 단위) -->
+  <StyledButton :width="120">120px</StyledButton>
+
+  <!-- 문자열로 설정 -->
+  <StyledButton width="200px">200px</StyledButton>
+  <StyledButton width="50%">50%</StyledButton>
+  <StyledButton width="10rem">10rem</StyledButton>
+  <StyledButton width="100%">전체 너비</StyledButton>
+</template>
+```
+
 ---
 
 ## 📝 예제
@@ -221,17 +237,17 @@ type ButtonColors =
 </template>
 
 <style scoped>
-  .button-examples {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
+.button-examples {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
 
-  .row {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-  }
+.row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
 </style>
 ```
 
@@ -255,21 +271,21 @@ type ButtonColors =
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue';
+import { ref } from 'vue';
 
-  const email = ref('');
-  const isSubmitting = ref(false);
+const email = ref('');
+const isSubmitting = ref(false);
 
-  const handleSubmit = async () => {
-    isSubmitting.value = true;
-    // API 호출 로직
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    isSubmitting.value = false;
-  };
+const handleSubmit = async () => {
+  isSubmitting.value = true;
+  // API 호출 로직
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  isSubmitting.value = false;
+};
 
-  const handleCancel = () => {
-    email.value = '';
-  };
+const handleCancel = () => {
+  email.value = '';
+};
 </script>
 ```
 

@@ -103,6 +103,11 @@ const router = createRouter({
       name: 'validatewrap',
       component: () => import('../components/Form/ValidateWrap/ex.vue'),
     },
+    {
+      path: '/components/validateform',
+      name: 'validateform',
+      component: () => import('../components/Form/ValidateForm/ex.vue'),
+    },
   ],
 });
 

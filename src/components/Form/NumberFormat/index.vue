@@ -204,6 +204,8 @@ const resetValidate = (): void => {
   errorTransition.value = false;
 };
 
+useAddFormValidate();
+
 onMounted(() => {
   if (Input.value) {
     if (props.autofocus) {
@@ -214,8 +216,6 @@ onMounted(() => {
       Input.value.value = format(props.modelValue);
     }
   }
-
-  useAddFormValidate();
 });
 
 defineExpose({

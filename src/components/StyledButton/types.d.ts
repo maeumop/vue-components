@@ -22,6 +22,7 @@ export interface StyledButtonProps {
   outline?: boolean;
   tag?: string;
   dropMenuToggle?: boolean;
+  width?: string | number;
 }
 
 export interface StyledButtonOptions {

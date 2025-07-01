@@ -5,7 +5,6 @@ export interface ValidateFormModel {
   resetForm(): void;
   validate(silence?: boolean): boolean;
   resetValidate(): void;
-
   addComponant(vNode: VNode): void;
 }
 
@@ -13,3 +12,9 @@ export type ValidateExplorKeys = Extract<
   keyof ValidateFormModel,
   'resetForm' | 'resetValidate' | 'validate'
 >;
+
+interface ValidatableComponent {
+  check(silence?: boolean): boolean;
+  resetForm(): void;
+  resetValidate(): void;
+}

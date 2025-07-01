@@ -611,8 +611,9 @@ if (props.modelValue) {
   }
 }
 
+useAddFormValidate();
+
 onMounted(() => {
-  useAddFormValidate();
   document.addEventListener('click', outsideClickEvent);
 });
 
