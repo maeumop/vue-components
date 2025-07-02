@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import { computed, getCurrentInstance, inject, nextTick, onMounted, ref, watch } from 'vue';
 import type { RuleFunc } from '../../types';
-import { useAddFormValidate } from '../common';
+import { VALIDATE_FORM_KEY } from '../ValidateForm/const';
+import { ValidateFormInjection } from '../ValidateForm/types';
 import { checkButtonColor, checkButtonIcons, checkButtonType } from './const';
 import type { CheckButtonEmits, CheckButtonItem, CheckButtonProps } from './types';
 
@@ -233,7 +234,14 @@ const resetForm = (): void => {
   val.value = props.type === 'radio' ? '' : [];
 };
 
-useAddFormValidate();
+const validateForm = inject<ValidateFormInjection>(VALIDATE_FORM_KEY);
+const instance = getCurrentInstance();
+
+onMounted(() => {
+  if (validateForm && instance) {
+    validateForm.addComponent(instance.vnode);
+  }
+});
 
 defineExpose({
   check,

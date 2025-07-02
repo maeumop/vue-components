@@ -5,16 +5,17 @@ export interface ValidateFormModel {
   resetForm(): void;
   validate(silence?: boolean): boolean;
   resetValidate(): void;
-  addComponant(vNode: VNode): void;
 }
 
-export type ValidateExplorKeys = Extract<
-  keyof ValidateFormModel,
-  'resetForm' | 'resetValidate' | 'validate'
->;
+export type ValidateExplorKey = (typeof ValidateExplorKey)[keyof typeof ValidateExplorKey];
 
 interface ValidatableComponent {
   check(silence?: boolean): boolean;
   resetForm(): void;
   resetValidate(): void;
+}
+
+// inject를 위한 타입 정의
+export interface ValidateFormInjection {
+  addComponent: (node: VNode) => void;
 }

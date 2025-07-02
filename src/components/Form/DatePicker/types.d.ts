@@ -1,6 +1,6 @@
 import type { Ref } from 'vue';
 import type { RuleFunc } from '../../types';
-import type { transitionCase } from './const';
+import { transitionCase } from './const';
 
 export type TransitionCase = (typeof transitionCase)[keyof typeof transitionCase];
 

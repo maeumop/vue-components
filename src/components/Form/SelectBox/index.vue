@@ -1,9 +1,20 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
 import type { CSSProperties, StyleValue } from 'vue';
-import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
+import {
+  computed,
+  getCurrentInstance,
+  inject,
+  nextTick,
+  onMounted,
+  onUnmounted,
+  reactive,
+  ref,
+  watch,
+} from 'vue';
 import type { RuleFunc } from '../../types';
-import { useAddFormValidate } from '../common';
+import { VALIDATE_FORM_KEY } from '../ValidateForm/const';
+import { ValidateFormInjection } from '../ValidateForm/types';
 import type { SelectBoxEmits, SelectBoxItem, SelectBoxProps } from './types';
 
 const props = withDefaults(defineProps<SelectBoxProps>(), {
@@ -580,9 +591,14 @@ watch(isShowOption, v => {
   }
 });
 
-useAddFormValidate();
+const validateForm = inject<ValidateFormInjection>(VALIDATE_FORM_KEY);
+const instance = getCurrentInstance();
 
 onMounted(() => {
+  if (validateForm && instance) {
+    validateForm.addComponent(instance.vnode);
+  }
+
   setDefaultModelValue();
 
   if (main.value) {

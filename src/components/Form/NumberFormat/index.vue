@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { StyleValue } from 'vue';
-import { computed, onMounted, ref, useAttrs, watch } from 'vue';
+import { computed, getCurrentInstance, inject, onMounted, ref, useAttrs, watch } from 'vue';
 import type { RuleFunc } from '../../types';
-import { useAddFormValidate } from '../common';
+import { VALIDATE_FORM_KEY } from '../ValidateForm/const';
+import { ValidateFormInjection } from '../ValidateForm/types';
 import type { NumberFormatEmits, NumberFormatProps } from './types';
 
 const props = withDefaults(defineProps<NumberFormatProps>(), {
@@ -204,9 +205,14 @@ const resetValidate = (): void => {
   errorTransition.value = false;
 };
 
-useAddFormValidate();
+const validateForm = inject<ValidateFormInjection>(VALIDATE_FORM_KEY);
+const instance = getCurrentInstance();
 
 onMounted(() => {
+  if (validateForm && instance) {
+    validateForm.addComponent(instance.vnode);
+  }
+
   if (Input.value) {
     if (props.autofocus) {
       Input.value.focus();

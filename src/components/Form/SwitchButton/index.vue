@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { nextTick, ref, watch } from 'vue';
-import { useAddFormValidate } from '../common';
+import { getCurrentInstance, inject, nextTick, onMounted, ref, watch } from 'vue';
+import { VALIDATE_FORM_KEY } from '../ValidateForm/const';
+import { ValidateFormInjection } from '../ValidateForm/types';
 import { switchButtonColor } from './const';
 import type { SwitchButtonEmits, SwitchButtonProps } from './types';
 
@@ -123,7 +124,14 @@ const updateValue = (evt: Event): void => {
   });
 };
 
-useAddFormValidate();
+const instance = getCurrentInstance();
+const validateForm = inject<ValidateFormInjection>(VALIDATE_FORM_KEY);
+
+onMounted(() => {
+  if (validateForm && instance) {
+    validateForm.addComponent(instance.vnode);
+  }
+});
 
 defineExpose({
   resetValidate,

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
 import type { StyleValue } from 'vue';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, getCurrentInstance, inject, onMounted, ref, watch } from 'vue';
 import type { RuleFunc } from '../../types';
-import { useAddFormValidate } from '../common';
+import { VALIDATE_FORM_KEY } from '../ValidateForm/const';
+import { ValidateFormInjection } from '../ValidateForm/types';
 import { textFieldType } from './const';
 import type { TextFieldEmits, TextFieldProps } from './types';
 
@@ -176,10 +177,14 @@ const resetValidate = (): void => {
   }
 };
 
-// ValidateForm에 자동 등록
-useAddFormValidate();
+const validateForm = inject<ValidateFormInjection>(VALIDATE_FORM_KEY);
+const instance = getCurrentInstance();
 
 onMounted(() => {
+  if (validateForm && instance) {
+    validateForm.addComponent(instance.vnode);
+  }
+
   if (props.autofocus) {
     if (props.multiline) {
       Textarea.value?.focus();

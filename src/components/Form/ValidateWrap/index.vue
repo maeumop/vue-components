@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { ref, useSlots, watch } from 'vue';
+import { getCurrentInstance, inject, onMounted, ref, useSlots, watch } from 'vue';
 import type { RuleFunc } from '../../types';
+import { VALIDATE_FORM_KEY } from '../ValidateForm/const';
+import { ValidateFormInjection } from '../ValidateForm/types';
 import type { ValidateWrapProps } from './types';
 
 const props = withDefaults(defineProps<ValidateWrapProps>(), {
@@ -83,6 +85,15 @@ const resetValidate = (): void => {
 const childBlur = (): void => {
   check();
 };
+
+const validateForm = inject<ValidateFormInjection>(VALIDATE_FORM_KEY);
+const instance = getCurrentInstance();
+
+onMounted(() => {
+  if (validateForm && instance) {
+    validateForm.addComponent(instance.vnode);
+  }
+});
 
 defineExpose({
   check,

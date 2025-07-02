@@ -1,8 +1,19 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue';
+import {
+  computed,
+  getCurrentInstance,
+  inject,
+  nextTick,
+  onMounted,
+  onUnmounted,
+  provide,
+  ref,
+  watch,
+} from 'vue';
 import type { RuleFunc } from '../../types';
-import { useAddFormValidate } from '../common';
+import { VALIDATE_FORM_KEY } from '../ValidateForm/const';
+import { ValidateFormInjection } from '../ValidateForm/types';
 import CalendarPart from './Calendar/index.vue';
 import DateController from './DateController/index.vue';
 import { useDatePickerHelper } from './helper';
@@ -611,9 +622,14 @@ if (props.modelValue) {
   }
 }
 
-useAddFormValidate();
+const validateForm = inject<ValidateFormInjection>(VALIDATE_FORM_KEY);
+const instance = getCurrentInstance();
 
 onMounted(() => {
+  if (validateForm && instance) {
+    validateForm.addComponent(instance.vnode);
+  }
+
   document.addEventListener('click', outsideClickEvent);
 });
 

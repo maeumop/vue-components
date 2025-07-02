@@ -268,6 +268,8 @@ const resetForm = (): void => {
             </ValidateForm>
 
             <!-- 폼 액션 -->
+            <div :style="{ height: '500px' }">&nbsp;</div>
+
             <div class="form-actions">
               <StyledButton color="secondary" :width="200" @click="resetForm"> 취소 </StyledButton>
               <StyledButton color="primary" :width="200" @click="validateForm"> 등록 </StyledButton>
