@@ -113,36 +113,59 @@ watch(
 
 watch(
   () => props.modelValue,
-  v => {
-    if (v) {
-      val.value = v;
+  (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+      val.value = newValue ?? (props.type === checkButtonType.radio ? '' : []);
+      // 값이 실제로 변경된 경우에만 유효성 검사 실행
+      nextTick(() => {
+        check(true);
+      });
     }
-
-    resetValidate();
   },
 );
 
-watch(val, () => {
-  resetValidate();
+watch(val, (newValue, oldValue) => {
+  if (newValue !== oldValue) {
+    // 내부 값이 변경된 경우에만 유효성 검사 실행
+    nextTick(() => {
+      check(true);
+    });
+  }
 });
 
 watch(
   () => props.validate,
   () => {
-    resetValidate();
+    // 유효성 검사 규칙이 변경된 경우에만 재검사
+    nextTick(() => {
+      check(true);
+    });
   },
 );
 
 watch(
   () => props.disabled,
-  v => v && resetValidate(),
+  (newValue, oldValue) => {
+    if (newValue !== oldValue && newValue) {
+      // 비활성화 상태로 변경된 경우에만 유효성 검사 초기화
+      resetValidate();
+    }
+  },
 );
+
+watch(errorTransition, v => {
+  if (v) {
+    setTimeout(() => {
+      errorTransition.value = false;
+    }, 300);
+  }
+});
 
 const updateValue = (): void => {
   emit('update:modelValue', val.value);
-  check();
-
+  // 사용자 상호작용으로 인한 값 변경이므로 유효성 검사 실행
   nextTick(() => {
+    check();
     emit('update:after');
   });
 };
@@ -189,22 +212,41 @@ const check = (silence: boolean = false): boolean => {
     return true;
   }
 
+  // 강제 에러 메시지가 있는 경우 검증 실패
   if (props.errorMessage) {
-    return true;
+    if (!silence) {
+      message.value = props.errorMessage;
+      isValidate.value = false;
+      checkPass.value = false;
+      errorTransition.value = true;
+    }
+    return false;
   }
 
+  // 유효성 검사 규칙이 없는 경우 성공으로 처리
   if (!props.validate.length) {
-    message.value = '';
-    isValidate.value = true;
+    if (!silence) {
+      message.value = '';
+      isValidate.value = true;
+      checkPass.value = true;
+      errorTransition.value = false;
+    }
     return true;
   }
 
   // 검증 실행
   for (const validator of props.validate) {
-    const result: string | boolean =
-      props.type === checkButtonType.checkbox
-        ? validator(Array.from(val.value))
-        : validator(val.value);
+    let valueToValidate: unknown;
+
+    if (props.type === checkButtonType.checkbox) {
+      // 체크박스의 경우 선택된 값들의 배열을 전달
+      valueToValidate = Array.isArray(val.value) ? val.value : [];
+    } else {
+      // 라디오의 경우 선택된 단일 값을 전달
+      valueToValidate = val.value;
+    }
+
+    const result: string | boolean = validator(valueToValidate);
 
     if (typeof result !== 'boolean') {
       if (!silence) {
@@ -219,15 +261,16 @@ const check = (silence: boolean = false): boolean => {
 
   message.value = '';
   isValidate.value = true;
+  checkPass.value = true;
+  errorTransition.value = false;
   return true;
 };
 
 const resetValidate = (): void => {
   isValidate.value = true;
-  if (!props.validate.length) {
-    message.value = '';
-    errorTransition.value = false;
-  }
+  checkPass.value = true;
+  message.value = '';
+  errorTransition.value = false;
 };
 
 const resetForm = (): void => {
@@ -318,11 +361,7 @@ defineExpose({
       </template>
     </template>
 
-    <div
-      :class="['description', { error: errorTransition }]"
-      @animationend="errorTransition = false"
-      v-show="message"
-    >
+    <div :class="['description', { error: errorTransition }]" v-show="message">
       {{ message }}
     </div>
   </div>
@@ -331,6 +370,7 @@ defineExpose({
 <style scoped lang="scss">
 @use './style';
 </style>
+
 <script lang="ts">
 export default { name: 'CheckButton' };
 </script>

@@ -4,27 +4,9 @@
 @use 'sass:color';
 @use '../../styles' as _;
 @use '../../common';
+@use '../common.scss' as form-common;
 
 .check-button {
-  .options-wrap {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
-
-    .input-label {
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: #333;
-      margin: 0;
-
-      .required {
-        color: #dc3545;
-        margin-left: 0.25rem;
-      }
-    }
-  }
-
   .origin-check-button {
     display: inline-block;
 
@@ -149,22 +131,7 @@
     margin-top: 0.5rem;
   }
 
-  .description {
-    margin-top: 0.25rem;
-    font-size: 0.75rem;
-    color: #dc3545;
-    min-height: 1rem;
-    opacity: 0;
-    transform: translateY(-0.25rem);
-    transition:
-      opacity 0.3s ease-in-out,
-      transform 0.3s ease-in-out;
-
-    &.error {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+  // description 스타일은 공통 스타일에서 상속
 
   // transition
   .check-scale-enter-from,

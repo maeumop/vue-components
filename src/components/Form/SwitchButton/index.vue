@@ -80,7 +80,11 @@ const check = (silence: boolean = false): boolean => {
       }
     }
     if (valid) {
-      resetForm();
+      // 검증 성공 시 에러 상태 초기화
+      message.value = '';
+      onError.value = false;
+      isValidate.value = true;
+      errorTransition.value = false;
       return true;
     }
     return false;
@@ -103,7 +107,7 @@ const resetValidate = (): void => {
   message.value = '';
   onError.value = false;
   isValidate.value = true;
-  errorTransition.value = false;
+  // errorTransition은 CSS 애니메이션이 완료된 후 자동으로 처리됨
 };
 
 /**
@@ -174,11 +178,7 @@ defineExpose({
       </Transition>
     </label>
 
-    <div
-      :class="['description', { error: errorTransition }]"
-      @animationend="errorTransition = false"
-      v-show="message"
-    >
+    <div :class="['description', { error: errorTransition }]" v-show="message">
       {{ message }}
     </div>
   </div>

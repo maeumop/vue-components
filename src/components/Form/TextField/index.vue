@@ -22,7 +22,6 @@ const emit = defineEmits<TextFieldEmits>();
 const isValidate = ref<boolean>(true);
 const message = ref<string>('');
 const errorTransition = ref<boolean>(false);
-
 const Textarea = ref<HTMLTextAreaElement>();
 const Input = ref<HTMLInputElement>();
 
@@ -70,6 +69,14 @@ watch(
     }
   },
 );
+
+watch(errorTransition, v => {
+  if (v) {
+    setTimeout(() => {
+      errorTransition.value = false;
+    }, 300);
+  }
+});
 
 const wrapperStyle = computed<StyleValue>(() => [
   'input-wrap',

@@ -4,6 +4,7 @@
 @use 'sass:map';
 @use '../../styles' as _;
 @use '../../common';
+@use '../common.scss' as form;
 
 /// date-picker의 a 버튼 공통 스타일
 @mixin picker-button {
@@ -39,26 +40,6 @@ $_button-colors: _.getButtonColors();
 
   .wrap {
     width: 100%;
-  }
-
-  .options-wrap {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
-
-    .input-label {
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: #333;
-      margin: 0;
-      cursor: pointer;
-
-      .required {
-        color: #dc3545;
-        margin-left: 0.25rem;
-      }
-    }
   }
 
   .picker-popup {
@@ -259,22 +240,7 @@ $_button-colors: _.getButtonColors();
     }
   }
 
-  .feedback {
-    margin-top: 0.25rem;
-    font-size: 0.75rem;
-    color: _.$danger;
-    min-height: 1rem;
-    opacity: 0;
-    transform: translateY(-0.25rem);
-    transition:
-      opacity 0.3s ease-in-out,
-      transform 0.3s ease-in-out;
-
-    &.error {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+  // feedback 스타일은 공통 스타일에서 상속
 }
 
 // 트랜지션 애니메이션

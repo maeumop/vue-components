@@ -143,30 +143,62 @@ watch(
 
 watch(
   () => props.validate,
-  () => {
-    resetValidate();
+  (newValue, oldValue) => {
+    // 유효성 검사 규칙이 실제로 변경된 경우에만 재검사
+    if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+      nextTick(() => {
+        check(true);
+      });
+    }
   },
 );
 
 watch(
   () => props.modelValue,
-  () => {
-    setDefaultModelValue();
+  (newValue, oldValue) => {
+    // 값이 실제로 변경된 경우에만 처리
+    if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+      setDefaultModelValue();
+      // 값이 변경된 경우 유효성 검사 실행
+      nextTick(() => {
+        check(true);
+      });
+    }
   },
 );
 
 watch(
   () => props.options,
-  () => {
-    setDefaultModelValue();
+  (newValue, oldValue) => {
+    // 옵션이 실제로 변경된 경우에만 처리
+    if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+      setDefaultModelValue();
+      // 옵션이 변경된 경우 유효성 검사 실행
+      nextTick(() => {
+        check(true);
+      });
+    }
   },
   { deep: true },
 );
 
 watch(
   () => props.disabled,
-  v => v && resetValidate(),
+  (newValue, oldValue) => {
+    // 비활성화 상태로 변경된 경우에만 유효성 검사 초기화
+    if (newValue !== oldValue && newValue) {
+      resetValidate();
+    }
+  },
 );
+
+watch(errorTransition, v => {
+  if (v) {
+    setTimeout(() => {
+      errorTransition.value = false;
+    }, 300);
+  }
+});
 
 // 메서드들
 const setDefaultModelValue = (): void => {
@@ -200,31 +232,59 @@ const updateValue = (v: string | string[], index: number = -1): void => {
   emit('update:modelValue', v);
   emit('update:selectedIndex', index);
   emit('change', v);
-  check();
+  // 사용자 상호작용으로 인한 값 변경이므로 유효성 검사 실행
+  nextTick(() => {
+    check();
+  });
 };
 
 const check = (silence: boolean = false): boolean => {
+  // 비활성화 상태인 경우 검증 성공
   if (props.disabled) {
     return true;
   }
 
-  if (!props.errorMessage && props.validate.length) {
-    for (let i: number = 0; i < props.validate.length; i++) {
-      const result: string | boolean = props.validate[i](selectedValue.value);
+  // 강제 에러 메시지가 있는 경우 검증 실패
+  if (props.errorMessage) {
+    if (!silence) {
+      message.value = props.errorMessage;
+      isValidate.value = false;
+      errorTransition.value = true;
+    }
+    return false;
+  }
 
-      if (typeof result === 'string') {
-        if (!silence) {
-          message.value = result;
-          isValidate.value = false;
-          errorTransition.value = true;
-        }
-        return false;
+  // 유효성 검사 규칙이 없는 경우 성공으로 처리
+  if (!props.validate.length) {
+    if (!silence) {
+      message.value = '';
+      isValidate.value = true;
+      errorTransition.value = false;
+    }
+    return true;
+  }
+
+  // 데이터 검증
+  for (let i: number = 0; i < props.validate.length; i++) {
+    const result: string | boolean = props.validate[i](selectedValue.value);
+
+    if (typeof result === 'string') {
+      if (!silence) {
+        message.value = result;
+        isValidate.value = false;
+        errorTransition.value = true;
       }
+      return false;
     }
   }
 
-  message.value = '';
-  isValidate.value = true;
+  // 모든 검증을 통과한 경우
+  if (!silence) {
+    message.value = '';
+    isValidate.value = true;
+    errorTransition.value = false;
+  }
+
   return true;
 };
 

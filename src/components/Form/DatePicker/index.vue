@@ -111,26 +111,34 @@ watch(isShow, v => {
 
 watch(
   () => [startDate.value, endDate.value],
-  () => {
-    resetError();
+  (newValue, oldValue) => {
+    // 날짜가 실제로 변경된 경우에만 에러 초기화
+    if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+      resetError();
+    }
   },
 );
 
 watch(
   () => props.modelValue,
-  (v, before) => {
-    dateUpdate(v);
+  (newValue, oldValue) => {
+    // 값이 실제로 변경된 경우에만 처리
+    if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+      dateUpdate(newValue);
 
-    // datePicker 디폴트값으로 변경시 달력도 초기화 될 수 있도록 처리
-    if (props.range && (before[0] !== v[0] || before[1] !== v[1])) {
-      if (v[0] && v[1]) {
-        setDateCalender();
+      // datePicker 디폴트값으로 변경시 달력도 초기화 될 수 있도록 처리
+      if (props.range && Array.isArray(newValue) && Array.isArray(oldValue)) {
+        if (newValue[0] !== oldValue[0] || newValue[1] !== oldValue[1]) {
+          if (newValue[0] && newValue[1]) {
+            setDateCalender();
 
-        // toggleDateButton 버튼을 클릭했을때 구분하여 버튼 checked 처리
-        if (clickToggleDateButton) {
-          clickToggleDateButton = false;
-        } else {
-          toggleDateButton.value.forEach(item => (item.checked = false));
+            // toggleDateButton 버튼을 클릭했을때 구분하여 버튼 checked 처리
+            if (clickToggleDateButton) {
+              clickToggleDateButton = false;
+            } else {
+              toggleDateButton.value.forEach(item => (item.checked = false));
+            }
+          }
         }
       }
     }
@@ -139,15 +147,33 @@ watch(
 
 watch(
   () => props.validate,
-  () => {
-    resetValidate();
+  (newValue, oldValue) => {
+    // 유효성 검사 규칙이 실제로 변경된 경우에만 재검사
+    if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+      nextTick(() => {
+        check(true);
+      });
+    }
   },
 );
 
 watch(
   () => props.disabled,
-  v => v && resetValidate(),
+  (newValue, oldValue) => {
+    // 비활성화 상태로 변경된 경우에만 유효성 검사 초기화
+    if (newValue !== oldValue && newValue) {
+      resetValidate();
+    }
+  },
 );
+
+watch(errorTransition, v => {
+  if (v) {
+    setTimeout(() => {
+      errorTransition.value = false;
+    }, 300);
+  }
+});
 
 // update
 const dateUpdate = (v: string | string[]): void => {
@@ -409,6 +435,11 @@ const updateValue = (): void => {
   } else {
     emit('update:modelValue', startDate.value);
   }
+
+  // 사용자 상호작용으로 인한 값 변경이므로 유효성 검사 실행
+  nextTick(() => {
+    check();
+  });
 };
 
 /**
@@ -456,36 +487,56 @@ const resetError = (): void => {
  * FormValidate 컴포넌트롤 통한 validation check
  */
 const check = (silence: boolean = false): boolean => {
-  // 데이터 검증
-  if (props.validate.length && !props.disabled) {
-    for (let i = 0; i < props.validate.length; i++) {
-      let result1: string | boolean = true;
-      let result2: string | boolean = true;
+  // 비활성화 상태인 경우 검증 성공
+  if (props.disabled) {
+    return true;
+  }
 
-      if (props.range) {
-        result1 = props.validate[i](startDate.value);
-        result2 = props.validate[i](endDate.value);
-      } else {
-        result1 = props.validate[i](startDate.value);
-      }
-
-      if (result1 !== true || result2 !== true) {
-        if (!silence) {
-          if (props.range) {
-            message.value = (result1 && !result2) || result2;
-          } else {
-            message.value = result1;
-          }
-          onError.value = true;
-          errorTransition.value = true;
-          isValidate.value = false;
-        }
-
-        return false;
-      } else {
-        message.value = '';
-      }
+  // 유효성 검사 규칙이 없는 경우 성공으로 처리
+  if (!props.validate.length) {
+    if (!silence) {
+      message.value = '';
+      onError.value = false;
+      errorTransition.value = false;
+      isValidate.value = true;
     }
+    return true;
+  }
+
+  // 데이터 검증
+  for (let i = 0; i < props.validate.length; i++) {
+    let result1: string | boolean = true;
+    let result2: string | boolean = true;
+
+    if (props.range) {
+      result1 = props.validate[i](startDate.value);
+      result2 = props.validate[i](endDate.value);
+    } else {
+      result1 = props.validate[i](startDate.value);
+    }
+
+    if (result1 !== true || result2 !== true) {
+      if (!silence) {
+        if (props.range) {
+          message.value = (result1 && !result2) || result2;
+        } else {
+          message.value = result1;
+        }
+        onError.value = true;
+        errorTransition.value = true;
+        isValidate.value = false;
+      }
+
+      return false;
+    }
+  }
+
+  // 모든 검증을 통과한 경우
+  if (!silence) {
+    message.value = '';
+    onError.value = false;
+    errorTransition.value = false;
+    isValidate.value = true;
   }
 
   return true;

@@ -83,6 +83,14 @@ watch(
   },
 );
 
+watch(errorTransition, v => {
+  if (v) {
+    setTimeout(() => {
+      errorTransition.value = false;
+    }, 300);
+  }
+});
+
 const wrapperStyle = computed<StyleValue>(() => [
   'input-wrap',
   {

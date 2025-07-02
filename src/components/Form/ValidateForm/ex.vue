@@ -30,7 +30,11 @@ const messageBox = inject('messageBox') as MessageBoxModel;
 
 // 유효성 검사 함수들
 const requiredRule: RuleFunc = (value: unknown): boolean | string => {
-  if (!value || (typeof value === 'string' && value.trim() === '')) {
+  if (
+    !value ||
+    (typeof value === 'string' && value.trim() === '') ||
+    (Array.isArray(value) && value.length === 0)
+  ) {
     return '필수 입력 항목입니다.';
   }
   return true;
@@ -231,11 +235,7 @@ const resetForm = (): void => {
                 <div class="form-row">
                   <ValidateWrap
                     :check-value="hobbies.join(',')"
-                    :error-message="
-                      hobbies.length > 0 && (hobbies.length < 2 || hobbies.length > 4)
-                        ? '취미를 2~4개 선택해주세요.'
-                        : ''
-                    "
+                    :validate="[requiredRule]"
                     label="취미 (2~4개 선택)"
                   >
                     <template #default="{ onBlur }">
@@ -259,6 +259,7 @@ const resetForm = (): void => {
                 <div class="form-row">
                   <SwitchButton
                     v-model="agreeTerms"
+                    validate="이용약관에 동의 하세요."
                     :label="['이용약관 동의 안함', '이용약관 동의 함']"
                     small
                     required
@@ -268,7 +269,6 @@ const resetForm = (): void => {
             </ValidateForm>
 
             <!-- 폼 액션 -->
-            <div :style="{ height: '500px' }">&nbsp;</div>
 
             <div class="form-actions">
               <StyledButton color="secondary" :width="200" @click="resetForm"> 취소 </StyledButton>

@@ -10,9 +10,9 @@ const props = withDefaults(defineProps<ValidateWrapProps>(), {
   errorMessage: '',
 });
 
-// emit은 현재 사용되지 않지만 향후 확장을 위해 유지
-// const emit = defineEmits<ValidateWrapEmits>();
-
+const isValidate = ref<boolean>(true);
+const message = ref<string>('');
+const errorTransition = ref<boolean>(false);
 const slots = useSlots();
 
 watch(
@@ -29,9 +29,13 @@ watch(
   },
 );
 
-const isValidate = ref<boolean>(true);
-const message = ref<string>('');
-const showError = ref<boolean>(false);
+watch(errorTransition, v => {
+  if (v) {
+    setTimeout(() => {
+      errorTransition.value = false;
+    }, 300);
+  }
+});
 
 const check = (silence: boolean = false): boolean => {
   if (props.disabled) {
@@ -42,7 +46,7 @@ const check = (silence: boolean = false): boolean => {
   if (props.errorMessage) {
     if (!silence) {
       message.value = props.errorMessage;
-      showError.value = true;
+      errorTransition.value = true;
       isValidate.value = false;
     }
     return false;
@@ -56,7 +60,7 @@ const check = (silence: boolean = false): boolean => {
       if (typeof result === 'string') {
         if (!silence) {
           message.value = result;
-          showError.value = true;
+          errorTransition.value = true;
           isValidate.value = false;
         }
 
@@ -67,7 +71,7 @@ const check = (silence: boolean = false): boolean => {
 
   // 모든 검증 통과
   message.value = '';
-  showError.value = false;
+  errorTransition.value = false;
   isValidate.value = true;
   return true;
 };
@@ -75,7 +79,7 @@ const check = (silence: boolean = false): boolean => {
 const resetForm = (): void => {
   isValidate.value = true;
   message.value = '';
-  showError.value = false;
+  errorTransition.value = false;
 };
 
 const resetValidate = (): void => {
@@ -114,11 +118,11 @@ defineExpose({
       </div>
     </div>
 
-    <div :class="['input-wrap', { error: showError }]">
+    <div :class="['input-wrap', { error: errorTransition }]">
       <slot :on-blur="childBlur"></slot>
     </div>
 
-    <div :class="['feedback', { error: showError }]">
+    <div :class="['feedback', { error: errorTransition }]">
       {{ message }}
     </div>
   </div>

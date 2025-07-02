@@ -4,6 +4,7 @@
 @use 'sass:color';
 @use '../../styles' as _;
 @use '../../common';
+@use '../common.scss' as form;
 
 .switch-wrap {
   display: inline-block;
@@ -116,4 +117,6 @@
   .label-fade-leave-active {
     transition: all 0.1s ease;
   }
+
+  // description 스타일은 공통 스타일에서 상속
 }
