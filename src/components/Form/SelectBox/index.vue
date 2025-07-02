@@ -789,9 +789,12 @@ defineExpose({
         <Icon icon="mdi:close-circle" :width="20" :height="20" />
       </a>
 
-      <div :class="['arrow', { rotate: isShowOption }]">
-        <Icon icon="mdi:chevron-down" :width="25" :height="25" />
-      </div>
+      <Icon
+        :class="['arrow', { rotate: isShowOption }]"
+        icon="mdi:chevron-down"
+        :width="20"
+        :height="20"
+      />
 
       <Transition
         :name="showBottom ? 'options-view-bottom' : 'options-view'"

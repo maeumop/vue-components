@@ -160,8 +160,8 @@ $_button-colors: _.getButtonColors();
 
   .picker-date-text {
     width: 100%;
-    border: 0.1rem solid _.$gray-300;
-    border-radius: 0.4rem;
+    border: 1px solid #e9ecef;
+    border-radius: 0.375rem;
     height: auto;
     padding: 0;
     margin: 0;
@@ -173,6 +173,10 @@ $_button-colors: _.getButtonColors();
       border-color 0.15s ease-in-out,
       box-shadow 0.15s ease-in-out;
     cursor: pointer;
+
+    &:hover {
+      border-color: #adb5bd;
+    }
 
     input {
       border: 0 !important;
@@ -206,16 +210,16 @@ $_button-colors: _.getButtonColors();
 
     svg {
       margin-right: 0.75rem;
-      color: _.$gray-800;
+      color: #6c757d;
     }
 
     &.active {
-      border-color: _.$primary;
+      border-color: #667eea;
       box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
     }
 
     &.error {
-      border-color: _.$danger;
+      border-color: #dc3545;
       box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
     }
 
@@ -230,7 +234,7 @@ $_button-colors: _.getButtonColors();
       }
 
       svg {
-        color: _.$gray-400;
+        color: #adb5bd;
       }
     }
 

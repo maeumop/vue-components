@@ -8,10 +8,12 @@
   display: inline-block;
   position: relative;
   vertical-align: middle;
+  width: 100%;
+  max-width: 300px;
 
   &.block {
     display: block;
-    width: 100%;
+    max-width: none;
   }
 
   .options-wrap {
@@ -33,7 +35,7 @@
     }
   }
 
-  .select-wrap {
+  .control-wrap {
     position: relative;
     display: inline-block;
     width: 100%;
@@ -51,6 +53,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    box-sizing: border-box;
 
     &:hover {
       border-color: #adb5bd;
@@ -72,6 +75,8 @@
       display: flex;
       flex-wrap: wrap;
       gap: 0.25rem;
+      align-items: center;
+      line-height: 1.5;
 
       &.ph {
         color: #6c757d;
@@ -102,6 +107,7 @@
       color: #adb5bd;
       transition: transform 0.2s ease;
       margin-left: 0.5rem;
+      flex-shrink: 0;
 
       &.rotate {
         transform: rotate(180deg);
@@ -116,9 +122,19 @@
       color: #6c757d;
       text-decoration: none;
       font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.25rem;
+      height: 1.25rem;
+      border-radius: 50%;
+      transition:
+        color 0.15s ease-in-out,
+        background-color 0.15s ease-in-out;
 
       &:hover {
         color: #333;
+        background-color: rgba(0, 0, 0, 0.1);
       }
     }
   }
