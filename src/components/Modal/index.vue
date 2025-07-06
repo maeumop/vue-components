@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, useSlots, watchEffect } from 'vue';
+import { computed, onBeforeUnmount, ref, StyleValue, useSlots, watchEffect } from 'vue';
 import { onBeforeRouteLeave } from 'vue-router';
 import { modalPosition, modalTransition } from './const';
 import type { ModalEmits, ModalProps, ModalTransition } from './types';
@@ -7,9 +7,10 @@ import type { ModalEmits, ModalProps, ModalTransition } from './types';
 const props = withDefaults(defineProps<ModalProps>(), {
   modelValue: false,
   escClose: false,
-  position: modalPosition.popup,
+  position: 'popup',
   screenCover: false,
   width: '320px',
+  fullscreen: false,
 });
 
 const emit = defineEmits<ModalEmits>();
@@ -31,7 +32,44 @@ const boxStyle = computed<string[]>(() => {
     styles.push('screen-cover');
   }
 
+  if (props.fullscreen) {
+    styles.push('fullscreen');
+  }
+
   return styles;
+});
+
+const bgStyle = computed<string[]>(() => {
+  const styles = ['modal-bg'];
+
+  if (!isShow.value) {
+    styles.push('hide');
+  }
+
+  return styles;
+});
+
+const boxStyleValue = computed<StyleValue>(() => {
+  if (props.fullscreen) {
+    return {
+      width: '100vw',
+      maxWidth: '100vw',
+      height: '100vh',
+      maxHeight: '100vh',
+    };
+  } else if (props.position === modalPosition.right || props.position === modalPosition.left) {
+    return {
+      width: props.width,
+      maxWidth: props.width,
+      height: '100vh',
+      maxHeight: '100vh',
+    };
+  } else {
+    return {
+      width: props.width,
+      maxWidth: props.width,
+    };
+  }
 });
 
 /**
@@ -67,9 +105,6 @@ const dispose = (): void => {
 const handleBoxLeave = (): void => {
   // 트랜지션이 완료된 후 isShow도 false로 설정 (더 긴 지연)
   isShow.value = false;
-
-  // 모달 박스 트랜지션이 완료된 후 추가 처리
-  console.log('Modal box transition completed');
 };
 
 /**
@@ -95,10 +130,8 @@ const keyDownEvent = (event: KeyboardEvent): void => {
 };
 
 const keyUpEvent = (event: KeyboardEvent): void => {
-  if (event.key.toLowerCase() === 'escape') {
-    if (!props.escClose) {
-      keyEventStyle.value = '';
-    }
+  if (event.key.toLowerCase() === 'escape' && !props.escClose) {
+    keyEventStyle.value = '';
   }
 };
 
@@ -108,19 +141,15 @@ const keyUpEvent = (event: KeyboardEvent): void => {
 const setEvents = (): void => {
   modalBg.value = document.body.querySelectorAll<HTMLDivElement>('.modal-bg:not(.hide)');
 
-  modal.value?.addEventListener('keydown', keyDownEvent);
-  modal.value?.addEventListener('keyup', keyUpEvent);
-  modal.value?.focus();
+  if (modal.value) {
+    modal.value.addEventListener('keydown', keyDownEvent);
+    modal.value.addEventListener('keyup', keyUpEvent);
+    modal.value.focus();
+  }
 };
 
 if (props.accessBack) {
-  onBeforeRouteLeave(() => {
-    if (isShow.value) {
-      return false;
-    }
-
-    return true;
-  });
+  onBeforeRouteLeave(() => !isShow.value);
 }
 
 watchEffect(() => {
@@ -134,10 +163,10 @@ watchEffect(() => {
   } else {
     // modal close - 트랜지션을 위해 isVisible을 먼저 false로 설정
     isVisible.value = false;
-    // 트랜지션이 완료된 후 isShow도 false로 설정 (더 긴 지연)
+    // 트랜지션이 완료된 후 isShow도 false로 설정
     setTimeout(() => {
       isShow.value = false;
-    }, 600); // 600ms로 증가하여 더 부드럽게
+    }, 300); // 0.3초로 조정
   }
 });
 
@@ -163,7 +192,7 @@ defineExpose({
 
 <template>
   <Teleport to="body">
-    <Transition appear name="modal-fade" @after-leave="dispose" @after-enter="setEvents">
+    <Transition appear name="modal-fade" @after-leave="dispose" @before-enter="setEvents">
       <div
         ref="modal"
         tabindex="0"
@@ -171,7 +200,7 @@ defineExpose({
         :aria-modal="true"
         :aria-labelledby="props.title ? 'modal-title' : undefined"
         :aria-describedby="slots.body ? 'modal-body' : undefined"
-        :class="['modal-bg', !isShow && 'hide']"
+        :class="bgStyle"
         v-bind="$attrs"
         v-show="isShow"
       >
@@ -181,30 +210,21 @@ defineExpose({
           @after-leave="handleBoxLeave"
           @after-enter="handleBoxEnter"
         >
-          <div
-            :style="{ width: props.width, maxWidth: props.width }"
-            :class="boxStyle"
-            v-show="isVisible"
-          >
-            <div :class="[!slots.header && 'modal-header']">
-              <template v-if="slots.header">
-                <slot name="header" :close="close"></slot>
-              </template>
-              <template v-else>
-                <div class="title-text" :id="props.title ? 'modal-title' : undefined">
-                  <span class="text">{{ props.title }}</span>
-                  <slot name="title"></slot>
-                </div>
+          <div :style="boxStyleValue" :class="boxStyle" v-show="isVisible">
+            <div class="modal-header">
+              <div class="title-text" :id="props.title ? 'modal-title' : undefined">
+                <span class="text">{{ props.title }}</span>
+                <slot name="title"></slot>
+              </div>
 
-                <Icon
-                  icon="mdi:window-close"
-                  size="22"
-                  class="close"
-                  :aria-label="'모달 닫기'"
-                  @click.prevent="close()"
-                  v-if="!props.hideClose"
-                />
-              </template>
+              <Icon
+                icon="mdi:window-close"
+                size="22"
+                class="close"
+                aria-label="모달 닫기"
+                @click.prevent="close()"
+                v-if="!props.hideClose"
+              />
             </div>
             <div class="modal-body" :id="slots.body ? 'modal-body' : undefined">
               <slot name="body" :close="close"></slot>

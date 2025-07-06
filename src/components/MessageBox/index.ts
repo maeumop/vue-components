@@ -3,7 +3,7 @@ import MessageBoxComponent from './component.vue';
 import { messageBoxTransition } from './const';
 import type { MessageBoxModel, MessageBoxOptions, MessageBoxPluginOptions } from './types';
 
-let messageBoxInstance: any = null;
+let messageBoxInstance: App<Element> | null = null;
 
 // 플러그인 옵션을 저장할 변수
 let pluginOptions: MessageBoxPluginOptions = {
@@ -15,8 +15,8 @@ const createMessageBox = (options: MessageBoxOptions): void => {
   // 플러그인 옵션과 개별 옵션을 병합
   const mergedOptions = {
     ...options,
-    noScrollStyleClass: options.noScrollStyleClass || pluginOptions.noScrollStyleClass,
-    transition: options.transition || pluginOptions.defaultTransition,
+    noScrollStyleClass: options.noScrollStyleClass ?? pluginOptions.noScrollStyleClass,
+    transition: options.transition ?? pluginOptions.defaultTransition,
   };
 
   // 기존 인스턴스가 있다면 제거

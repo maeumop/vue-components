@@ -1,3 +1,55 @@
+<script setup lang="ts">
+import FloatingBackButton from '@/views/FloatingBackButton/index.vue';
+import { Icon } from '@iconify/vue';
+import { computed, ref } from 'vue';
+import { modalPosition } from './const';
+import Modal from './index.vue';
+import type { ModalPosition } from './types';
+
+const showModal = ref(false);
+const showFullscreenModal = ref(false);
+const showConfirmModal = ref(false);
+const position = ref<ModalPosition>(modalPosition.popup);
+
+const modalTitle = computed(() => {
+  const titles = {
+    popup: '팝업 모달',
+    fullscreen: '전체 화면 모달',
+    bottom: '하단 모달',
+    left: '좌측 모달',
+    right: '우측 모달',
+  };
+  return titles[position.value];
+});
+
+const modalWidth = computed(() => {
+  return ['left', 'right', 'bottom'].includes(position.value) ? '400px' : '500px';
+});
+
+const openModal = (pos: ModalPosition) => {
+  position.value = pos;
+  showModal.value = true;
+};
+
+const openFullscreenModal = () => {
+  showFullscreenModal.value = true;
+};
+
+const openConfirmModal = () => {
+  showConfirmModal.value = true;
+};
+
+const handleConfirm = (close: () => void) => {
+  console.log('모달 확인됨');
+  close();
+};
+
+const handleDelete = (close: () => void) => {
+  console.log('삭제 작업 수행');
+  close();
+};
+</script>
+
 <template>
   <div id="app">
     <header class="app-header">
@@ -18,8 +70,6 @@
             </div>
             <div class="button-group">
               <button @click="openModal('popup')" class="demo-button">팝업 모달</button>
-              <button @click="openModal('center')" class="demo-button">중앙 모달</button>
-              <button @click="openModal('top')" class="demo-button">상단 모달</button>
             </div>
           </div>
         </section>
@@ -44,11 +94,10 @@
           <h2>고급 기능</h2>
           <div class="example-item">
             <div class="info">
-              <p>전체 화면, 커스텀 헤더, 확인 모달 등 고급 기능을 확인해보세요.</p>
+              <p>전체 화면, 확인 모달 등 고급 기능을 확인해보세요.</p>
             </div>
             <div class="button-group">
               <button @click="openFullscreenModal" class="demo-button">전체 화면 모달</button>
-              <button @click="openCustomModal" class="demo-button">커스텀 헤더</button>
               <button @click="openConfirmModal" class="demo-button demo-button-danger">
                 확인 모달
               </button>
@@ -62,14 +111,14 @@
     <Modal
       v-model="showModal"
       :title="modalTitle"
-      :position="modalPosition"
+      :position="position"
       :width="modalWidth"
       esc-close
     >
       <template #body>
         <div class="modal-content">
           <p>
-            이것은 <strong>{{ modalPosition }}</strong> 위치의 모달입니다.
+            이것은 <strong>{{ position }}</strong> 위치의 모달입니다.
           </p>
           <p>ESC 키를 눌러서 닫을 수 있습니다.</p>
           <div class="content-demo">
@@ -94,7 +143,7 @@
     </Modal>
 
     <!-- 전체 화면 모달 -->
-    <Modal v-model="showFullscreenModal" position="center" screen-cover width="100%" esc-close>
+    <Modal v-model="showFullscreenModal" title="전체 화면 모달" fullscreen esc-close>
       <template #body>
         <div class="fullscreen-content">
           <h1>전체 화면 모달</h1>
@@ -121,35 +170,6 @@
       </template>
     </Modal>
 
-    <!-- 커스텀 헤더 모달 -->
-    <Modal v-model="showCustomModal" width="600px" esc-close>
-      <template #header="{ close }">
-        <div class="custom-header">
-          <div class="header-left">
-            <Icon icon="mdi:information" size="24" class="header-icon" />
-            <h2>커스텀 헤더</h2>
-          </div>
-          <button @click="() => close()" class="custom-close">
-            <Icon icon="mdi:close" size="20" />
-          </button>
-        </div>
-      </template>
-
-      <template #body>
-        <div class="custom-content">
-          <p>커스텀 헤더가 있는 모달입니다. 아이콘과 함께 더 풍부한 헤더를 구성할 수 있습니다.</p>
-          <div class="info-box">
-            <Icon icon="mdi:lightbulb" size="20" />
-            <span>이 모달은 완전히 커스터마이징된 헤더를 가지고 있습니다.</span>
-          </div>
-        </div>
-      </template>
-
-      <template #action="{ close }">
-        <button @click="() => close()" class="demo-button">확인</button>
-      </template>
-    </Modal>
-
     <!-- 확인 모달 -->
     <Modal v-model="showConfirmModal" title="확인" width="400px" esc-close>
       <template #body>
@@ -172,63 +192,6 @@
     <FloatingBackButton />
   </div>
 </template>
-
-<script setup lang="ts">
-import FloatingBackButton from '@/views/FloatingBackButton/index.vue';
-import { Icon } from '@iconify/vue';
-import { computed, ref } from 'vue';
-import Modal from './index.vue';
-import type { ModalPosition } from './types';
-
-const showModal = ref(false);
-const showFullscreenModal = ref(false);
-const showCustomModal = ref(false);
-const showConfirmModal = ref(false);
-const modalPosition = ref<ModalPosition>('popup');
-
-const modalTitle = computed(() => {
-  const titles = {
-    popup: '팝업 모달',
-    center: '중앙 모달',
-    top: '상단 모달',
-    bottom: '하단 모달',
-    left: '좌측 모달',
-    right: '우측 모달',
-  };
-  return titles[modalPosition.value];
-});
-
-const modalWidth = computed(() => {
-  return ['left', 'right', 'bottom'].includes(modalPosition.value) ? '400px' : '500px';
-});
-
-const openModal = (position: ModalPosition) => {
-  modalPosition.value = position;
-  showModal.value = true;
-};
-
-const openFullscreenModal = () => {
-  showFullscreenModal.value = true;
-};
-
-const openCustomModal = () => {
-  showCustomModal.value = true;
-};
-
-const openConfirmModal = () => {
-  showConfirmModal.value = true;
-};
-
-const handleConfirm = (close: () => void) => {
-  console.log('모달 확인됨');
-  close();
-};
-
-const handleDelete = (close: () => void) => {
-  console.log('삭제 작업 수행');
-  close();
-};
-</script>
 
 <style lang="scss" scoped>
 .app-header {
@@ -499,99 +462,6 @@ const handleDelete = (close: () => void) => {
         margin: 0;
         line-height: 1.6;
       }
-    }
-  }
-}
-
-.custom-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-
-    .header-icon {
-      color: #3b82f6;
-      filter: drop-shadow(0 2px 4px rgba(59, 130, 246, 0.2));
-    }
-
-    h2 {
-      margin: 0;
-      font-size: 1.75rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-  }
-
-  .custom-close {
-    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    color: #64748b;
-    cursor: pointer;
-    padding: 0.75rem;
-    border-radius: 0.75rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-
-    &:hover {
-      background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
-      color: #374151;
-      transform: scale(1.05);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    &:active {
-      transform: scale(0.95);
-    }
-  }
-}
-
-.custom-content {
-  .info-box {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-top: 1.5rem;
-    padding: 1.5rem;
-    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-    border-radius: 0.75rem;
-    border-left: 4px solid #f59e0b;
-    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.1);
-    position: relative;
-    overflow: hidden;
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: linear-gradient(
-        90deg,
-        transparent 0%,
-        rgba(245, 158, 11, 0.3) 50%,
-        transparent 100%
-      );
-    }
-
-    .iconify {
-      color: #f59e0b;
-      flex-shrink: 0;
-      filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.2));
-    }
-
-    span {
-      color: #92400e;
-      font-weight: 600;
-      line-height: 1.5;
     }
   }
 }

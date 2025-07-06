@@ -24,6 +24,8 @@ export interface ModalProps {
   hideClose?: boolean;
   /** 뒤로가기 방지 여부 */
   accessBack?: boolean;
+  /** 전체 화면 모달 여부 */
+  fullscreen?: boolean;
 }
 
 export interface ModalEmits {
