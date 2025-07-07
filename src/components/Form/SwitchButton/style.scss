@@ -29,7 +29,6 @@
 
   .switch {
     cursor: pointer;
-    font-size: 0.875rem;
     margin: 0;
     display: flex;
     align-items: center;
@@ -57,18 +56,19 @@
       clip: rect(0, 0, 0, 0);
 
       & + span {
-        display: inline-block;
+        display: flex;
+        align-items: center;
         width: 3rem;
-        height: 1.5rem;
+        height: 1.6rem;
         background: _.$gray-400;
-        border-radius: 0.75rem;
+        border-radius: 0.8rem;
         margin-right: 0.5rem;
 
         i {
           display: inline-block;
-          margin: 0.3rem;
-          width: 0.9rem;
-          height: 0.9rem;
+          width: 1.2rem;
+          height: 1.2rem;
+          margin: 0 0.2rem;
           background: white;
           border-radius: 50%;
           transition: all 0.2s;

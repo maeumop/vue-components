@@ -24,9 +24,7 @@
   }
 
   .input-label {
-    font-size: 0.875rem;
     font-weight: 500;
-    color: #333;
     margin: 0;
 
     .required {
@@ -47,7 +45,7 @@
       border-color 0.15s ease-in-out,
       box-shadow 0.15s ease-in-out;
     padding: 0.75rem;
-    font-size: 0.875rem;
+    font-size: var(--form-input-font-size);
     line-height: 1.5;
     color: #333;
     display: flex;
@@ -86,7 +84,7 @@
         background-color: #e9ecef;
         padding: 0.125rem 0.5rem;
         border-radius: 0.25rem;
-        font-size: 0.75rem;
+        font-size: var(--form-feedback-font-size);
         display: flex;
         align-items: center;
         gap: 0.25rem;
@@ -94,7 +92,7 @@
         .remove-icon {
           cursor: pointer;
           color: #6c757d;
-          font-size: 0.875rem;
+          font-size: var(--form-input-font-size);
 
           &:hover {
             color: #dc3545;
@@ -121,7 +119,7 @@
       transform: translateY(-50%);
       color: #6c757d;
       text-decoration: none;
-      font-size: 0.875rem;
+      font-size: var(--form-input-font-size);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -163,7 +161,7 @@
           border: 0;
           width: calc(100% - 3rem);
           outline: none;
-          font-size: 0.875rem;
+          font-size: var(--form-input-font-size);
 
           &::placeholder {
             color: #6c757d;
@@ -192,7 +190,7 @@
       background-color: #fff;
       border-top: 1px solid #e9ecef;
       color: #333;
-      font-size: 0.875rem;
+      font-size: var(--form-input-font-size);
       text-decoration: none;
 
       &:hover {
@@ -210,7 +208,7 @@
         box-sizing: border-box;
         display: flex;
         align-items: center;
-        font-size: 0.875rem;
+        font-size: var(--form-input-font-size);
         font-weight: 400;
         color: #333;
         cursor: pointer;
@@ -269,7 +267,7 @@
 
   .feedback {
     margin-top: 0.25rem;
-    font-size: 0.75rem;
+    font-size: var(--form-feedback-font-size);
     color: #dc3545;
     min-height: 1rem;
     transition:

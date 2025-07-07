@@ -12,7 +12,7 @@
   text-decoration: none;
   border: 0.1rem solid _.$gray-300;
   border-radius: 0.4rem;
-  font-size: 0.8rem;
+  font-size: var(--form-input-font-size);
   padding: 0.5rem 0.8rem;
   color: _.$text-default;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -187,7 +187,7 @@ $_button-colors: _.getButtonColors();
       text-align: center;
       background-color: transparent;
       color: _.$text-default;
-      font-size: 0.875rem;
+      font-size: var(--form-input-font-size);
       line-height: 1.5;
       cursor: pointer;
 
@@ -196,7 +196,7 @@ $_button-colors: _.getButtonColors();
       }
 
       &::placeholder {
-        font-size: 0.875rem;
+        font-size: var(--form-input-font-size);
         font-weight: 400;
         color: _.$text-placeholder;
       }

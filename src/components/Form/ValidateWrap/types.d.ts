@@ -1,7 +1,7 @@
 import type { RuleFunc } from '../../types';
 
 export interface ValidateWrapProps {
-  checkValue: unknown;
+  checkValue: string | string[] | number | number[];
   validate?: RuleFunc[];
   errorMessage?: string;
   label?: string;

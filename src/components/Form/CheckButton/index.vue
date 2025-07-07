@@ -236,7 +236,7 @@ const check = (silence: boolean = false): boolean => {
 
   // 검증 실행
   for (const validator of props.validate) {
-    let valueToValidate: unknown;
+    let valueToValidate: string | string[];
 
     if (props.type === checkButtonType.checkbox) {
       // 체크박스의 경우 선택된 값들의 배열을 전달

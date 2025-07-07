@@ -68,8 +68,8 @@ export default {
               return;
             }
 
-            const color = opt.color || toastColor.success;
-            const icon = opt.icon || toastIcon[color];
+            const color = opt.color ?? toastColor.success;
+            const icon = opt.icon ?? toastIcon[color];
 
             exposed.setMessage(opt.message, color, icon);
           } else {

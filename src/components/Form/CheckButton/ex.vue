@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import FloatingBackButton from '@/views/FloatingBackButton/index.vue';
 import { ref } from 'vue';
+import { RuleFunc } from '../../types';
 import CheckButton from './index.vue';
-import { CheckButtonItem } from './types';
+import { CheckButtonItem, CheckButtonModel } from './types';
 
 // 기본 체크박스
 const selectedHobbies = ref<string[]>([]);
@@ -60,7 +61,7 @@ const allItems: CheckButtonItem[] = [
 ];
 
 // 유효성 검사
-const checkButtonRef = ref();
+const checkButtonRef = ref<CheckButtonModel>();
 const selectedValidated = ref<string[]>([]);
 const validatedItems: CheckButtonItem[] = [
   { text: '항목 1', value: 'item1' },
@@ -68,7 +69,7 @@ const validatedItems: CheckButtonItem[] = [
   { text: '항목 3', value: 'item3' },
 ];
 
-const validators = [
+const validators: RuleFunc[] = [
   (value: unknown) => {
     if (Array.isArray(value) && value.length === 0) {
       return '최소 1개 이상 선택해주세요.';
@@ -267,7 +268,7 @@ const blockItems: CheckButtonItem[] = [
               required
             />
             <div class="result">선택된 값: {{ selectedValidated }}</div>
-            <button class="validate-btn" @click="validate">검증 실행</button>
+            <StyledButton color="primary" @click="validate">검증 실행</StyledButton>
           </div>
         </section>
 
@@ -297,7 +298,6 @@ const blockItems: CheckButtonItem[] = [
               disabled
               label="비활성화된 체크박스"
             />
-            <div class="result">선택된 값: {{ selectedDisabled }}</div>
           </div>
         </section>
 

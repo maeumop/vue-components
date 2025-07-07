@@ -13,7 +13,7 @@ const color = ref<ToastColor>(toastColor.success);
 const icon = ref<ToastIcon>(toastIcon.success);
 const message = ref<string>('');
 
-const list = ref<ToastListType[]>([]);
+const toastItems = ref<ToastListType[]>([]);
 const timeoutMap = ref<Map<number, number>>(new Map());
 const animatingKeys = ref<Set<number>>(new Set());
 let key = 0;
@@ -24,7 +24,7 @@ let key = 0;
 const show = (): void => {
   const currentKey = key;
 
-  list.value.push({
+  toastItems.value.push({
     key: currentKey,
     color: color.value,
     icon: icon.value,
@@ -40,8 +40,8 @@ const show = (): void => {
   key++;
 
   // 최대 개수 제한
-  if (list.value.length > props.maxShowMessage) {
-    const firstItem = list.value[0];
+  if (toastItems.value.length > props.maxShowMessage) {
+    const firstItem = toastItems.value[0];
     if (firstItem) {
       hideByKey(firstItem.key);
     }
@@ -53,8 +53,8 @@ const show = (): void => {
  * @param index 사용자가 클릭한 message index
  */
 const hide = (index: number = 0): void => {
-  if (index >= 0 && index < list.value.length) {
-    const item = list.value[index];
+  if (index >= 0 && index < toastItems.value.length) {
+    const item = toastItems.value[index];
     hideByKey(item.key);
   }
 };
@@ -81,9 +81,9 @@ const hideByKey = (messageKey: number): void => {
 
   // 애니메이션 완료 후 리스트에서 제거
   setTimeout((): void => {
-    const index = list.value.findIndex(item => item.key === messageKey);
+    const index = toastItems.value.findIndex(item => item.key === messageKey);
     if (index !== -1) {
-      list.value.splice(index, 1);
+      toastItems.value.splice(index, 1);
     }
     animatingKeys.value.delete(messageKey);
   }, 300); // CSS 애니메이션 시간과 동일
@@ -101,7 +101,7 @@ const clear = (): void => {
 
   key = 0;
   message.value = '';
-  list.value = [];
+  toastItems.value = [];
   animatingKeys.value.clear();
 };
 
@@ -118,7 +118,7 @@ const setMessage = (msg: string, msgColor?: ToastColor, msgIcon?: ToastIcon): vo
   }
 };
 
-watch(list.value, items => {
+watch(toastItems.value, items => {
   if (!items.length) {
     clear();
   }
@@ -154,7 +154,7 @@ defineExpose({
         role="alert"
         :aria-live="item.color === 'error' ? 'assertive' : 'polite'"
         :aria-label="`${item.color} 알림: ${item.message}`"
-        v-for="(item, i) in list"
+        v-for="(item, i) in toastItems"
       >
         <Icon :icon="item.icon" class="icon" v-if="item.icon" aria-hidden="true" />
         <span class="message" v-html="item.message"></span>

@@ -3,7 +3,7 @@ export interface KeyIndex<T> {
 }
 
 export interface RuleFunc {
-  (v: unknown): string | boolean;
+  (v: string | string[] | number | number[]): string | boolean;
 }
 
 // validate rule type
@@ -20,5 +20,3 @@ export interface OptionItem {
 export interface OptionItemGroup {
   [index: string]: OptionItem[];
 }
-
-export type MdiSvgIcon = string;
