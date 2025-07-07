@@ -1,8 +1,8 @@
-import type { toastColorCase, toastIconCase } from './const';
+import type { toastColor, toastIcon } from './const';
 
-export type ToastColorCase = (typeof toastColorCase)[keyof typeof toastColorCase];
+export type ToastColor = (typeof toastColor)[keyof typeof toastColor];
 
-export type ToastIconCase = (typeof toastIconCase)[keyof typeof toastIconCase];
+export type ToastIcon = (typeof toastIcon)[keyof typeof toastIcon];
 
 export interface ToastOptions {
   maxShowMessage?: number;
@@ -12,8 +12,8 @@ export interface ToastOptions {
 
 export interface MessageOptions {
   message: string;
-  icon?: ToastIconCase;
-  color?: ToastColorCase;
+  icon?: ToastIcon;
+  color?: ToastColor;
 }
 
 export interface ToastModel {
@@ -22,14 +22,14 @@ export interface ToastModel {
 
 export interface ToastListType {
   key: number;
-  color: ToastColorCase;
-  icon: ToastIconCase;
+  color: ToastColor;
+  icon: ToastIcon;
   message: string;
 }
 
 export interface ToastExpose {
   show(): void;
-  setMessage(message: string, color?: ToastColorCase, icon?: ToastIconCase): void;
+  setMessage(message: string, color?: ToastColor, icon?: ToastIcon): void;
   hide(index?: number): void;
   clear(): void;
 }

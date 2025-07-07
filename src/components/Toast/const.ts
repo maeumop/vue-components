@@ -1,11 +1,11 @@
-export const toastColorCase = {
+export const toastColor = {
   success: 'success',
   warning: 'warning',
   info: 'info',
   error: 'error',
 } as const;
 
-export const toastIconCase = {
+export const toastIcon = {
   success: 'mdi:check-circle-outline',
   warning: 'mdi:chat-alert',
   info: 'mdi:information-variant-circle-outline',

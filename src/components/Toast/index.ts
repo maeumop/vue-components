@@ -1,7 +1,7 @@
 import type { App, VNode } from 'vue';
 import { h, isVNode, render } from 'vue';
 import ToastComponent from './component.vue';
-import { toastColorCase, toastIconCase } from './const';
+import { toastColor, toastIcon } from './const';
 import type { MessageOptions, ToastModel, ToastOptions } from './types';
 
 export default {
@@ -60,7 +60,7 @@ export default {
 
           if (typeof opt === 'string') {
             // 문자열인 경우 기본 success로 설정
-            exposed.setMessage(opt, toastColorCase.success, toastIconCase.success);
+            exposed.setMessage(opt, toastColor.success, toastIcon.success);
           } else if (opt && typeof opt === 'object') {
             // 객체인 경우
             if (!opt.message) {
@@ -68,8 +68,8 @@ export default {
               return;
             }
 
-            const color = opt.color || toastColorCase.success;
-            const icon = opt.icon || toastIconCase[color];
+            const color = opt.color || toastColor.success;
+            const icon = opt.icon || toastIcon[color];
 
             exposed.setMessage(opt.message, color, icon);
           } else {

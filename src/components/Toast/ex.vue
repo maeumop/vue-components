@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import FloatingBackButton from '@/views/FloatingBackButton/index.vue';
 import { inject } from 'vue';
-import { toastIconCase } from './const';
-import type { ToastColorCase, ToastModel } from './types';
+import { toastIcon } from './const';
+import type { ToastColor, ToastModel } from './types';
 
 // Toast 인스턴스 주입
 const toast = inject('toast') as ToastModel;
@@ -50,7 +50,7 @@ const showCustomIconToast = (): void => {
   toast({
     message: '커스텀 아이콘이 적용된 메시지입니다.',
     color: 'info',
-    icon: toastIconCase.info,
+    icon: toastIcon.info,
   });
 };
 
@@ -100,7 +100,7 @@ const showRapidToasts = (): void => {
     setTimeout(() => {
       toast({
         message: `${msg} 빠른 토스트`,
-        color: ['success', 'info', 'warning', 'error', 'success'][index] as ToastColorCase,
+        color: ['success', 'info', 'warning', 'error', 'success'][index] as ToastColor,
       });
     }, index * 200);
   });

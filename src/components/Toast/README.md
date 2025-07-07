@@ -93,11 +93,11 @@ interface ToastModel {
 
 ### MessageOptions
 
-| 속성      | 타입             | 기본값      | 설명                                   |
-| --------- | ---------------- | ----------- | -------------------------------------- |
-| `message` | `string`         | -           | **필수** 표시할 메시지                 |
-| `color`   | `ToastColorCase` | `'success'` | 토스트 색상                            |
-| `icon`    | `ToastIconCase`  | -           | 커스텀 아이콘 (color에 따라 자동 설정) |
+| 속성      | 타입         | 기본값      | 설명                                   |
+| --------- | ------------ | ----------- | -------------------------------------- |
+| `message` | `string`     | -           | **필수** 표시할 메시지                 |
+| `color`   | `ToastColor` | `'success'` | 토스트 색상                            |
+| `icon`    | `ToastIcon`  | -           | 커스텀 아이콘 (color에 따라 자동 설정) |
 
 ### ToastOptions (플러그인 설정)
 
