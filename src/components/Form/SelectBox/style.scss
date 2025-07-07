@@ -45,7 +45,7 @@
       border-color 0.15s ease-in-out,
       box-shadow 0.15s ease-in-out;
     padding: 0.75rem;
-    font-size: var(--form-input-font-size);
+    font-size: var(--form-input-font-size, 0.875rem);
     line-height: 1.5;
     color: #333;
     display: flex;
@@ -84,7 +84,7 @@
         background-color: #e9ecef;
         padding: 0.125rem 0.5rem;
         border-radius: 0.25rem;
-        font-size: var(--form-feedback-font-size);
+        font-size: var(--form-feedback-font-size, 0.5rem);
         display: flex;
         align-items: center;
         gap: 0.25rem;
@@ -92,7 +92,7 @@
         .remove-icon {
           cursor: pointer;
           color: #6c757d;
-          font-size: var(--form-input-font-size);
+          font-size: var(--form-input-font-size, 0.875rem);
 
           &:hover {
             color: #dc3545;
@@ -119,7 +119,7 @@
       transform: translateY(-50%);
       color: #6c757d;
       text-decoration: none;
-      font-size: var(--form-input-font-size);
+      font-size: var(--form-input-font-size, 0.875rem);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -161,7 +161,7 @@
           border: 0;
           width: calc(100% - 3rem);
           outline: none;
-          font-size: var(--form-input-font-size);
+          font-size: var(--form-input-font-size, 0.875rem);
 
           &::placeholder {
             color: #6c757d;
@@ -190,7 +190,7 @@
       background-color: #fff;
       border-top: 1px solid #e9ecef;
       color: #333;
-      font-size: var(--form-input-font-size);
+      font-size: var(--form-input-font-size, 0.875rem);
       text-decoration: none;
 
       &:hover {
@@ -208,7 +208,7 @@
         box-sizing: border-box;
         display: flex;
         align-items: center;
-        font-size: var(--form-input-font-size);
+        font-size: var(--form-input-font-size, 0.875rem);
         font-weight: 400;
         color: #333;
         cursor: pointer;
@@ -267,7 +267,7 @@
 
   .feedback {
     margin-top: 0.25rem;
-    font-size: var(--form-feedback-font-size);
+    font-size: var(--form-feedback-font-size, 0.5rem);
     color: #dc3545;
     min-height: 1rem;
     transition:
