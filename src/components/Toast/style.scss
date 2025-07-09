@@ -2,7 +2,7 @@
 /* @/components/Toast/_style.scss */
 @use 'sass:map';
 @use 'sass:meta';
-@use '../styles' as _;
+@use '../../assets/styles/components' as _;
 
 .toast-bg {
   position: fixed;

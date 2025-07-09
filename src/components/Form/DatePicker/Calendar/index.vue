@@ -54,17 +54,13 @@ const dateRender = computed<DateCellType[][]>(() => {
 
 // 달력 데이터 생성 함수
 const generateCalendarData = (): DateCellType[][] => {
+  const calendarData: DateCellType[][] = [];
   const startWeek: number = new Date(state.year, state.month - 1, 1).getDay();
   const lastDay: number = new Date(state.year, state.month, 0).getDate();
 
   let day: number = 1;
   let afterDay: number = 1;
   let beforeDay: number = helper.getBeforeDay(state.year, state.month - 1, startWeek);
-
-  const startTime: number = new Date(startDate.value).getTime();
-  const endTime: number = new Date(endDate.value).getTime();
-
-  const calendarData: DateCellType[][] = [];
 
   // 달력 총 7일 6줄을 생성한다
   for (let i = 0; i < 6; i++) {
@@ -90,19 +86,27 @@ const generateCalendarData = (): DateCellType[][] => {
       if (objData.type !== 'selected' && props.range) {
         const time = new Date(formatDate).getTime();
 
-        if (selectedDate[caseStartEnd]) {
-          if (time >= startTime && time <= endTime) {
-            if (props.end === false && time >= startTime) {
-              objData.type = 'date-range';
-            } else if (props.end && time <= endTime) {
-              objData.type = 'date-range';
-            }
-          }
+        // 시작일과 종료일이 모두 선택된 경우에만 범위 표시
+        if (startDate.value && endDate.value) {
+          const startTime = new Date(startDate.value).getTime();
+          const endTime = new Date(endDate.value).getTime();
+          const minTime = Math.min(startTime, endTime);
+          const maxTime = Math.max(startTime, endTime);
 
-          // 시작일과 종료일 기준으로 선택 할 수 없도록 처리
-          if (props.end && selectedDate[caseStartEnd] && time < startTime) {
+          if (time >= minTime && time <= maxTime) {
+            objData.type = 'date-range';
+          }
+        }
+
+        // 종료일 선택 시 시작일이 없어도 선택 가능하도록 제한 완화
+        if (props.end && startDate.value) {
+          const startTime = new Date(startDate.value).getTime();
+          if (time < startTime) {
             objData.type = 'disabled';
-          } else if (props.end === false && selectedDate[caseStartEnd] && time > endTime) {
+          }
+        } else if (props.end === false && endDate.value) {
+          const endTime = new Date(endDate.value).getTime();
+          if (time > endTime) {
             objData.type = 'disabled';
           }
         }
@@ -131,14 +135,8 @@ const selectedDay = (tr: number, td: number): void => {
     setSelected(caseStartEnd, date);
 
     if (props.end) {
-      const startTime = new Date(startDate.value).getTime();
-      const endTime = new Date(selectedDate[caseStartEnd]).getTime();
-
-      if (endTime >= startTime) {
-        setEndDate(selectedDate[caseStartEnd]);
-      } else {
-        setSelected(caseStartEnd, endDate.value);
-      }
+      // 종료일 선택 시 시작일이 없어도 선택 가능
+      setEndDate(selectedDate[caseStartEnd]);
     } else {
       setStartDate(selectedDate[caseStartEnd]);
     }
@@ -359,3 +357,7 @@ defineExpose({
 <style scoped lang="scss">
 @use './style';
 </style>
+
+<script lang="ts">
+export default { name: 'Calendar' };
+</script>

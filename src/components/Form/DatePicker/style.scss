@@ -2,7 +2,7 @@
 /* @/components/Form/DatePicker/_style.scss */
 
 @use 'sass:map';
-@use '../../styles' as _;
+@use '../../../assets/styles/components' as _;
 @use '../../common';
 @use '../common.scss' as form;
 
@@ -196,7 +196,7 @@ $_button-colors: _.getButtonColors();
       }
 
       &::placeholder {
-        font-size: var(--form-input-font-size);
+        font-size: var(--form-input-font-size, 0.875rem);
         font-weight: 400;
         color: _.$text-placeholder;
       }

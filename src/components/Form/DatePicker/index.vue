@@ -209,8 +209,11 @@ const selectedDateView = computed<string>(() => {
     return selectedError.value;
   }
 
-  if (startDate.value !== '' && endDate.value !== '') {
-    return `${startDate.value} ~ ${endDate.value}`;
+  // 시작일과 종료일 중 하나라도 선택된 경우 표시
+  if (startDate.value !== '' || endDate.value !== '') {
+    const start = startDate.value || '선택 안됨';
+    const end = endDate.value || '선택 안됨';
+    return `${start} ~ ${end}`;
   }
 
   return '';
@@ -401,7 +404,7 @@ const cancel = (): void => {
  * 적용 버튼 클릭
  */
 const accept = (): void => {
-  if (props.range && (!startDate.value || !endDate.value)) {
+  if (props.range && !startDate.value && !endDate.value) {
     setErrorMsg();
     return;
   }
@@ -423,9 +426,9 @@ const accept = (): void => {
  * model update
  */
 const updateValue = (): void => {
-  // 종료 날짜가 시작 날짜보다 작지 않을 경우 데이터 적용
   if (props.range) {
-    if (startDate.value && endDate.value) {
+    // 시작일과 종료일 중 하나라도 선택된 경우 데이터 적용
+    if (startDate.value || endDate.value) {
       emit('update:modelValue', [startDate.value, endDate.value]);
     } else {
       setStartDate('');
@@ -605,13 +608,13 @@ const dateTermCheck = (isEnd: boolean): void => {
   toggleDateButton.value.forEach(item => (item.checked = false));
 
   nextTick(() => {
-    // 범위 선택 모드
+    // 범위 선택 모드 - 시작일과 종료일이 모두 선택된 경우에만 maxRange 검사
     if (props.maxRange && startDate.value && endDate.value) {
       const startTime: number = new Date(startDate.value).getTime();
       const endTime: number = new Date(endDate.value).getTime();
 
       // 선택 최대 기간이 설정된 경우 날짜를 계산하여 선택이 안되도록 처리
-      const term: number = (endTime - startTime) / (86400 * 1000) + 1;
+      const term: number = Math.abs(endTime - startTime) / (86400 * 1000) + 1;
 
       // 만약 기간이 초과 한다면 변수를 초기화 하고, 다시 랜더링 하지 않는다.
       if (props.maxRange < term) {

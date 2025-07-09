@@ -2,7 +2,7 @@
 /* @/components/DropMenu/_style.scss */
 @use 'sass:map';
 @use 'sass:meta';
-@use '../styles' as _;
+@use '../../assets/styles/components' as _;
 
 /// 컴포넌트 color 스타일 정의
 /// @output - .drop-menu.#{color-name} { ... }

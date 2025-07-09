@@ -5,7 +5,7 @@
 //================================================================================
 // Override
 //================================================================================
-@use '../../assets/styles/variables' as *;
+@use '../variables' as *;
 @forward './init' with (
   $primary: $primary-color,
   $secondary: $secondary-color,

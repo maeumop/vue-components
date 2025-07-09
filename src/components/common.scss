@@ -392,48 +392,6 @@ $spacings: (
   display: block !important;
 }
 
-.options-wrap {
-  display: flex;
-  justify-content: space-between;
-
-  label.input-label {
-    margin-bottom: 0.4rem;
-    font-size: 1.3rem;
-    font-weight: 400;
-    color: $gray-600;
-    line-height: 1.9rem;
-
-    .required {
-      color: $error-color;
-      font-weight: 400;
-    }
-  }
-}
-
-.feedback {
-  margin-top: 0.4rem;
-  font-size: 0.8em;
-  color: $error-color;
-
-  &.error {
-    animation: shaking 0.3s;
-  }
-}
-
-.description {
-  font-size: 0.75rem !important;
-  font-weight: normal;
-  padding: 0 !important;
-  margin-bottom: 0 !important;
-  border: 0 !important;
-  color: $error-color;
-  text-align: left !important;
-
-  &.error {
-    animation: shaking 0.3s;
-  }
-}
-
 .scrollbar {
   &::-webkit-scrollbar {
     width: 0.6rem;
@@ -453,19 +411,6 @@ $spacings: (
 //================================================================================
 // 애니메이션
 //================================================================================
-@keyframes shaking {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-5px);
-  }
-  75% {
-    transform: translateX(5px);
-  }
-}
-
 @keyframes spinner {
   from {
     transform: rotate(0deg);

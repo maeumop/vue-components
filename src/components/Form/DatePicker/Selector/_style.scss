@@ -3,7 +3,7 @@
 
 @use 'sass:map';
 @use 'sass:color';
-@use '../../../styles' as _;
+@use '../../../../assets/styles/components' as _;
 
 .selector-trigger {
   position: relative;

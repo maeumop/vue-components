@@ -41,26 +41,18 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.5rem;
-}
 
-// 공통 입력 라벨 스타일
-.input-label {
-  font-size: var(--form-label-font-size, 0.875rem);
-  font-weight: 500;
-  color: var(--form-label-color, #333);
-  margin: 0;
+  .input-label {
+    font-size: var(--form-label-font-size, 0.875rem);
+    font-weight: 500;
+    color: var(--form-label-color, #333);
+    margin: 0;
 
-  .required {
-    color: #dc3545;
-    margin-left: 0.25rem;
+    .required {
+      color: #dc3545;
+      margin-left: 0.25rem;
+    }
   }
-}
-
-// 모든 Form 컴포넌트의 label에 적용되는 공통 스타일
-label {
-  font-size: var(--form-label-font-size, 0.875rem);
-  font-weight: var(--form-label-font-weight, 400);
-  color: var(--form-label-color, #333);
 }
 
 // 공통 에러 메시지 스타일 (feedback과 description 모두 지원)
@@ -77,13 +69,6 @@ label {
   &.error {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-// 공통 옵션 래퍼 내부 스타일
-.options-wrap {
-  .input-label {
-    cursor: pointer;
   }
 }
 
@@ -185,5 +170,18 @@ textarea {
     background-color: #f8f9fa;
     color: #6c757d;
     cursor: not-allowed;
+  }
+}
+
+@keyframes shaking {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
   }
 }

@@ -25,35 +25,30 @@
       text: #08afdd,
       disabled: color.change($info, $lightness: 65%),
     ),
-
     success: (
       hover: color.change($success, $lightness: 40%),
       default: $success,
       text: color.change($success, $lightness: 35%),
       disabled: color.change($success, $lightness: 70%),
     ),
-
     warning: (
       hover: #f29e02,
       default: color.change($warning, $lightness: 50%),
       text: #f29e02,
       disabled: color.change($warning, $lightness: 70%),
     ),
-
     error: (
       hover: color.change($danger, $lightness: 45%),
       default: $danger,
       text: color.change($danger, $lightness: 45%),
       disabled: color.change($danger, $lightness: 70%),
     ),
-
     light: (
       hover: color.change($gray-100, $lightness: -5%),
       default: $gray-100,
       text: $gray-600,
       disabled: color.change($gray-100, $lightness: 20%),
     ),
-
     dark: (
       hover: color.change($gray-900, $lightness: 10%),
       default: $gray-900,

@@ -203,3 +203,7 @@ const getAriaLabel = (action: 'year' | 'month', direction: 'prev' | 'next'): str
 <style scoped lang="scss">
 @use './style';
 </style>
+
+<script lang="ts">
+export default { name: 'DateController' };
+</script>

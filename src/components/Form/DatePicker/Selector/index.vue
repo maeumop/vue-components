@@ -283,3 +283,7 @@ onUnmounted(() => {
 <style scoped lang="scss">
 @use './style';
 </style>
+
+<script lang="ts">
+export default { name: 'Selector' };
+</script>

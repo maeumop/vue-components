@@ -1,8 +1,8 @@
 @charset "UTF-8";
 /* @/components/Tooltip/_style.scss */
 @use 'sass:color';
-@use '../styles' as _;
 @use '../../assets/styles/variables' as *;
+@use '../../assets/styles/components' as _;
 
 // 툴팁 컨테이너
 .tooltip-container {

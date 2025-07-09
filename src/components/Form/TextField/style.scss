@@ -1,14 +1,8 @@
-@use '@/components/styles/index.scss' as *;
+@use '@/assets/styles/components' as *;
 @use '../common.scss' as form;
 
 .input-wrap {
   display: inline-block;
-  width: 100%;
-  max-width: 300px;
-
-  &.block {
-    max-width: none;
-  }
 }
 
 .counting {
