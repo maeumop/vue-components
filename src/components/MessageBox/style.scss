@@ -2,8 +2,8 @@
 /* @/components/MessageBox/_style.scss */
 @use 'sass:map';
 @use 'sass:color';
-@use '../../assets/styles/variables' as vars;
-@use '../../assets/styles/components' as _;
+@use '@/assets/styles/variables' as vars;
+@use '@/assets/styles/components' as _;
 
 .msg-box-fade-enter-from,
 .msg-box-fade-leave-to {
