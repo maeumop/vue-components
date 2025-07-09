@@ -90,11 +90,12 @@ const childBlur = (): void => {
   check();
 };
 
-const validateForm = inject<ValidateFormInjection>(VALIDATE_FORM_KEY);
+const validateForm = inject<ValidateFormInjection | null>(VALIDATE_FORM_KEY, null);
 const instance = getCurrentInstance();
 
 onMounted(() => {
-  if (validateForm && instance) {
+  // validateForm이 제공되지 않은 경우에도 컴포넌트가 정상 작동하도록 처리
+  if (validateForm !== null && instance) {
     validateForm.addComponent(instance.vnode);
   }
 });

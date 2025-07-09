@@ -8,4 +8,4 @@ export const validateExplorKey = {
 } as const;
 
 // inject 키 상수
-export const VALIDATE_FORM_KEY = Symbol('validateForm') as InjectionKey<ValidateFormInjection>;
+export const VALIDATE_FORM_KEY: InjectionKey<ValidateFormInjection> = Symbol('validateForm');

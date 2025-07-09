@@ -277,11 +277,11 @@ const resetForm = (): void => {
   val.value = props.type === 'radio' ? '' : [];
 };
 
-const validateForm = inject<ValidateFormInjection>(VALIDATE_FORM_KEY);
+const validateForm = inject<ValidateFormInjection | null>(VALIDATE_FORM_KEY, null);
 const instance = getCurrentInstance();
 
 onMounted(() => {
-  if (validateForm && instance) {
+  if (validateForm !== null && instance) {
     validateForm.addComponent(instance.vnode);
   }
 });

@@ -20,6 +20,26 @@ $gray-800: #1f2937;
 $gray-900: #111827;
 $black: #000000;
 
+// 컴포넌트 전용 색상 (기존 _init.scss에서 통합)
+$primary: $primary-color;
+$secondary: $secondary-color;
+$accent: $info-color;
+$info: $info-color;
+$success: $success-color;
+$warning: $warning-color;
+$danger: $error-color;
+
+// 텍스트 색상
+$text-default: $gray-900;
+$text-placeholder: $gray-500;
+$text-disabled: $gray-400;
+
+// 스크롤바 색상
+$scrollbar-color: (
+  'thumb': $gray-400,
+  'track': $gray-100,
+);
+
 // 폰트 변수
 $font-family-base:
   'Inter',
