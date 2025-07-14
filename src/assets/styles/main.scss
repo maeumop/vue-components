@@ -2,15 +2,6 @@
 @use 'variables' as *;
 @use 'utilities';
 
-// Form 컴포넌트 공통 CSS 변수
-:root {
-  --form-label-font-size: 0.875rem;
-  --form-label-font-weight: 400;
-  --form-label-color: #333;
-  --form-input-font-size: 0.875rem;
-  --form-feedback-font-size: 0.7rem;
-}
-
 // 전역 스타일 리셋
 * {
   margin: 0;

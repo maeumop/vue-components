@@ -4,7 +4,7 @@
 @use 'sass:color';
 @use '@/assets/styles/components' as _;
 @use '../../common';
-@use '../common.scss' as form-common;
+@use '../common' as form-common;
 
 .check-button {
   .origin-check-button {
@@ -127,18 +127,5 @@
     display: block !important;
     width: 100%;
     margin-top: 0.5rem;
-  }
-
-  // description 스타일은 공통 스타일에서 상속
-
-  // transition
-  .check-scale-enter-from,
-  .check-scale-leave-to {
-    opacity: 0;
-    transform: scale(1.2);
-  }
-  .check-scale-enter-active,
-  .check-scale-leave-active {
-    transition: all 0.1s ease;
   }
 }

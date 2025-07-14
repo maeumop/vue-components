@@ -1,16 +1,14 @@
 @use '@/assets/styles/components' as *;
-@use '../common.scss' as form;
+@use '../common' as form-common;
 
 .input-wrap {
   display: inline-block;
 }
 
 .counting {
-  font-size: var(--form-feedback-font-size, 0.5rem);
+  font-size: form-common.$form-feedback-font-size;
   color: #6c757d;
 }
-
-// textarea 스타일은 공통 스타일에서 상속
 
 .with-slot {
   position: relative;
@@ -29,7 +27,7 @@ input {
   padding: 0.75rem;
   border: 1px solid #e9ecef;
   border-radius: 0.375rem;
-  font-size: var(--form-input-font-size, 0.875rem);
+  font-size: form-common.$form-input-font-size;
   line-height: 1.5;
   color: #333;
   background-color: #fff;
@@ -119,5 +117,3 @@ input {
     color: #667eea;
   }
 }
-
-// feedback 스타일은 공통 스타일에서 상속
