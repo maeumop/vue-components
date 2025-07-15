@@ -13,7 +13,6 @@ import {
 import type { TabsEmits, TabsProps } from './types.d';
 
 const props = withDefaults(defineProps<TabsProps>(), {
-  inBox: false,
   activeTab: 0,
   variant: 'default',
   transition: 'slide',
@@ -111,7 +110,7 @@ const setIndex = (index: number): void => {
         </li>
       </ul>
     </div>
-    <div :class="['tab-contents', props.inBox && 'in-box']">
+    <div class="tab-contents">
       <div ref="transitionWrapper" class="transition-wrapper">
         <Transition :name="currentTransition" mode="out-in">
           <div :key="`tab-content-${active}`" class="tab-panel">

@@ -5,7 +5,6 @@ export type TabsTransition = (typeof tabsTransition)[keyof typeof tabsTransition
 
 export interface TabsProps {
   tabItems: string[];
-  inBox?: boolean;
   activeTab?: number;
   disabled?: boolean[];
   variant?: TabsVariant;

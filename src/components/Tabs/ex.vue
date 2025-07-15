@@ -429,14 +429,7 @@ const toggleDisabled = (index: number): void => {
 
 .tab-content {
   padding: 1rem;
-  background: white;
-  border-radius: 0 0 6px 6px;
-  border: 1px solid #e9ecef;
-  border-top: none !important;
-
-  &.none-border {
-    border: none !important;
-  }
+  background: transparent;
 
   h3 {
     margin: 0 0 1rem 0;

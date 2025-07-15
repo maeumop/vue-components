@@ -116,14 +116,10 @@
 
   .tab-contents {
     width: 100%;
-    &.in-box {
-      padding: 1rem;
-      border-width: 0 0.1rem 0.1rem 0.1rem;
-      border-style: solid;
-      border-color: vars.$gray-300;
-      border-radius: 0 0 0.4rem 0.4rem;
-      background: vars.$white;
-    }
+    padding: 1rem;
+    border: 1px solid vars.$gray-200;
+    border-radius: 0 0 0.4rem 0.4rem;
+    background: vars.$white;
   }
 }
 
