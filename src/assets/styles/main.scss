@@ -75,3 +75,53 @@ select {
     padding: 0 $spacing-xl;
   }
 }
+
+/* 앞으로 가기 트랜지션 (기본) */
+.page-fade-forward-enter-active,
+.page-fade-forward-leave-active {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.page-fade-forward-enter-from {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.page-fade-forward-leave-to {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+.page-fade-forward-enter-to,
+.page-fade-forward-leave-from {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* 뒤로 가기 트랜지션 */
+.page-fade-backward-enter-active,
+.page-fade-backward-leave-active {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.page-fade-backward-enter-from {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+.page-fade-backward-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.page-fade-backward-enter-to,
+.page-fade-backward-leave-from {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* 페이지 컨테이너 스타일 */
+.page-container {
+  min-height: 100vh;
+  padding: 20px;
+}

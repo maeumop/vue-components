@@ -13,7 +13,7 @@ const showBasicSuccess = (): void => {
 };
 
 const showBasicError = (): void => {
-  toast('기본 오류 메시지입니다.');
+  toast({ color: 'error', message: '기본 오류 메시지입니다.' });
 };
 
 // 상태별 토스트 메시지들

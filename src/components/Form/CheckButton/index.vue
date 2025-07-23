@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, getCurrentInstance, inject, nextTick, onMounted, ref, watch } from 'vue';
-import type { RuleFunc } from '../../types';
 import { VALIDATE_FORM_KEY } from '../ValidateForm/const';
 import { ValidateFormInjection } from '../ValidateForm/types';
 import { checkButtonColor, checkButtonIcons, checkButtonType } from './const';
@@ -10,8 +9,8 @@ const props = withDefaults(defineProps<CheckButtonProps>(), {
   type: 'checkbox',
   all: false,
   maxLength: 0,
-  items: (): CheckButtonItem[] => [],
-  validate: (): RuleFunc[] => [],
+  items: () => [],
+  validate: () => [],
   button: false,
   block: false,
   color: checkButtonColor.primary,
@@ -21,9 +20,9 @@ const props = withDefaults(defineProps<CheckButtonProps>(), {
 const emit = defineEmits<CheckButtonEmits>();
 
 const list = ref<CheckButtonItem[]>([]);
-const val = ref<string | string[]>(props.type === checkButtonType.radio ? '' : []);
-const isValidate = ref<boolean>(true);
-const checkPass = ref<boolean>(false);
+const val = ref<string | string[]>(
+  props.modelValue ?? (props.type === checkButtonType.radio ? '' : []),
+);
 const message = ref<string>('');
 const errorTransition = ref<boolean>(false);
 
@@ -70,18 +69,16 @@ const processedItems = computed<CheckButtonItem[]>(() => {
   return items;
 });
 
-// 초기값 설정
-const initializeValue = (): void => {
-  if (props.modelValue) {
-    val.value = props.modelValue;
-  } else {
-    val.value = props.type === checkButtonType.radio ? '' : [];
-  }
-};
+const feedbackStatus = computed(() => {
+  return ['description', { error: errorTransition.value }];
+});
 
-// 컴포넌트 마운트 시 초기화
-onMounted(() => {
-  initializeValue();
+const checkButtonStyleClass = computed(() => {
+  if (props.button) {
+    return ['check-button-group', props.color, { disabled: props.disabled }];
+  }
+
+  return ['origin-check-button', { block: props.block }];
 });
 
 // props.items 변경 시 list 업데이트
@@ -99,13 +96,9 @@ watch(
     // 임의로 지정된 에러가 있는 경우 에러 아이콘 표기
     if (v) {
       message.value = v;
-      isValidate.value = false;
-      checkPass.value = false;
       errorTransition.value = true;
     } else {
       message.value = '';
-      isValidate.value = true;
-      checkPass.value = true;
       errorTransition.value = false;
     }
   },
@@ -216,10 +209,9 @@ const check = (silence: boolean = false): boolean => {
   if (props.errorMessage) {
     if (!silence) {
       message.value = props.errorMessage;
-      isValidate.value = false;
-      checkPass.value = false;
       errorTransition.value = true;
     }
+
     return false;
   }
 
@@ -227,10 +219,9 @@ const check = (silence: boolean = false): boolean => {
   if (!props.validate.length) {
     if (!silence) {
       message.value = '';
-      isValidate.value = true;
-      checkPass.value = true;
       errorTransition.value = false;
     }
+
     return true;
   }
 
@@ -251,8 +242,6 @@ const check = (silence: boolean = false): boolean => {
     if (typeof result !== 'boolean') {
       if (!silence) {
         message.value = result;
-        isValidate.value = false;
-        checkPass.value = false;
         errorTransition.value = true;
       }
       return false;
@@ -260,15 +249,11 @@ const check = (silence: boolean = false): boolean => {
   }
 
   message.value = '';
-  isValidate.value = true;
-  checkPass.value = true;
   errorTransition.value = false;
   return true;
 };
 
 const resetValidate = (): void => {
-  isValidate.value = true;
-  checkPass.value = true;
   message.value = '';
   errorTransition.value = false;
 };
@@ -280,6 +265,7 @@ const resetForm = (): void => {
 const validateForm = inject<ValidateFormInjection | null>(VALIDATE_FORM_KEY, null);
 const instance = getCurrentInstance();
 
+// 컴포넌트 마운트 시 초기화
 onMounted(() => {
   if (validateForm !== null && instance) {
     validateForm.addComponent(instance.vnode);
@@ -303,7 +289,7 @@ defineExpose({
     </div>
 
     <template v-if="button">
-      <div :class="['check-button-group', props.color, { disabled: props.disabled }]">
+      <div :class="checkButtonStyleClass">
         <template :key="`keyword${i}`" v-for="({ text, value }, i) in list">
           <input
             type="checkbox"
@@ -323,7 +309,7 @@ defineExpose({
     </template>
     <template v-else>
       <template :key="`check-button-${i}`" v-for="({ text, value }, i) in list">
-        <div :class="['origin-check-button', { block: props.block }]">
+        <div :class="checkButtonStyleClass">
           <label :class="props.color" :for="`${name}${i}`">
             <input
               :type="props.type"
@@ -361,7 +347,7 @@ defineExpose({
       </template>
     </template>
 
-    <div :class="['description', { error: errorTransition }]" v-show="message">
+    <div :class="feedbackStatus" v-show="message">
       {{ message }}
     </div>
   </div>

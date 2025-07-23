@@ -33,7 +33,7 @@ const show = (): void => {
 
   // 표시 시간이 지나면 자동으로 메시지 삭제
   const timeoutId = setTimeout((): void => {
-    hideByKey(currentKey);
+    // hideByKey(currentKey);
   }, props.delay);
 
   timeoutMap.value.set(currentKey, timeoutId);
