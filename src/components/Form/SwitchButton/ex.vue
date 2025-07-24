@@ -5,8 +5,6 @@ import SwitchButton from './index.vue';
 
 // 기본
 const basic = ref(false);
-// 색상
-const color = ref(true);
 // 체크박스
 const checkbox = ref(false);
 // 유효성
@@ -54,17 +52,6 @@ const colorDark = ref(false);
             <div class="example-item">
               <SwitchButton v-model="basic" />
               <span class="example-label">기본</span>
-            </div>
-          </div>
-        </section>
-
-        <!-- 색상/라벨 -->
-        <section class="example-section">
-          <h2>색상/라벨</h2>
-          <div class="example-grid">
-            <div class="example-item">
-              <SwitchButton v-model="color" :label="['OFF', 'ON']" color="secondary" />
-              <span class="example-label">secondary, 라벨</span>
             </div>
           </div>
         </section>

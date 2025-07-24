@@ -19,7 +19,6 @@ const props = withDefaults(defineProps<TextFieldProps>(), {
 
 const emit = defineEmits<TextFieldEmits>();
 
-const isValidate = ref<boolean>(true);
 const message = ref<string>('');
 const errorTransition = ref<boolean>(false);
 const Textarea = ref<HTMLTextAreaElement>();
@@ -30,11 +29,9 @@ watch(
   v => {
     if (v) {
       message.value = v;
-      isValidate.value = false;
       errorTransition.value = true;
     } else {
       message.value = '';
-      isValidate.value = true;
       errorTransition.value = false;
     }
   },
@@ -70,14 +67,6 @@ watch(
   },
 );
 
-watch(errorTransition, v => {
-  if (v) {
-    setTimeout(() => {
-      errorTransition.value = false;
-    }, 300);
-  }
-});
-
 const wrapperStyle = computed<StyleValue>(() => [
   'input-wrap',
   {
@@ -85,13 +74,23 @@ const wrapperStyle = computed<StyleValue>(() => [
   },
 ]);
 
-const inputStyleClass = computed<StyleValue>(() => [
-  {
-    error: message.value,
-    'left-space': props.icon && props.iconLeft,
-    'right-space': props.icon && !props.iconLeft,
-  },
-]);
+const inputStyleClass = computed<StyleValue>(() => {
+  if (props.multiline) {
+    return [{ error: message.value }];
+  }
+
+  return [
+    {
+      error: message.value,
+      'left-space': props.icon && props.iconLeft,
+      'right-space': props.icon && !props.iconLeft,
+    },
+  ];
+});
+
+const feedbackStatus = computed(() => {
+  return ['description', { error: errorTransition.value }];
+});
 
 const updateValue = (evt: Event): void => {
   const target = evt.target as HTMLInputElement | HTMLTextAreaElement;
@@ -137,7 +136,6 @@ const check = (silence?: boolean): boolean => {
       if (regExp && !regExp.test(checkValue)) {
         if (!silence) {
           message.value = errMsg ?? '형식이 일치하지 않습니다.';
-          isValidate.value = false;
           errorTransition.value = true;
         }
         return false;
@@ -152,7 +150,6 @@ const check = (silence?: boolean): boolean => {
         if (typeof result === 'string') {
           if (!silence) {
             message.value = result;
-            isValidate.value = false;
             errorTransition.value = true;
           }
 
@@ -163,7 +160,6 @@ const check = (silence?: boolean): boolean => {
       }
     }
 
-    isValidate.value = true;
     return true;
   }
 
@@ -176,8 +172,6 @@ const resetForm = (): void => {
 };
 
 const resetValidate = (): void => {
-  console.log('resetValidate', props.modelValue);
-  isValidate.value = true;
   if (!props.errorMessage) {
     message.value = '';
     errorTransition.value = false;
@@ -224,7 +218,7 @@ defineExpose({
     <template v-if="props.multiline">
       <textarea
         ref="Textarea"
-        :class="{ error: message }"
+        :class="inputStyleClass"
         :style="[{ height: props.height }]"
         :rows="props.rows"
         :placeholder="props.placeholder"
@@ -291,7 +285,11 @@ defineExpose({
       </div>
     </template>
 
-    <div :class="['feedback', { error: errorTransition }]" v-show="message && !props.hideMessage">
+    <div
+      :class="feedbackStatus"
+      v-show="message && !props.hideMessage"
+      v-on:animationend="errorTransition = false"
+    >
       {{ message }}
     </div>
   </div>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { getCurrentInstance, inject, nextTick, onMounted, ref, watch } from 'vue';
+import { computed, getCurrentInstance, inject, nextTick, onMounted, ref, watch } from 'vue';
 import { VALIDATE_FORM_KEY } from '../ValidateForm/const';
 import { ValidateFormInjection } from '../ValidateForm/types';
 import { switchButtonColor } from './const';
@@ -16,13 +16,15 @@ const props = withDefaults(defineProps<SwitchButtonProps>(), {
 
 const emit = defineEmits<SwitchButtonEmits>();
 
-const onError = ref<boolean>(false);
 const errorTransition = ref<boolean>(false);
 const message = ref<string>('');
-const isValidate = ref<boolean>(true);
 
 // 고유 id 생성 (접근성)
 const inputId = `switch-btn-${Math.random().toString(36).slice(2, 10)}`;
+
+const feedbackStatus = computed(() => {
+  return ['description', { error: errorTransition.value }];
+});
 
 watch(
   () => props.modelValue,
@@ -48,47 +50,47 @@ watch(errorTransition, v => {
 const check = (silence: boolean = false): boolean => {
   if (props.validate !== undefined) {
     let valid = true;
+
     if (typeof props.validate === 'function') {
       const result = (props.validate as (value: unknown) => boolean | string)(props.modelValue);
+
       if (typeof result === 'string') {
         valid = false;
+
         if (!silence) {
           message.value = result;
-          onError.value = true;
-          isValidate.value = false;
           errorTransition.value = true;
         }
       } else if (result === false) {
         valid = false;
+
         if (!silence) {
           message.value = `${props.label[1]}을(를) 선택해주세요.`;
-          onError.value = true;
-          isValidate.value = false;
           errorTransition.value = true;
         }
       }
     } else if (props.modelValue !== props.trueValue) {
       valid = false;
+
       if (!silence) {
         message.value =
           typeof props.validate === 'string'
             ? props.validate
             : `${props.label[1]}을(를) 선택해주세요.`;
-        onError.value = true;
-        isValidate.value = false;
         errorTransition.value = true;
       }
     }
+
     if (valid) {
       // 검증 성공 시 에러 상태 초기화
       message.value = '';
-      onError.value = false;
-      isValidate.value = true;
       errorTransition.value = false;
       return true;
     }
+
     return false;
   }
+
   return true;
 };
 
@@ -105,9 +107,6 @@ const resetForm = (): void => {
  */
 const resetValidate = (): void => {
   message.value = '';
-  onError.value = false;
-  isValidate.value = true;
-  // errorTransition은 CSS 애니메이션이 완료된 후 자동으로 처리됨
 };
 
 /**
@@ -178,7 +177,7 @@ defineExpose({
       </Transition>
     </label>
 
-    <div :class="['description', { error: errorTransition }]" v-show="message">
+    <div :class="feedbackStatus" v-show="message">
       {{ message }}
     </div>
   </div>

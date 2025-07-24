@@ -37,11 +37,8 @@ const eventComputing = computed(() => {
   return events;
 });
 
-const isValidate = ref<boolean>(true);
-const checkPass = ref<boolean>(false);
 const message = ref<string>('');
 const errorTransition = ref<boolean>(false);
-
 const Input = ref<HTMLInputElement>();
 
 watch(
@@ -50,7 +47,6 @@ watch(
     // 임의로 지정된 에러가 있는 경우 에러 아이콘 표기
     if (v !== '') {
       message.value = v;
-      isValidate.value = false;
       errorTransition.value = true;
     } else {
       resetValidate();
@@ -83,14 +79,6 @@ watch(
   },
 );
 
-watch(errorTransition, v => {
-  if (v) {
-    setTimeout(() => {
-      errorTransition.value = false;
-    }, 300);
-  }
-});
-
 const wrapperStyle = computed<StyleValue>(() => [
   'input-wrap',
   {
@@ -98,6 +86,10 @@ const wrapperStyle = computed<StyleValue>(() => [
     block: props.block,
   },
 ]);
+
+const feedbackStatus = computed(() => {
+  return ['description', { error: errorTransition.value }];
+});
 
 /**
  * 입력 폼이 focus, blur 됐을때 해당 값을 체크 하여 값을 비우거나 0으로 채워 준다.
@@ -170,14 +162,11 @@ const check = (silence: boolean = false): boolean => {
     // validate check
     if (props.validate.length) {
       for (const validateFunc of props.validate) {
-        console.log('props.modelValue', props.modelValue);
-        const result: string | boolean = validateFunc(props.modelValue);
+        const result = validateFunc(props.modelValue);
 
         if (typeof result === 'string') {
           if (!silence) {
             message.value = result;
-            isValidate.value = false;
-            checkPass.value = false;
             errorTransition.value = true;
           }
 
@@ -187,9 +176,6 @@ const check = (silence: boolean = false): boolean => {
         }
       }
     }
-
-    isValidate.value = true;
-    checkPass.value = true;
 
     return true;
   }
@@ -209,7 +195,6 @@ const resetForm = (): void => {
 
 const resetValidate = (): void => {
   message.value = '';
-  isValidate.value = true;
   errorTransition.value = false;
 };
 
@@ -262,7 +247,11 @@ defineExpose({
       @input="updateValue"
     />
 
-    <div :class="['feedback', { error: errorTransition }]" v-show="message && !props.hideMessage">
+    <div
+      :class="feedbackStatus"
+      v-show="message && !props.hideMessage"
+      v-on:animationend="errorTransition = false"
+    >
       {{ message }}
     </div>
   </div>
