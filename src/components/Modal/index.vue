@@ -97,6 +97,7 @@ const dispose = (): void => {
   document.body.classList.remove('no-scroll');
 
   emit('update:modelValue', false);
+  props.closed?.();
 };
 
 /**

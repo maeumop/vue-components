@@ -9,7 +9,7 @@ export interface ValidateFormModel {
 
 export type ValidateExplorKey = (typeof ValidateExplorKey)[keyof typeof ValidateExplorKey];
 
-interface ValidatableComponent {
+export interface ValidatableComponent {
   check(silence?: boolean): boolean;
   resetForm(): void;
   resetValidate(): void;

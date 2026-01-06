@@ -42,6 +42,7 @@ const show = (): void => {
   // 최대 개수 제한
   if (toastItems.value.length > props.maxShowMessage) {
     const firstItem = toastItems.value[0];
+
     if (firstItem) {
       hideByKey(firstItem.key);
     }
@@ -82,9 +83,11 @@ const hideByKey = (messageKey: number): void => {
   // 애니메이션 완료 후 리스트에서 제거
   setTimeout((): void => {
     const index = toastItems.value.findIndex(item => item.key === messageKey);
+
     if (index !== -1) {
       toastItems.value.splice(index, 1);
     }
+
     animatingKeys.value.delete(messageKey);
   }, 300); // CSS 애니메이션 시간과 동일
 };
@@ -138,7 +141,7 @@ defineExpose({
 </script>
 
 <template>
-  <div class="toast-bg" role="region" aria-label="알림 메시지">
+  <div class="toast-bg">
     <TransitionGroup name="toast-view">
       <div
         :key="`toast-${item.key}`"
@@ -151,12 +154,9 @@ defineExpose({
         @keydown.enter="hide(i)"
         @keydown.space="hide(i)"
         :tabindex="0"
-        role="alert"
-        :aria-live="item.color === 'error' ? 'assertive' : 'polite'"
-        :aria-label="`${item.color} 알림: ${item.message}`"
         v-for="(item, i) in toastItems"
       >
-        <Icon :icon="item.icon" class="icon" v-if="item.icon" aria-hidden="true" />
+        <Icon :icon="item.icon" class="icon" v-if="item.icon" />
         <span class="message" v-html="item.message"></span>
       </div>
     </TransitionGroup>

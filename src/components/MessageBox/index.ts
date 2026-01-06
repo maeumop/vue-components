@@ -79,7 +79,7 @@ export const install = (app: App, options: MessageBoxPluginOptions = {}): void =
   app.config.globalProperties.$messageBox = messageBox;
 
   // provide/inject를 위한 provide
-  app.provide('messageBox', messageBox);
+  app.provide('MessageBox', messageBox);
 };
 
 // 타입 선언을 위한 모듈 확장

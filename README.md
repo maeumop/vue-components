@@ -17,38 +17,38 @@ Vue 3 + TypeScript + SCSS + ESLint + Prettier + Pinia로 구성된 컴포넌트 
 
 ```bash
 # 의존성 설치
-npm install
+pnpm install
 
 # 개발 서버 실행
-npm run dev
+pnpm run dev
 
 # 빌드
-npm run build
+pnpm run build
 
 # 미리보기
-npm run preview
+pnpm run preview
 ```
 
 ## 🛠️ 개발 도구
 
 ```bash
 # 린트 검사 및 수정
-npm run lint
+pnpm run lint
 
 # 린트 검사만 (수정하지 않음)
-npm run lint:check
+pnpm run lint:check
 
 # 코드 포맷팅
-npm run format
+pnpm run format
 
 # 포맷팅 검사만 (수정하지 않음)
-npm run format:check
+pnpm run format:check
 
 # 린트 + 포맷팅 한번에 실행
-npm run fix
+pnpm run fix
 
 # 타입 체크
-npm run type-check
+pnpm run type-check
 ```
 
 ## 📁 프로젝트 구조
@@ -112,10 +112,10 @@ vue-components/
 
 ```bash
 # 프로덕션 빌드
-npm run build
+pnpm run build
 
 # 빌드 결과 미리보기
-npm run preview
+pnpm run preview
 ```
 
 ## �� 라이선스

@@ -26,6 +26,8 @@ export interface ModalProps {
   accessBack?: boolean;
   /** 전체 화면 모달 여부 */
   fullscreen?: boolean;
+  /** 모달이 완전히 닫히고 나서 실행되는 callback */
+  closed?: () => void;
 }
 
 export interface ModalEmits {

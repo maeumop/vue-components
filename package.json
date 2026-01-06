@@ -13,8 +13,9 @@
     "lint:check": "eslint .",
     "format": "prettier --write src/",
     "format:check": "prettier --check src/",
-    "fix": "npm run lint && npm run format"
+    "fix": "pnpm run lint && pnpm run format"
   },
+  "packageManager": "pnpm@9.0.0",
   "dependencies": {
     "@iconify/vue": "^5.0.0",
     "pinia": "^3.0.1",
